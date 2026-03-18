@@ -12,7 +12,7 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { useTranslation } from "@/lib/i18n"
-import type { SocialPost } from "@/lib/types"
+import type { SocialPost, Thumbnail } from "@/lib/types"
 import { SOCIAL_PLATFORMS } from "../constants"
 import { SocialSimulator } from "./SocialSimulator"
 
@@ -27,6 +27,8 @@ interface SocialStepProps {
     onContinue: () => void
     skillMapping: any
     setSkillMapping: (mapping: any) => void
+    thumbnails?: Thumbnail[]
+    videoTitle?: string
 }
 
 export function SocialStep({
@@ -40,6 +42,8 @@ export function SocialStep({
     onContinue,
     skillMapping,
     setSkillMapping,
+    thumbnails,
+    videoTitle,
 }: SocialStepProps) {
     const { toast } = useToast()
     const { t } = useTranslation()
@@ -141,6 +145,8 @@ export function SocialStep({
                     <SocialSimulator 
                         socialPosts={socialPosts}
                         selectedPlatforms={selectedPlatforms.length > 0 ? selectedPlatforms : socialPosts.map(p => p.platform)}
+                        thumbnailUrl={thumbnails?.find(t => t.selected)?.imageUrl}
+                        videoTitle={videoTitle}
                     />
                 </div>
             )}

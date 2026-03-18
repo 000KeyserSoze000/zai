@@ -394,6 +394,8 @@ export default function ContentStudioPage() {
             onContinue={() => setStep(5)}
             skillMapping={gen.skillMapping}
             setSkillMapping={gen.setSkillMapping}
+            thumbnails={gen.thumbnails}
+            videoTitle={gen.metadata?.titles[gen.metadata.selectedTitle || 0]}
           />
         )
       case 5:

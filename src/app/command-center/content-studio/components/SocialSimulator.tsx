@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import {
     Linkedin, Youtube, Instagram, Facebook, Twitter,
     Play, Heart, MessageCircle, Share2, Bookmark, Send,
@@ -44,8 +45,53 @@ const formatNumber = (num: number): string => {
     return num.toString()
 }
 
+// Thumbnail display component with platform-specific cropping
+function ThumbnailImage({ 
+    src, 
+    alt, 
+    aspectRatio,
+    className = "" 
+}: { 
+    src?: string
+    alt: string
+    aspectRatio: "landscape" | "square" | "portrait"
+    className?: string 
+}) {
+    if (!src) {
+        return (
+            <div className={`bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center ${className}`}>
+                <div className="text-center text-white p-4">
+                    <Play className="w-16 h-16 mx-auto mb-2 opacity-80" />
+                    <p className="font-bold text-lg">Miniature</p>
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div className={`relative overflow-hidden ${className}`}>
+            <img 
+                src={src} 
+                alt={alt}
+                className="absolute inset-0 w-full h-full object-cover"
+            />
+            {/* Video play overlay */}
+            <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                <div className="w-16 h-16 rounded-full bg-black/50 flex items-center justify-center">
+                    <Play className="w-8 h-8 text-white ml-1" />
+                </div>
+            </div>
+        </div>
+    )
+}
+
 // LinkedIn Preview
-function LinkedInPreview({ post, engagement }: { post: SocialPost, engagement: ReturnType<typeof simulateEngagement> }) {
+function LinkedInPreview({ post, engagement, thumbnailUrl, videoTitle }: { 
+    post: SocialPost, 
+    engagement: ReturnType<typeof simulateEngagement>,
+    thumbnailUrl?: string,
+    videoTitle?: string
+}) {
     return (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-md mx-auto">
             {/* Header */}
@@ -72,15 +118,13 @@ function LinkedInPreview({ post, engagement }: { post: SocialPost, engagement: R
                 ))}
             </div>
             
-            {/* Image placeholder */}
-            <div className="aspect-video bg-gradient-to-br from-orange-400 to-orange-600 relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center text-white">
-                        <Play className="w-16 h-16 mx-auto mb-2 opacity-80" />
-                        <p className="font-bold text-lg px-4">Vidéo YouTube</p>
-                    </div>
-                </div>
-            </div>
+            {/* Thumbnail - LinkedIn landscape format */}
+            <ThumbnailImage 
+                src={thumbnailUrl}
+                alt={videoTitle || "Video thumbnail"}
+                aspectRatio="landscape"
+                className="aspect-video w-full"
+            />
             
             {/* Engagement */}
             <div className="px-4 py-2 flex items-center justify-between text-xs text-gray-500 border-b">
@@ -115,7 +159,12 @@ function LinkedInPreview({ post, engagement }: { post: SocialPost, engagement: R
 }
 
 // Instagram Preview
-function InstagramPreview({ post, engagement }: { post: SocialPost, engagement: ReturnType<typeof simulateEngagement> }) {
+function InstagramPreview({ post, engagement, thumbnailUrl, videoTitle }: { 
+    post: SocialPost, 
+    engagement: ReturnType<typeof simulateEngagement>,
+    thumbnailUrl?: string,
+    videoTitle?: string
+}) {
     return (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-md mx-auto">
             {/* Header */}
@@ -132,15 +181,13 @@ function InstagramPreview({ post, engagement }: { post: SocialPost, engagement: 
                 <MoreHorizontal className="w-5 h-5" />
             </div>
             
-            {/* Image */}
-            <div className="aspect-square bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600 relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center text-white p-6">
-                        <ImageIcon className="w-16 h-16 mx-auto mb-3 opacity-80" />
-                        <p className="font-bold text-xl px-4 text-center leading-tight">{post.content.split('\n')[0]}</p>
-                    </div>
-                </div>
-            </div>
+            {/* Thumbnail - Instagram square format */}
+            <ThumbnailImage 
+                src={thumbnailUrl}
+                alt={videoTitle || "Instagram post"}
+                aspectRatio="square"
+                className="aspect-square w-full"
+            />
             
             {/* Actions */}
             <div className="p-3">
@@ -173,15 +220,31 @@ function InstagramPreview({ post, engagement }: { post: SocialPost, engagement: 
 }
 
 // TikTok Preview
-function TikTokPreview({ post, engagement }: { post: SocialPost, engagement: ReturnType<typeof simulateEngagement> }) {
+function TikTokPreview({ post, engagement, thumbnailUrl, videoTitle }: { 
+    post: SocialPost, 
+    engagement: ReturnType<typeof simulateEngagement>,
+    thumbnailUrl?: string,
+    videoTitle?: string
+}) {
     return (
         <div className="bg-black rounded-xl overflow-hidden max-w-sm mx-auto aspect-[9/16] relative">
-            {/* Video Background */}
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-800 to-black">
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <Play className="w-20 h-20 text-white opacity-30" />
+            {/* Thumbnail Background - TikTok portrait format */}
+            {thumbnailUrl ? (
+                <img 
+                    src={thumbnailUrl} 
+                    alt={videoTitle || "TikTok video"}
+                    className="absolute inset-0 w-full h-full object-cover"
+                />
+            ) : (
+                <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-800 to-black">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <Play className="w-20 h-20 text-white opacity-30" />
+                    </div>
                 </div>
-            </div>
+            )}
+            
+            {/* Overlay gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
             
             {/* Content */}
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
@@ -229,7 +292,12 @@ function TikTokPreview({ post, engagement }: { post: SocialPost, engagement: Ret
 }
 
 // X (Twitter) Preview
-function XPreview({ post, engagement }: { post: SocialPost, engagement: ReturnType<typeof simulateEngagement> }) {
+function XPreview({ post, engagement, thumbnailUrl, videoTitle }: { 
+    post: SocialPost, 
+    engagement: ReturnType<typeof simulateEngagement>,
+    thumbnailUrl?: string,
+    videoTitle?: string
+}) {
     return (
         <div className="bg-black rounded-xl p-4 max-w-md mx-auto border border-gray-800">
             {/* Header */}
@@ -246,6 +314,17 @@ function XPreview({ post, engagement }: { post: SocialPost, engagement: ReturnTy
             
             {/* Content */}
             <p className="text-white text-base mb-3 whitespace-pre-line">{post.content}</p>
+            
+            {/* Thumbnail - X landscape format */}
+            {thumbnailUrl && (
+                <div className="rounded-xl overflow-hidden mb-3 border border-gray-800">
+                    <img 
+                        src={thumbnailUrl} 
+                        alt={videoTitle || "X post image"}
+                        className="w-full aspect-video object-cover"
+                    />
+                </div>
+            )}
             
             {/* Hashtags */}
             <div className="flex flex-wrap gap-1 mb-3">
@@ -280,7 +359,12 @@ function XPreview({ post, engagement }: { post: SocialPost, engagement: ReturnTy
 }
 
 // YouTube Community Preview
-function YouTubePreview({ post, engagement }: { post: SocialPost, engagement: ReturnType<typeof simulateEngagement> }) {
+function YouTubePreview({ post, engagement, thumbnailUrl, videoTitle }: { 
+    post: SocialPost, 
+    engagement: ReturnType<typeof simulateEngagement>,
+    thumbnailUrl?: string,
+    videoTitle?: string
+}) {
     return (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-md mx-auto">
             {/* Header */}
@@ -300,16 +384,18 @@ function YouTubePreview({ post, engagement }: { post: SocialPost, engagement: Re
                 <p className="text-gray-800 text-sm">{post.content}</p>
             </div>
             
-            {/* Video thumbnail */}
-            <div className="aspect-video bg-gray-100 relative border-y">
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-500 to-red-700">
-                    <div className="w-16 h-16 rounded-full bg-black/30 flex items-center justify-center">
-                        <Play className="w-8 h-8 text-white ml-1" />
-                    </div>
-                </div>
-                <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1 rounded">
-                    12:34
-                </div>
+            {/* Video thumbnail - YouTube 16:9 format */}
+            <ThumbnailImage 
+                src={thumbnailUrl}
+                alt={videoTitle || "YouTube video"}
+                aspectRatio="landscape"
+                className="aspect-video w-full border-y"
+            />
+            
+            {/* Video title overlay */}
+            <div className="px-3 py-2 bg-gray-50 border-b">
+                <p className="text-sm font-medium text-gray-900">{videoTitle || "Nouvelle Vidéo"}</p>
+                <p className="text-xs text-gray-500">Votre Chaîne • 12:34</p>
             </div>
             
             {/* Engagement */}
@@ -331,7 +417,12 @@ function YouTubePreview({ post, engagement }: { post: SocialPost, engagement: Re
 }
 
 // Facebook Preview
-function FacebookPreview({ post, engagement }: { post: SocialPost, engagement: ReturnType<typeof simulateEngagement> }) {
+function FacebookPreview({ post, engagement, thumbnailUrl, videoTitle }: { 
+    post: SocialPost, 
+    engagement: ReturnType<typeof simulateEngagement>,
+    thumbnailUrl?: string,
+    videoTitle?: string
+}) {
     return (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-md mx-auto">
             {/* Header */}
@@ -358,15 +449,13 @@ function FacebookPreview({ post, engagement }: { post: SocialPost, engagement: R
                 <p className="text-gray-800 text-sm whitespace-pre-line">{post.content}</p>
             </div>
             
-            {/* Image */}
-            <div className="aspect-video bg-gradient-to-br from-blue-500 to-blue-700 relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center text-white">
-                        <Play className="w-12 h-12 mx-auto mb-2" />
-                        <p className="font-medium">Voir la vidéo</p>
-                    </div>
-                </div>
-            </div>
+            {/* Thumbnail - Facebook landscape format */}
+            <ThumbnailImage 
+                src={thumbnailUrl}
+                alt={videoTitle || "Facebook post"}
+                aspectRatio="landscape"
+                className="aspect-video w-full"
+            />
             
             {/* Engagement bar */}
             <div className="px-3 py-2 flex items-center justify-between text-xs text-gray-500 border-b">
@@ -400,7 +489,12 @@ function FacebookPreview({ post, engagement }: { post: SocialPost, engagement: R
 }
 
 // Threads Preview
-function ThreadsPreview({ post, engagement }: { post: SocialPost, engagement: ReturnType<typeof simulateEngagement> }) {
+function ThreadsPreview({ post, engagement, thumbnailUrl, videoTitle }: { 
+    post: SocialPost, 
+    engagement: ReturnType<typeof simulateEngagement>,
+    thumbnailUrl?: string,
+    videoTitle?: string
+}) {
     return (
         <div className="bg-black rounded-xl p-4 max-w-md mx-auto border border-gray-800">
             {/* Header */}
@@ -418,6 +512,17 @@ function ThreadsPreview({ post, engagement }: { post: SocialPost, engagement: Re
             
             {/* Content */}
             <p className="text-white text-sm mb-3 whitespace-pre-line">{post.content}</p>
+            
+            {/* Thumbnail - Threads supports images */}
+            {thumbnailUrl && (
+                <div className="rounded-xl overflow-hidden mb-3 border border-gray-800">
+                    <img 
+                        src={thumbnailUrl} 
+                        alt={videoTitle || "Threads post"}
+                        className="w-full aspect-[4/5] object-cover"
+                    />
+                </div>
+            )}
             
             {/* Hashtags */}
             <div className="flex flex-wrap gap-1 mb-3">
@@ -451,7 +556,12 @@ function ThreadsPreview({ post, engagement }: { post: SocialPost, engagement: Re
 }
 
 // School/Community Preview
-function SchoolPreview({ post, engagement }: { post: SocialPost, engagement: ReturnType<typeof simulateEngagement> }) {
+function SchoolPreview({ post, engagement, thumbnailUrl, videoTitle }: { 
+    post: SocialPost, 
+    engagement: ReturnType<typeof simulateEngagement>,
+    thumbnailUrl?: string,
+    videoTitle?: string
+}) {
     return (
         <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-5 max-w-md mx-auto border border-slate-700">
             {/* Header */}
@@ -460,11 +570,19 @@ function SchoolPreview({ post, engagement }: { post: SocialPost, engagement: Ret
                     VO
                 </div>
                 <div className="flex-1">
-                    <p className="font-bold text-white">Votre Formation</p>
+                    <p className="font-bold text-white">{videoTitle || "Votre Formation"}</p>
                     <p className="text-xs text-gray-400">Par Votre Entreprise</p>
                 </div>
                 <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">Nouveau</Badge>
             </div>
+            
+            {/* Thumbnail - School landscape format */}
+            <ThumbnailImage 
+                src={thumbnailUrl}
+                alt={videoTitle || "Course thumbnail"}
+                aspectRatio="landscape"
+                className="aspect-video w-full rounded-lg mb-4"
+            />
             
             {/* Content */}
             <div className="bg-slate-800/50 rounded-lg p-4 mb-4">
@@ -519,23 +637,23 @@ export function SocialSimulator({ socialPosts, selectedPlatforms, videoTitle, th
         
         switch (platform) {
             case 'linkedin':
-                return <LinkedInPreview post={post} engagement={engagement} />
+                return <LinkedInPreview post={post} engagement={engagement} thumbnailUrl={thumbnailUrl} videoTitle={videoTitle} />
             case 'instagram':
-                return <InstagramPreview post={post} engagement={engagement} />
+                return <InstagramPreview post={post} engagement={engagement} thumbnailUrl={thumbnailUrl} videoTitle={videoTitle} />
             case 'tiktok':
-                return <TikTokPreview post={post} engagement={engagement} />
+                return <TikTokPreview post={post} engagement={engagement} thumbnailUrl={thumbnailUrl} videoTitle={videoTitle} />
             case 'x':
-                return <XPreview post={post} engagement={engagement} />
+                return <XPreview post={post} engagement={engagement} thumbnailUrl={thumbnailUrl} videoTitle={videoTitle} />
             case 'youtube_community':
-                return <YouTubePreview post={post} engagement={engagement} />
+                return <YouTubePreview post={post} engagement={engagement} thumbnailUrl={thumbnailUrl} videoTitle={videoTitle} />
             case 'facebook':
-                return <FacebookPreview post={post} engagement={engagement} />
+                return <FacebookPreview post={post} engagement={engagement} thumbnailUrl={thumbnailUrl} videoTitle={videoTitle} />
             case 'threads':
-                return <ThreadsPreview post={post} engagement={engagement} />
+                return <ThreadsPreview post={post} engagement={engagement} thumbnailUrl={thumbnailUrl} videoTitle={videoTitle} />
             case 'school':
-                return <SchoolPreview post={post} engagement={engagement} />
+                return <SchoolPreview post={post} engagement={engagement} thumbnailUrl={thumbnailUrl} videoTitle={videoTitle} />
             default:
-                return <LinkedInPreview post={post} engagement={engagement} />
+                return <LinkedInPreview post={post} engagement={engagement} thumbnailUrl={thumbnailUrl} videoTitle={videoTitle} />
         }
     }
 
@@ -578,6 +696,15 @@ export function SocialSimulator({ socialPosts, selectedPlatforms, videoTitle, th
                     </div>
                 </div>
             </div>
+
+            {/* Thumbnail Preview Info */}
+            {thumbnailUrl && (
+                <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-3">
+                    <p className="text-sm text-orange-400">
+                        🖼️ <span className="font-medium">Miniature intégrée</span> - La miniature est automatiquement adaptée au format de chaque plateforme sociale.
+                    </p>
+                </div>
+            )}
 
             {/* Platform Tabs */}
             <Tabs value={selectedPost} onValueChange={setSelectedPost} className="w-full">
@@ -643,6 +770,29 @@ export function SocialSimulator({ socialPosts, selectedPlatforms, videoTitle, th
                                                     {formatNumber((engagementData[post.platform] as any).retweets)}
                                                 </span>
                                             </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-4">
+                                    <h4 className="text-sm font-medium text-neutral-400 uppercase tracking-wider mb-3">
+                                        Format de Miniature
+                                    </h4>
+                                    <div className="space-y-2 text-sm">
+                                        {post.platform === 'instagram' && (
+                                            <p className="text-neutral-300">📷 Format carré (1:1) - 1080x1080px</p>
+                                        )}
+                                        {post.platform === 'tiktok' && (
+                                            <p className="text-neutral-300">📱 Format portrait (9:16) - 1080x1920px</p>
+                                        )}
+                                        {(post.platform === 'linkedin' || post.platform === 'facebook' || post.platform === 'x' || post.platform === 'youtube_community') && (
+                                            <p className="text-neutral-300">🖥️ Format paysage (16:9) - 1280x720px</p>
+                                        )}
+                                        {post.platform === 'threads' && (
+                                            <p className="text-neutral-300">🖼️ Format portrait (4:5) - 1080x1350px</p>
+                                        )}
+                                        {post.platform === 'school' && (
+                                            <p className="text-neutral-300">🎓 Format paysage (16:9) - 1280x720px</p>
                                         )}
                                     </div>
                                 </div>
