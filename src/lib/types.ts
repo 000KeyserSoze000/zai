@@ -115,12 +115,26 @@ export interface CostBreakdown {
 export interface OrchestrationConfig {
   id: string
   name: string
+  isDefault?: boolean
   categories: AgentCategory[]
   steps: OrchestrationStep[]
   icon: string
   color: string
   agents: AgentConfig[]
   enabled: boolean
+}
+
+export interface AgentCategory {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  icon: string
+  color: string
+  accessLevel?: string
+  displayOrder?: number
+  isActive: boolean
+  agents?: AgentConfig[]
 }
 
 export interface AgentConfig {

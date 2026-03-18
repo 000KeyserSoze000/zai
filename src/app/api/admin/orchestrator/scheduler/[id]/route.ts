@@ -4,7 +4,7 @@ import { getSession } from "@/lib/session"
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getSession()
@@ -12,9 +12,10 @@ export async function PATCH(
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await req.json()
     const task = await db.scheduledTask.update({
-      where: { id: params.id },
+      where: { id },
       data: body
     })
 
@@ -27,7 +28,7 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getSession()
@@ -35,8 +36,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
     }
 
+    const { id } = await params
     await db.scheduledTask.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ success: true })

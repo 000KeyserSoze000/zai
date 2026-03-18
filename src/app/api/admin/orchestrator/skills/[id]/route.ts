@@ -44,23 +44,20 @@ export async function GET(
       where: { skillId: id },
       _count: true,
       _avg: {
-        tokensInput: true,
-        tokensOutput: true,
-        latencyMs: true,
+        tokensUsed: true,
         cost: true
-      },
-      where2: { success: true }
+      }
     })
 
-    const successRate = await db.executionLog.count({
-      where: { skillId: id, success: true }
+    const successCount = await db.executionLog.count({
+      where: { skillId: id, status: 'success' }
     })
 
     return NextResponse.json({
       skill,
       stats: {
         ...stats,
-        successRate: stats._count > 0 ? (successRate / stats._count) * 100 : 0
+        successRate: (stats._count ?? 0) > 0 ? (successCount / (stats._count ?? 1)) * 100 : 0
       }
     })
   } catch (error) {
@@ -153,8 +150,7 @@ export async function PATCH(
           inputSchema: inputSchema || skill.inputSchema,
           outputSchema: outputSchema || skill.outputSchema,
           examples: examples || skill.examples,
-          changeNote: changeNote || `Version ${newVersion}`,
-          createdBy: session.id
+          changeNote: changeNote || `Version ${newVersion}`
         }
       })
     }

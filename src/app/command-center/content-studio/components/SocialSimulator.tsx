@@ -23,19 +23,30 @@ interface SocialSimulatorProps {
     thumbnailUrl?: string
 }
 
+// Unified engagement type for all platforms
+interface EngagementData {
+    likes: number
+    comments: number
+    shares: number
+    retweets?: number
+    replies?: number
+    saves?: number
+    reposts?: number
+}
+
 // Simulated engagement data for each platform
-const simulateEngagement = (platform: string) => {
-    const base = {
+const simulateEngagement = (platform: string): EngagementData => {
+    const base: Record<string, EngagementData> = {
         linkedin: { likes: Math.floor(Math.random() * 150) + 50, comments: Math.floor(Math.random() * 20) + 5, shares: Math.floor(Math.random() * 30) + 10 },
-        youtube_community: { likes: Math.floor(Math.random() * 500) + 100, comments: Math.floor(Math.random() * 50) + 10 },
+        youtube_community: { likes: Math.floor(Math.random() * 500) + 100, comments: Math.floor(Math.random() * 50) + 10, shares: 0 },
         tiktok: { likes: Math.floor(Math.random() * 10000) + 1000, comments: Math.floor(Math.random() * 500) + 50, shares: Math.floor(Math.random() * 200) + 30 },
-        x: { likes: Math.floor(Math.random() * 300) + 50, retweets: Math.floor(Math.random() * 100) + 20, replies: Math.floor(Math.random() * 30) + 5 },
-        instagram: { likes: Math.floor(Math.random() * 2000) + 500, comments: Math.floor(Math.random() * 100) + 20, saves: Math.floor(Math.random() * 50) + 10 },
+        x: { likes: Math.floor(Math.random() * 300) + 50, comments: 0, shares: 0, retweets: Math.floor(Math.random() * 100) + 20, replies: Math.floor(Math.random() * 30) + 5 },
+        instagram: { likes: Math.floor(Math.random() * 2000) + 500, comments: Math.floor(Math.random() * 100) + 20, shares: 0, saves: Math.floor(Math.random() * 50) + 10 },
         facebook: { likes: Math.floor(Math.random() * 200) + 50, comments: Math.floor(Math.random() * 30) + 5, shares: Math.floor(Math.random() * 20) + 5 },
-        threads: { likes: Math.floor(Math.random() * 500) + 100, replies: Math.floor(Math.random() * 30) + 5, reposts: Math.floor(Math.random() * 20) + 3 },
-        school: { likes: Math.floor(Math.random() * 100) + 20, comments: Math.floor(Math.random() * 15) + 3 },
+        threads: { likes: Math.floor(Math.random() * 500) + 100, comments: 0, shares: 0, replies: Math.floor(Math.random() * 30) + 5, reposts: Math.floor(Math.random() * 20) + 3 },
+        school: { likes: Math.floor(Math.random() * 100) + 20, comments: Math.floor(Math.random() * 15) + 3, shares: 0 },
     }
-    return base[platform as keyof typeof base] || base.linkedin
+    return base[platform] || base.linkedin
 }
 
 // Format number for display
@@ -88,7 +99,7 @@ function ThumbnailImage({
 // LinkedIn Preview
 function LinkedInPreview({ post, engagement, thumbnailUrl, videoTitle }: { 
     post: SocialPost, 
-    engagement: ReturnType<typeof simulateEngagement>,
+    engagement: EngagementData,
     thumbnailUrl?: string,
     videoTitle?: string
 }) {

@@ -253,6 +253,21 @@ model SiteSettings {
   defaultLanguage    String   @default("fr")
   availableLanguages String   @default("fr")
   defaultCurrency    String   @default("EUR")
+  // Email settings
+  emailEnabled       Boolean  @default(false)
+  emailProvider      String?
+  // SMTP extended
+  smtpUsername       String?
+  smtpEncryptionType String?
+  // Email providers
+  sendgridApiKey     String?
+  brevoApiKey        String?
+  mailchimpApiKey    String?
+  amazonSesApiKey    String?
+  amazonSesSecretKey String?
+  mailgunApiKey      String?
+  mailgunDomain      String?
+  postmarkApiKey     String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -486,4 +501,54 @@ model Post {
   authorId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ============================================
+// EMAIL TEMPLATES
+// ============================================
+
+model EmailTemplate {
+  id        String   @id @default(cuid())
+  type      String   @unique
+  subject   String
+  body      String
+  variables String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("email_templates")
+}
+
+// ============================================
+// SUPPORT TICKETS
+// ============================================
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING
+  RESOLVED
+  CLOSED
+}
+
+model SupportTicket {
+  id        String        @id @default(cuid())
+  userId    String
+  subject   String
+  message   String
+  priority  TicketPriority @default(MEDIUM)
+  status    TicketStatus   @default(OPEN)
+  response  String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@map("support_tickets")
 }

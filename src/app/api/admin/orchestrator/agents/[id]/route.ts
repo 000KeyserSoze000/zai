@@ -41,11 +41,10 @@ export async function GET(
       take: 10,
       select: {
         id: true,
-        success: true,
-        tokensInput: true,
-        tokensOutput: true,
+        status: true,
+        tokensUsed: true,
         cost: true,
-        latencyMs: true,
+        durationMs: true,
         createdAt: true
       }
     })
@@ -142,9 +141,6 @@ export async function DELETE(
 
     // Delete execution logs
     await db.executionLog.deleteMany({ where: { agentId: id } })
-
-    // Delete scheduled tasks
-    await db.scheduledTask.deleteMany({ where: { agentId: id } })
 
     // Delete agent
     await db.agent.delete({ where: { id } })

@@ -16,8 +16,8 @@ const requestSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     // 1. Auth check
-    const session = await requireAuth()
-    const userId = session.user?.id
+    const user = await requireAuth(req)
+    const userId = user.id
 
     // 2. Validate input
     const body = requestSchema.parse(await req.json())
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('[Sequential API] Error:', error)
     if (error instanceof z.ZodError) {
-      return apiError('Données invalides : ' + error.errors.map(e => e.message).join(', '), 400)
+      return apiError('Données invalides : ' + error.issues.map(e => e.message).join(', '), 400)
     }
     return apiError(error instanceof Error ? error.message : 'Échec de l\'exécution séquentielle', 500)
   }
