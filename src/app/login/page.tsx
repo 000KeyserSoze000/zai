@@ -131,6 +131,7 @@ function LoginContent() {
               </div>
               <span className="text-sm text-neutral-300 font-mono">Client123!</span>
             </button>
+          </div>
         </div>
       </div>
       
