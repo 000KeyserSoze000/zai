@@ -47,7 +47,7 @@ export function SocialStep({
 }: SocialStepProps) {
     const { toast } = useToast()
     const { t } = useTranslation()
-    const [showSimulator, setShowSimulator] = useState(false)
+    const [showSimulator, setShowSimulator] = useState(true)
 
     const togglePlatform = (platform: string) => {
         setSelectedPlatforms(prev =>
