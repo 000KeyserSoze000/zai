@@ -67,7 +67,7 @@ export async function generateAIResponse(
   }
 
   const temperature = options.temperature ?? 0.7;
-  const maxTokens = options.maxTokens ?? 4000;
+  const maxTokens = Math.min(options.maxTokens ?? 1000, 1000); // Limit to 1000 for free tiers
 
   console.log('[AI Provider] ========== STARTING AI GENERATION ==========');
   console.log('[AI Provider] System prompt length:', finalSystemPrompt.length);
