@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import ZAI from 'z-ai-web-dev-sdk'
 import { requireAuth, checkRateLimit, apiError } from '@/lib/api-utils'
+import { generateAIResponse } from '@/lib/ai-provider'
 
 // Helper to finalize results (sanitize for JSON serialization)
 function finalizeResult(data: any): any {
@@ -55,6 +55,23 @@ async function fetchYouTubeThumbnail(videoId: string): Promise<{ url: string; ba
   return null
 }
 
+// Fetch YouTube video info using noembed (free, no API key needed)
+async function fetchYouTubeVideoInfo(videoId: string): Promise<{ title: string; author_name: string } | null> {
+  try {
+    const response = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`)
+    if (response.ok) {
+      const data = await response.json()
+      return {
+        title: data.title || 'Unknown Title',
+        author_name: data.author_name || 'Unknown Author'
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch video info:', error)
+  }
+  return null
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Check authentication - pass request to get auth token from cookies
@@ -83,123 +100,102 @@ export async function POST(request: NextRequest) {
       return apiError('Could not fetch video thumbnail', 404)
     }
 
-    // Create ZAI instance
-    const zai = await ZAI.create()
+    // Fetch video info
+    const videoInfo = await fetchYouTubeVideoInfo(videoId)
 
-    // Analyze the thumbnail using vision model
-    const analysis = await zai.chat.completions.createVision({
-      model: 'z-ai/vlm',
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: `Analyze this YouTube thumbnail image and extract visual design information.
+    // Generate artistic direction using AI
+    const systemPrompt = `You are an expert creative director and graphic designer specializing in YouTube thumbnails.
 
+Based on the video information provided, generate 3 artistic directions for a YouTube thumbnail.
+
+Respond with a JSON object containing:
+{
+  "directions": [
+    {
+      "name": "Direction Name",
+      "style": "modern" | "retro" | "minimalist" | "bold" | "elegant" | "playful",
+      "colorPalette": {
+        "primary": "#hex",
+        "secondary": "#hex",
+        "accent": "#hex",
+        "background": "#hex",
+        "text": "#hex"
+      },
+      "typography": {
+        "headingFont": "Font Name",
+        "bodyFont": "Font Name",
+        "headingWeight": "700",
+        "emphasis": "uppercase" | "lowercase" | "capitalize" | "none"
+      },
+      "moodKeywords": ["keyword1", "keyword2", "keyword3"],
+      "thumbnailConcept": "Brief concept description"
+    }
+  ]
+}`
+
+    const userPrompt = `Generate 3 artistic directions for a YouTube thumbnail for this video:
+
+Video Title: ${videoInfo?.title || 'Unknown'}
+Channel: ${videoInfo?.author_name || 'Unknown'}
 Video URL: ${videoUrl}
 ${context ? `Additional context: ${context}` : ''}
 
-Please provide a detailed analysis in JSON format:
-{
-  "colorPalette": {
-    "primary": "#hex color code",
-    "secondary": "#hex color code", 
-    "accent": "#hex color code",
-    "background": "#hex color code",
-    "text": "#hex color code"
-  },
-  "style": "modern|retro|minimalist|bold|elegant|playful",
-  "typography": {
-    "headingFont": "Font name suggestion",
-    "bodyFont": "Font name suggestion",
-    "headingWeight": "700",
-    "emphasis": "uppercase|lowercase|capitalize|none"
-  },
-  "moodKeywords": ["keyword1", "keyword2", "keyword3"],
-  "compositionNotes": "Description of layout and design elements",
-  "recommendations": "Suggestions for creating similar thumbnails"
-}
+Each direction should have a unique style, color palette, typography recommendations, mood keywords, and a brief concept for the thumbnail design.`
 
-Respond ONLY with valid JSON, no additional text.`
-            },
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:${thumbnailData.mimeType};base64,${thumbnailData.base64}`
-              }
-            }
-          ]
-        }
-      ],
-      thinking: { type: 'disabled' }
-    })
+    const aiResponse = await generateAIResponse(systemPrompt, userPrompt, 0.7)
 
-    const responseText = analysis.choices[0]?.message?.content || ''
-
-    // Parse the JSON from the response
-    let visualAnalysis
+    let directions = []
     try {
-      // Try to extract JSON from markdown code blocks or raw response
-      const jsonMatch = responseText.match(/```json\s*([\s\S]*?)\s*```/) || responseText.match(/```\s*([\s\S]*?)\s*```/)
-      const jsonStr = jsonMatch ? jsonMatch[1] : responseText
-      visualAnalysis = JSON.parse(jsonStr.trim())
-    } catch {
-      console.log('Failed to parse JSON from response:', responseText.substring(0, 200))
-      // Default fallback based on common YouTube styles
-      visualAnalysis = {
-        colorPalette: {
-          primary: '#FF0000',
-          secondary: '#282828',
-          accent: '#FFFFFF',
-          background: '#0F0F0F',
-          text: '#FFFFFF'
+      const jsonMatch = aiResponse.match(/```json\s*([\s\S]*?)\s*```/) || aiResponse.match(/```\s*([\s\S]*?)\s*```/)
+      const jsonStr = jsonMatch ? jsonMatch[1] : aiResponse
+      const parsed = JSON.parse(jsonStr)
+      directions = parsed.directions || []
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', parseError)
+      // Fallback directions
+      directions = [
+        {
+          name: 'Tech Moderne',
+          style: 'modern',
+          colorPalette: { primary: '#FF6B00', secondary: '#1A1A2E', accent: '#00D9FF', background: '#0F0F1A', text: '#FFFFFF' },
+          typography: { headingFont: 'Inter', bodyFont: 'Inter', headingWeight: '800', emphasis: 'uppercase' },
+          moodKeywords: ['innovant', 'professionnel', 'high-tech'],
+          thumbnailConcept: 'Design moderne avec gradient orange'
         },
-        style: 'modern',
-        typography: {
-          headingFont: 'Roboto',
-          bodyFont: 'Roboto',
-          headingWeight: '700',
-          emphasis: 'uppercase'
+        {
+          name: 'Minimaliste Elegant',
+          style: 'minimalist',
+          colorPalette: { primary: '#2D2D2D', secondary: '#F5F5F5', accent: '#FFD700', background: '#FFFFFF', text: '#1A1A1A' },
+          typography: { headingFont: 'Playfair Display', bodyFont: 'Lato', headingWeight: '700', emphasis: 'capitalize' },
+          moodKeywords: ['elegant', 'epure', 'premium'],
+          thumbnailConcept: 'Design minimaliste avec accent dore'
         },
-        moodKeywords: ['dynamic', 'engaging', 'professional'],
-        compositionNotes: 'Modern YouTube style with high contrast',
-        recommendations: 'Use vibrant colors and readable text'
-      }
+        {
+          name: 'Bold Impact',
+          style: 'bold',
+          colorPalette: { primary: '#FF0050', secondary: '#000000', accent: '#00FF88', background: '#111111', text: '#FFFFFF' },
+          typography: { headingFont: 'Bebas Neue', bodyFont: 'Roboto', headingWeight: '900', emphasis: 'uppercase' },
+          moodKeywords: ['audacieux', 'percutant', 'energique'],
+          thumbnailConcept: 'Design audacieux avec contrastes forts'
+        }
+      ]
     }
 
-    // Create an artistic direction from the analysis
-    const direction = {
-      id: 'dir-from-video-' + Date.now(),
-      name: `Style Extracted - ${visualAnalysis.style?.charAt(0).toUpperCase() + visualAnalysis.style?.slice(1) || 'Custom'}`,
-      style: visualAnalysis.style || 'modern',
-      colorPalette: visualAnalysis.colorPalette || {
-        primary: '#FF0000',
-        secondary: '#282828',
-        accent: '#FFFFFF',
-        background: '#0F0F0F',
-        text: '#FFFFFF'
-      },
-      typography: visualAnalysis.typography || {
-        headingFont: 'Roboto',
-        bodyFont: 'Roboto',
-        headingWeight: '700',
-        emphasis: 'uppercase'
-      },
-      moodKeywords: visualAnalysis.moodKeywords || ['youtube', 'modern'],
-      thumbnailConcept: visualAnalysis.compositionNotes || '',
-      recommendations: visualAnalysis.recommendations || '',
+    // Create direction objects with IDs
+    const formattedDirections = directions.map((dir: any, index: number) => ({
+      id: `dir-${videoId}-${index}`,
+      ...dir,
       sourceVideo: videoUrl,
       sourceThumbnail: thumbnailData.url,
-      selected: true
-    }
+      selected: index === 0
+    }))
 
     return NextResponse.json({
       success: true,
       videoId,
       thumbnailUrl: thumbnailData.url,
-      analysis: finalizeResult(visualAnalysis),
-      direction: finalizeResult(direction),
+      videoInfo,
+      directions: formattedDirections,
       usage: { totalTokens: 500 }
     })
 
