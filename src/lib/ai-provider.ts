@@ -70,24 +70,33 @@ export async function generateAIResponse(
   const temperature = options.temperature ?? 0.7;
   const maxTokens = options.maxTokens ?? 4000;
 
-  console.log('[AI Provider] Using z-ai-web-dev-sdk');
+  console.log('[AI Provider] ========== STARTING AI GENERATION ==========');
+  console.log('[AI Provider] System prompt length:', finalSystemPrompt.length);
+  console.log('[AI Provider] User prompt length:', finalUserPrompt.length);
+  console.log('[AI Provider] Temperature:', temperature);
+  console.log('[AI Provider] Max tokens:', maxTokens);
   
   try {
     // Use z-ai-web-dev-sdk which has built-in API keys
+    console.log('[AI Provider] Creating ZAI instance...');
     const zai = await ZAI.create();
+    console.log('[AI Provider] ZAI instance created successfully');
     
+    console.log('[AI Provider] Calling chat.completions.create...');
     const completion = await zai.chat.completions.create({
       messages: [
-        { role: 'system', content: finalSystemPrompt },
+        { role: 'assistant', content: finalSystemPrompt },
         { role: 'user', content: finalUserPrompt }
       ],
-      temperature,
-      max_tokens: maxTokens,
+      thinking: { type: 'disabled' }
     });
 
     const content = completion.choices[0]?.message?.content || '';
     
-    console.log('[AI Provider] z-ai-web-dev-sdk success');
+    console.log('[AI Provider] ========== AI GENERATION SUCCESS ==========');
+    console.log('[AI Provider] Response length:', content.length);
+    console.log('[AI Provider] Response preview:', content.slice(0, 200));
+    console.log('[AI Provider] Tokens used:', completion.usage?.total_tokens || 0);
     
     return {
       content: Object.keys(brandSubstitutions).length > 0 
@@ -97,7 +106,10 @@ export async function generateAIResponse(
       model: completion.model || 'z-ai-default',
     };
   } catch (error) {
-    console.error('[AI Provider] z-ai-web-dev-sdk failed:', error);
+    console.error('[AI Provider] ========== AI GENERATION FAILED ==========');
+    console.error('[AI Provider] Error type:', error?.constructor?.name);
+    console.error('[AI Provider] Error message:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('[AI Provider] Full error:', error);
     throw new Error('AI generation failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
   }
 }
