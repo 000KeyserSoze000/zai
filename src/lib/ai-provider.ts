@@ -93,8 +93,8 @@ export async function generateAIResponse(
     try {
       console.log('[AI Provider] Trying OpenRouter...');
       
-      // Use a free/cheap model through OpenRouter
-      const model = options.model || 'google/gemini-2.0-flash-exp:free';
+      // Use Claude 3.5 Sonnet through OpenRouter
+      const model = options.model || 'anthropic/claude-3.5-sonnet';
       
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
