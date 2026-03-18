@@ -75,16 +75,76 @@ export async function generateAIResponse(
   console.log('[AI Provider] Temperature:', temperature);
   console.log('[AI Provider] Max tokens:', maxTokens);
 
-  // Get API key from environment
+  // Get API keys from environment
+  const openRouterApiKey = process.env.OPENROUTER_API_KEY;
   const googleApiKey = process.env.GOOGLE_AI_API_KEY;
   const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
   const openaiApiKey = process.env.OPENAI_API_KEY;
 
+  console.log('[AI Provider] OpenRouter Key exists:', !!openRouterApiKey);
   console.log('[AI Provider] Google AI Key exists:', !!googleApiKey);
   console.log('[AI Provider] Anthropic Key exists:', !!anthropicApiKey);
   console.log('[AI Provider] OpenAI Key exists:', !!openaiApiKey);
 
-  // Try Google AI first (free tier available)
+  // ============================================
+  // 1. Try OpenRouter FIRST (supports many models)
+  // ============================================
+  if (openRouterApiKey) {
+    try {
+      console.log('[AI Provider] Trying OpenRouter...');
+      
+      // Use a free/cheap model through OpenRouter
+      const model = options.model || 'google/gemini-2.0-flash-exp:free';
+      
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openRouterApiKey}`,
+          'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'https://contentpro.fr',
+          'X-Title': 'ContentPro AI',
+        },
+        body: JSON.stringify({
+          model: model,
+          max_tokens: maxTokens,
+          temperature: temperature,
+          messages: [
+            { role: 'system', content: finalSystemPrompt },
+            { role: 'user', content: finalUserPrompt }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[AI Provider] OpenRouter error:', errorText);
+        throw new Error(`OpenRouter error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content || '';
+      
+      console.log('[AI Provider] ========== AI GENERATION SUCCESS (OpenRouter) ==========');
+      console.log('[AI Provider] Model used:', model);
+      console.log('[AI Provider] Response length:', content.length);
+      console.log('[AI Provider] Response preview:', content.slice(0, 200));
+      
+      return {
+        content: Object.keys(brandSubstitutions).length > 0 
+          ? applyBrandSubstitutions(content, brandSubstitutions) 
+          : content,
+        tokensUsed: data.usage?.total_tokens || Math.ceil((finalSystemPrompt.length + finalUserPrompt.length + content.length) / 4),
+        model: `openrouter/${model}`,
+      };
+    } catch (error) {
+      console.error('[AI Provider] OpenRouter failed:', error);
+      // Continue to next provider
+    }
+  }
+
+  // ============================================
+  // 2. Try Google AI (free tier available)
+  // ============================================
   if (googleApiKey) {
     try {
       console.log('[AI Provider] Trying Google AI (Gemini)...');
@@ -135,7 +195,9 @@ export async function generateAIResponse(
     }
   }
 
-  // Try Anthropic Claude
+  // ============================================
+  // 3. Try Anthropic Claude
+  // ============================================
   if (anthropicApiKey) {
     try {
       console.log('[AI Provider] Trying Anthropic Claude...');
@@ -184,7 +246,9 @@ export async function generateAIResponse(
     }
   }
 
-  // Try OpenAI
+  // ============================================
+  // 4. Try OpenAI
+  // ============================================
   if (openaiApiKey) {
     try {
       console.log('[AI Provider] Trying OpenAI...');
@@ -231,10 +295,12 @@ export async function generateAIResponse(
     }
   }
 
-  // No API keys available
+  // ============================================
+  // All providers failed
+  // ============================================
   console.error('[AI Provider] ========== AI GENERATION FAILED ==========');
   console.error('[AI Provider] No valid API keys configured or all providers failed');
-  throw new Error('No AI API keys configured. Please set GOOGLE_AI_API_KEY, ANTHROPIC_API_KEY, or OPENAI_API_KEY in your environment.');
+  throw new Error('No AI API keys configured. Please set OPENROUTER_API_KEY, GOOGLE_AI_API_KEY, ANTHROPIC_API_KEY, or OPENAI_API_KEY in your environment.');
 }
 
 export function calculateCost(model: string, tokensUsed: number): number {
@@ -262,6 +328,9 @@ export function calculateCost(model: string, tokensUsed: number): number {
     'gemini-1.5-pro': 0.00000125,
     'gemini-1.5-flash': 0.000000375,
     'gemini-2.0-flash': 0.0000001,
+    'gemini-2.0-flash-exp:free': 0,
+    // OpenRouter
+    'openrouter/google/gemini-2.0-flash-exp:free': 0,
   }
   
   const perToken = costs[model] || 0.000002;
