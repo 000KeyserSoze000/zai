@@ -67,7 +67,7 @@ export async function generateAIResponse(
   }
 
   const temperature = options.temperature ?? 0.7;
-  const maxTokens = Math.min(options.maxTokens ?? 400, 400); // Limit to 400 for available credits
+  const maxTokens = Math.min(options.maxTokens ?? 300, 300); // Limit to 300 for available credits
 
   console.log('[AI Provider] ========== STARTING AI GENERATION ==========');
   console.log('[AI Provider] System prompt length:', finalSystemPrompt.length);
@@ -202,6 +202,9 @@ export async function generateAIResponse(
     try {
       console.log('[AI Provider] Trying Anthropic Claude...');
       
+      // Use more tokens for Anthropic (user has credits)
+      const anthropicMaxTokens = 4000;
+      
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -212,7 +215,7 @@ export async function generateAIResponse(
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
-          max_tokens: maxTokens,
+          max_tokens: anthropicMaxTokens,
           system: finalSystemPrompt,
           messages: [
             { role: 'user', content: finalUserPrompt }
