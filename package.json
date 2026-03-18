@@ -14,7 +14,10 @@
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
     "db:studio": "prisma studio",
-    "db:seed": "node --loader ts-node/esm prisma/seed.ts"
+    "db:seed": "node --loader ts-node/esm prisma/seed.ts",
+    "db:config": "node scripts/db-config.js",
+    "db:config:status": "node scripts/db-config.js status",
+    "db:config:switch": "node scripts/db-config.js switch"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
