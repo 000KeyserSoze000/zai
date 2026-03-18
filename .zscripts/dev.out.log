@@ -33359,3 +33359,463 @@ prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.
 prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
  GET /api/subscription 200 in 33ms (compile: 2ms, proxy.ts: 21ms, render: 10ms)
  GET /api/auth/session 200 in 29ms (compile: 1885µs, proxy.ts: 20ms, render: 7ms)
+ GET /api/auth/session 200 in 50ms (compile: 3ms, proxy.ts: 42ms, render: 5ms)
+ GET /api/auth/session 200 in 25ms (compile: 2ms, proxy.ts: 17ms, render: 5ms)
+ GET /api/auth/session 200 in 35ms (compile: 3ms, proxy.ts: 27ms, render: 5ms)
+ GET /api/auth/session 200 in 32ms (compile: 2ms, proxy.ts: 26ms, render: 4ms)
+ GET / 200 in 53ms (compile: 2ms, proxy.ts: 28ms, render: 24ms)
+ GET /api/auth/session 200 in 49ms (compile: 2000µs, proxy.ts: 44ms, render: 3ms)
+ GET /api/auth/session 200 in 24ms (compile: 1641µs, proxy.ts: 19ms, render: 3ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 27ms (compile: 2ms, proxy.ts: 18ms, render: 8ms)
+ GET /api/auth/session 200 in 50ms (compile: 1568µs, proxy.ts: 45ms, render: 3ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`site_settings`.`id`, `main`.`site_settings`.`siteName`, `main`.`site_settings`.`siteUrl`, `main`.`site_settings`.`siteEmail`, `main`.`site_settings`.`timezone`, `main`.`site_settings`.`defaultUserGroup`, `main`.`site_settings`.`enableRecaptcha`, `main`.`site_settings`.`recaptchaSiteKey`, `main`.`site_settings`.`recaptchaSecretKey`, `main`.`site_settings`.`enableAnalytics`, `main`.`site_settings`.`analyticsId`, `main`.`site_settings`.`oauthEnabled`, `main`.`site_settings`.`facebookOAuth`, `main`.`site_settings`.`twitterOAuth`, `main`.`site_settings`.`linkedinOAuth`, `main`.`site_settings`.`googleOAuth`, `main`.`site_settings`.`zaiApiKey`, `main`.`site_settings`.`openaiApiKey`, `main`.`site_settings`.`anthropicApiKey`, `main`.`site_settings`.`googleAiApiKey`, `main`.`site_settings`.`mistralApiKey`, `main`.`site_settings`.`replicateApiKey`, `main`.`site_settings`.`stabilityApiKey`, `main`.`site_settings`.`smtpEnabled`, `main`.`site_settings`.`smtpHost`, `main`.`site_settings`.`smtpPort`, `main`.`site_settings`.`smtpUser`, `main`.`site_settings`.`smtpPassword`, `main`.`site_settings`.`smtpFromEmail`, `main`.`site_settings`.`smtpFromName`, `main`.`site_settings`.`smtpEncryption`, `main`.`site_settings`.`twoFactorEnabled`, `main`.`site_settings`.`rateLimitEnabled`, `main`.`site_settings`.`rateLimitRequests`, `main`.`site_settings`.`rateLimitWindow`, `main`.`site_settings`.`maintenanceMode`, `main`.`site_settings`.`maintenanceMessage`, `main`.`site_settings`.`gdprEnabled`, `main`.`site_settings`.`cookieValidityDays`, `main`.`site_settings`.`defaultLanguage`, `main`.`site_settings`.`availableLanguages`, `main`.`site_settings`.`defaultCurrency`, `main`.`site_settings`.`createdAt`, `main`.`site_settings`.`updatedAt` FROM `main`.`site_settings` WHERE 1=1 LIMIT ? OFFSET ?
+ GET /api/maintenance-status 200 in 9ms (compile: 2ms, proxy.ts: 1907µs, render: 5ms)
+ GET / 200 in 111ms (compile: 1870µs, proxy.ts: 83ms, render: 26ms)
+ GET /api/auth/session 200 in 14ms (compile: 5ms, proxy.ts: 3ms, render: 6ms)
+ GET /api/auth/session 200 in 15ms (compile: 9ms, proxy.ts: 3ms, render: 3ms)
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 17ms (compile: 1978µs, proxy.ts: 3ms, render: 12ms)
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/auth/session 200 in 14ms (compile: 4ms, proxy.ts: 6ms, render: 3ms)
+ GET /api/maintenance-status 200 in 10ms (compile: 2ms, proxy.ts: 1691µs, render: 6ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`site_settings`.`id`, `main`.`site_settings`.`siteName`, `main`.`site_settings`.`siteUrl`, `main`.`site_settings`.`siteEmail`, `main`.`site_settings`.`timezone`, `main`.`site_settings`.`defaultUserGroup`, `main`.`site_settings`.`enableRecaptcha`, `main`.`site_settings`.`recaptchaSiteKey`, `main`.`site_settings`.`recaptchaSecretKey`, `main`.`site_settings`.`enableAnalytics`, `main`.`site_settings`.`analyticsId`, `main`.`site_settings`.`oauthEnabled`, `main`.`site_settings`.`facebookOAuth`, `main`.`site_settings`.`twitterOAuth`, `main`.`site_settings`.`linkedinOAuth`, `main`.`site_settings`.`googleOAuth`, `main`.`site_settings`.`zaiApiKey`, `main`.`site_settings`.`openaiApiKey`, `main`.`site_settings`.`anthropicApiKey`, `main`.`site_settings`.`googleAiApiKey`, `main`.`site_settings`.`mistralApiKey`, `main`.`site_settings`.`replicateApiKey`, `main`.`site_settings`.`stabilityApiKey`, `main`.`site_settings`.`smtpEnabled`, `main`.`site_settings`.`smtpHost`, `main`.`site_settings`.`smtpPort`, `main`.`site_settings`.`smtpUser`, `main`.`site_settings`.`smtpPassword`, `main`.`site_settings`.`smtpFromEmail`, `main`.`site_settings`.`smtpFromName`, `main`.`site_settings`.`smtpEncryption`, `main`.`site_settings`.`twoFactorEnabled`, `main`.`site_settings`.`rateLimitEnabled`, `main`.`site_settings`.`rateLimitRequests`, `main`.`site_settings`.`rateLimitWindow`, `main`.`site_settings`.`maintenanceMode`, `main`.`site_settings`.`maintenanceMessage`, `main`.`site_settings`.`gdprEnabled`, `main`.`site_settings`.`cookieValidityDays`, `main`.`site_settings`.`defaultLanguage`, `main`.`site_settings`.`availableLanguages`, `main`.`site_settings`.`defaultCurrency`, `main`.`site_settings`.`createdAt`, `main`.`site_settings`.`updatedAt` FROM `main`.`site_settings` WHERE 1=1 LIMIT ? OFFSET ?
+ GET / 200 in 64ms (compile: 1944µs, proxy.ts: 37ms, render: 26ms)
+ GET /api/auth/session 200 in 9ms (compile: 2ms, proxy.ts: 3ms, render: 4ms)
+ GET /api/auth/session 200 in 7ms (compile: 1501µs, proxy.ts: 2ms, render: 3ms)
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 12ms (compile: 1851µs, proxy.ts: 3ms, render: 8ms)
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/auth/session 200 in 12ms (compile: 1869µs, proxy.ts: 7ms, render: 3ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`site_settings`.`id`, `main`.`site_settings`.`siteName`, `main`.`site_settings`.`siteUrl`, `main`.`site_settings`.`siteEmail`, `main`.`site_settings`.`timezone`, `main`.`site_settings`.`defaultUserGroup`, `main`.`site_settings`.`enableRecaptcha`, `main`.`site_settings`.`recaptchaSiteKey`, `main`.`site_settings`.`recaptchaSecretKey`, `main`.`site_settings`.`enableAnalytics`, `main`.`site_settings`.`analyticsId`, `main`.`site_settings`.`oauthEnabled`, `main`.`site_settings`.`facebookOAuth`, `main`.`site_settings`.`twitterOAuth`, `main`.`site_settings`.`linkedinOAuth`, `main`.`site_settings`.`googleOAuth`, `main`.`site_settings`.`zaiApiKey`, `main`.`site_settings`.`openaiApiKey`, `main`.`site_settings`.`anthropicApiKey`, `main`.`site_settings`.`googleAiApiKey`, `main`.`site_settings`.`mistralApiKey`, `main`.`site_settings`.`replicateApiKey`, `main`.`site_settings`.`stabilityApiKey`, `main`.`site_settings`.`smtpEnabled`, `main`.`site_settings`.`smtpHost`, `main`.`site_settings`.`smtpPort`, `main`.`site_settings`.`smtpUser`, `main`.`site_settings`.`smtpPassword`, `main`.`site_settings`.`smtpFromEmail`, `main`.`site_settings`.`smtpFromName`, `main`.`site_settings`.`smtpEncryption`, `main`.`site_settings`.`twoFactorEnabled`, `main`.`site_settings`.`rateLimitEnabled`, `main`.`site_settings`.`rateLimitRequests`, `main`.`site_settings`.`rateLimitWindow`, `main`.`site_settings`.`maintenanceMode`, `main`.`site_settings`.`maintenanceMessage`, `main`.`site_settings`.`gdprEnabled`, `main`.`site_settings`.`cookieValidityDays`, `main`.`site_settings`.`defaultLanguage`, `main`.`site_settings`.`availableLanguages`, `main`.`site_settings`.`defaultCurrency`, `main`.`site_settings`.`createdAt`, `main`.`site_settings`.`updatedAt` FROM `main`.`site_settings` WHERE 1=1 LIMIT ? OFFSET ?
+ GET /api/maintenance-status 200 in 9ms (compile: 2ms, proxy.ts: 1788µs, render: 5ms)
+ GET / 200 in 73ms (compile: 1910µs, proxy.ts: 41ms, render: 30ms)
+ GET /api/auth/session 200 in 9ms (compile: 2ms, proxy.ts: 3ms, render: 4ms)
+ GET /api/auth/session 200 in 7ms (compile: 1563µs, proxy.ts: 2ms, render: 3ms)
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 13ms (compile: 2ms, proxy.ts: 2ms, render: 9ms)
+ GET /api/auth/session 200 in 8ms (compile: 2ms, proxy.ts: 3ms, render: 3ms)
+ GET / 200 in 53ms (compile: 2ms, proxy.ts: 22ms, render: 29ms)
+ GET /api/auth/session 200 in 23ms (compile: 2ms, proxy.ts: 17ms, render: 4ms)
+ GET /api/auth/session 200 in 28ms (compile: 1699µs, proxy.ts: 23ms, render: 3ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 29ms (compile: 1997µs, proxy.ts: 21ms, render: 6ms)
+ GET /api/auth/session 200 in 27ms (compile: 3ms, proxy.ts: 17ms, render: 7ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`site_settings`.`id`, `main`.`site_settings`.`siteName`, `main`.`site_settings`.`siteUrl`, `main`.`site_settings`.`siteEmail`, `main`.`site_settings`.`timezone`, `main`.`site_settings`.`defaultUserGroup`, `main`.`site_settings`.`enableRecaptcha`, `main`.`site_settings`.`recaptchaSiteKey`, `main`.`site_settings`.`recaptchaSecretKey`, `main`.`site_settings`.`enableAnalytics`, `main`.`site_settings`.`analyticsId`, `main`.`site_settings`.`oauthEnabled`, `main`.`site_settings`.`facebookOAuth`, `main`.`site_settings`.`twitterOAuth`, `main`.`site_settings`.`linkedinOAuth`, `main`.`site_settings`.`googleOAuth`, `main`.`site_settings`.`zaiApiKey`, `main`.`site_settings`.`openaiApiKey`, `main`.`site_settings`.`anthropicApiKey`, `main`.`site_settings`.`googleAiApiKey`, `main`.`site_settings`.`mistralApiKey`, `main`.`site_settings`.`replicateApiKey`, `main`.`site_settings`.`stabilityApiKey`, `main`.`site_settings`.`smtpEnabled`, `main`.`site_settings`.`smtpHost`, `main`.`site_settings`.`smtpPort`, `main`.`site_settings`.`smtpUser`, `main`.`site_settings`.`smtpPassword`, `main`.`site_settings`.`smtpFromEmail`, `main`.`site_settings`.`smtpFromName`, `main`.`site_settings`.`smtpEncryption`, `main`.`site_settings`.`twoFactorEnabled`, `main`.`site_settings`.`rateLimitEnabled`, `main`.`site_settings`.`rateLimitRequests`, `main`.`site_settings`.`rateLimitWindow`, `main`.`site_settings`.`maintenanceMode`, `main`.`site_settings`.`maintenanceMessage`, `main`.`site_settings`.`gdprEnabled`, `main`.`site_settings`.`cookieValidityDays`, `main`.`site_settings`.`defaultLanguage`, `main`.`site_settings`.`availableLanguages`, `main`.`site_settings`.`defaultCurrency`, `main`.`site_settings`.`createdAt`, `main`.`site_settings`.`updatedAt` FROM `main`.`site_settings` WHERE 1=1 LIMIT ? OFFSET ?
+ GET /api/maintenance-status 200 in 8ms (compile: 1940µs, proxy.ts: 1683µs, render: 4ms)
+ GET /api/auth/session 200 in 37ms (compile: 1711µs, proxy.ts: 30ms, render: 5ms)
+ GET /api/auth/session 200 in 8ms (compile: 1860µs, proxy.ts: 3ms, render: 3ms)
+ GET /api/auth/session 200 in 86ms (compile: 2ms, proxy.ts: 78ms, render: 6ms)
+ GET /api/auth/session 200 in 31ms (compile: 2ms, proxy.ts: 26ms, render: 3ms)
+ GET /admin/users 200 in 40ms (compile: 3ms, proxy.ts: 25ms, render: 12ms)
+ GET /api/auth/session 200 in 28ms (compile: 2ms, proxy.ts: 22ms, render: 4ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT 1
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`users`.`id` FROM `main`.`users` WHERE 1=1 LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`name`, `main`.`users`.`password`, `main`.`users`.`role`, `main`.`users`.`image`, `main`.`users`.`emailVerified`, `main`.`users`.`createdAt`, `main`.`users`.`updatedAt` FROM `main`.`users` WHERE 1=1 ORDER BY `main`.`users`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE `main`.`subscriptions`.`userId` IN (?,?) LIMIT ? OFFSET ?
+ GET /api/admin/users 200 in 45ms (compile: 17ms, proxy.ts: 19ms, render: 9ms)
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`plans`.`id`, `main`.`plans`.`name`, `main`.`plans`.`type`, `main`.`plans`.`priceMonthly`, `main`.`plans`.`sessionsIncluded`, `main`.`plans`.`pricePerExtraSession`, `main`.`plans`.`maxUsers`, `main`.`plans`.`features`, `main`.`plans`.`isActive`, `main`.`plans`.`createdAt`, COALESCE(`aggr_selection_0_Subscription`.`_aggr_count_subscriptions`, 0) AS `_aggr_count_subscriptions` FROM `main`.`plans` LEFT JOIN (SELECT `main`.`subscriptions`.`planId`, COUNT(*) AS `_aggr_count_subscriptions` FROM `main`.`subscriptions` WHERE 1=1 GROUP BY `main`.`subscriptions`.`planId`) AS `aggr_selection_0_Subscription` ON (`main`.`plans`.`id` = `aggr_selection_0_Subscription`.`planId`) WHERE 1=1 ORDER BY `main`.`plans`.`priceMonthly` ASC LIMIT ? OFFSET ?
+[Plans API] Found 4 plans
+ GET /api/admin/plans 200 in 36ms (compile: 3ms, proxy.ts: 22ms, render: 11ms)
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 33ms (compile: 1926µs, proxy.ts: 21ms, render: 10ms)
+ GET /admin 200 in 41ms (compile: 5ms, proxy.ts: 24ms, render: 11ms)
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`users`.`id` FROM `main`.`users` WHERE 1=1 LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`users`.`id` FROM `main`.`users` WHERE `main`.`users`.`createdAt` >= ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`content_sessions`.`userId` FROM `main`.`content_sessions` WHERE `main`.`content_sessions`.`createdAt` >= ? GROUP BY `main`.`content_sessions`.`userId` LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE `main`.`subscriptions`.`status` IN (?,?) LIMIT ? OFFSET ?
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE 1=1 LIMIT ? OFFSET ?) AS `sub`
+ GET /api/auth/session 200 in 42ms (compile: 6ms, proxy.ts: 29ms, render: 7ms)
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE `main`.`content_sessions`.`createdAt` >= ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE `main`.`content_sessions`.`createdAt` >= ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`content_sessions`.`id`, `main`.`content_sessions`.`thumbnails`, `main`.`content_sessions`.`socialPosts`, `main`.`content_sessions`.`metadata` FROM `main`.`content_sessions` WHERE `main`.`content_sessions`.`status` = ? LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`content_sessions`.`id`, `main`.`content_sessions`.`thumbnails`, `main`.`content_sessions`.`socialPosts`, `main`.`content_sessions`.`metadata` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ? AND `main`.`content_sessions`.`status` = ?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`content_sessions`.`id`, `main`.`content_sessions`.`thumbnails`, `main`.`content_sessions`.`socialPosts`, `main`.`content_sessions`.`metadata` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ? AND `main`.`content_sessions`.`status` = ?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`content_sessions`.`id`, `main`.`content_sessions`.`thumbnails`, `main`.`content_sessions`.`socialPosts`, `main`.`content_sessions`.`metadata` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ? AND `main`.`content_sessions`.`status` = ?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`content_sessions`.`id`, `main`.`content_sessions`.`thumbnails`, `main`.`content_sessions`.`socialPosts`, `main`.`content_sessions`.`metadata` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ? AND `main`.`content_sessions`.`status` = ?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`content_sessions`.`id`, `main`.`content_sessions`.`thumbnails`, `main`.`content_sessions`.`socialPosts`, `main`.`content_sessions`.`metadata` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ? AND `main`.`content_sessions`.`status` = ?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`content_sessions`.`id`, `main`.`content_sessions`.`thumbnails`, `main`.`content_sessions`.`socialPosts`, `main`.`content_sessions`.`metadata` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ? AND `main`.`content_sessions`.`status` = ?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`content_sessions`.`id`, `main`.`content_sessions`.`thumbnails`, `main`.`content_sessions`.`socialPosts`, `main`.`content_sessions`.`metadata` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ? AND `main`.`content_sessions`.`status` = ?) LIMIT ? OFFSET ?
+prisma:query SELECT SUM(`cost`) AS `_sum$cost` FROM (SELECT `main`.`content_sessions`.`cost` FROM `main`.`content_sessions` WHERE 1=1 LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT SUM(`tokensUsed`) AS `_sum$tokensUsed` FROM (SELECT `main`.`content_sessions`.`tokensUsed` FROM `main`.`content_sessions` WHERE 1=1 LIMIT ? OFFSET ?) AS `sub`
+Support tickets not available yet
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`users`.`id` FROM `main`.`users` WHERE `main`.`users`.`createdAt` <= ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`users`.`id` FROM `main`.`users` WHERE `main`.`users`.`createdAt` <= ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`users`.`id` FROM `main`.`users` WHERE `main`.`users`.`createdAt` <= ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`users`.`id` FROM `main`.`users` WHERE `main`.`users`.`createdAt` <= ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`users`.`id` FROM `main`.`users` WHERE `main`.`users`.`createdAt` <= ? LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`users`.`id` FROM `main`.`users` WHERE `main`.`users`.`createdAt` <= ? LIMIT ? OFFSET ?) AS `sub`
+ GET /api/admin/stats 200 in 88ms (compile: 3ms, proxy.ts: 23ms, render: 62ms)
+prisma:query SELECT COUNT(*) AS `_count$_all` FROM (SELECT `main`.`content_sessions`.`id` FROM `main`.`content_sessions` WHERE (`main`.`content_sessions`.`createdAt` >= ? AND `main`.`content_sessions`.`createdAt` <= ?) LIMIT ? OFFSET ?) AS `sub`
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 31ms (compile: 1831µs, proxy.ts: 22ms, render: 7ms)
+ GET /api/auth/session 200 in 46ms (compile: 3ms, proxy.ts: 37ms, render: 6ms)
+ GET /api/auth/session 200 in 31ms (compile: 2ms, proxy.ts: 25ms, render: 4ms)
+ GET /api/auth/session 200 in 30ms (compile: 2ms, proxy.ts: 24ms, render: 4ms)
+ GET /api/auth/session 200 in 27ms (compile: 1996µs, proxy.ts: 22ms, render: 3ms)
+ GET / 200 in 50ms (compile: 2ms, proxy.ts: 22ms, render: 25ms)
+ GET /api/auth/session 200 in 24ms (compile: 2ms, proxy.ts: 18ms, render: 4ms)
+ GET /api/auth/session 200 in 22ms (compile: 1673µs, proxy.ts: 17ms, render: 3ms)
+ GET /api/auth/session 200 in 23ms (compile: 2ms, proxy.ts: 17ms, render: 4ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 34ms (compile: 2ms, proxy.ts: 24ms, render: 8ms)
+ GET / 200 in 61ms (compile: 2ms, proxy.ts: 31ms, render: 28ms)
+ GET /api/auth/session 200 in 102ms (compile: 2ms, proxy.ts: 95ms, render: 5ms)
+ GET /api/auth/session 200 in 123ms (compile: 1560µs, proxy.ts: 119ms, render: 2ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 34ms (compile: 3ms, proxy.ts: 23ms, render: 8ms)
+ GET /api/auth/session 200 in 26ms (compile: 2ms, proxy.ts: 20ms, render: 4ms)
+ GET / 200 in 66ms (compile: 2ms, proxy.ts: 36ms, render: 27ms)
+ GET /api/auth/session 200 in 36ms (compile: 3ms, proxy.ts: 28ms, render: 4ms)
+ GET /api/auth/session 200 in 39ms (compile: 7ms, proxy.ts: 28ms, render: 4ms)
+ GET /api/auth/session 200 in 26ms (compile: 6ms, proxy.ts: 15ms, render: 6ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 38ms (compile: 7ms, proxy.ts: 23ms, render: 7ms)
+ GET / 200 in 97ms (compile: 2ms, proxy.ts: 70ms, render: 25ms)
+ GET /api/auth/session 200 in 30ms (compile: 2ms, proxy.ts: 24ms, render: 4ms)
+ GET /api/auth/session 200 in 30ms (compile: 2ms, proxy.ts: 24ms, render: 4ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 34ms (compile: 1927µs, proxy.ts: 20ms, render: 12ms)
+ GET /api/auth/session 200 in 29ms (compile: 1662µs, proxy.ts: 25ms, render: 3ms)
+ GET /api/auth/session 200 in 41ms (compile: 2ms, proxy.ts: 34ms, render: 5ms)
+ GET /api/auth/session 200 in 21ms (compile: 1900µs, proxy.ts: 16ms, render: 3ms)
+ GET /api/auth/session 200 in 41ms (compile: 1817µs, proxy.ts: 35ms, render: 4ms)
+ GET /api/auth/session 200 in 26ms (compile: 3ms, proxy.ts: 19ms, render: 3ms)
+ GET /api/auth/session 200 in 33ms (compile: 2ms, proxy.ts: 27ms, render: 3ms)
+ GET /api/auth/session 200 in 35ms (compile: 2ms, proxy.ts: 28ms, render: 5ms)
+ GET /api/auth/session 200 in 38ms (compile: 1942µs, proxy.ts: 31ms, render: 5ms)
+ GET /api/auth/session 200 in 74ms (compile: 2ms, proxy.ts: 68ms, render: 3ms)
+ GET /api/auth/session 200 in 28ms (compile: 2ms, proxy.ts: 20ms, render: 5ms)
+ GET /api/auth/session 200 in 26ms (compile: 1804µs, proxy.ts: 20ms, render: 4ms)
+ GET /api/auth/session 200 in 88ms (compile: 2ms, proxy.ts: 82ms, render: 4ms)
+ GET /api/auth/session 200 in 27ms (compile: 4ms, proxy.ts: 20ms, render: 3ms)
+ GET /api/auth/session 200 in 32ms (compile: 2ms, proxy.ts: 25ms, render: 5ms)
+ GET /api/auth/session 200 in 24ms (compile: 1838µs, proxy.ts: 19ms, render: 3ms)
+ GET / 200 in 57ms (compile: 2ms, proxy.ts: 31ms, render: 24ms)
+ GET /api/auth/session 200 in 27ms (compile: 1717µs, proxy.ts: 21ms, render: 5ms)
+ GET /api/auth/session 200 in 26ms (compile: 1419µs, proxy.ts: 22ms, render: 3ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 31ms (compile: 2ms, proxy.ts: 20ms, render: 9ms)
+ GET /api/auth/session 200 in 24ms (compile: 4ms, proxy.ts: 18ms, render: 3ms)
+ GET / 200 in 49ms (compile: 2ms, proxy.ts: 23ms, render: 24ms)
+ GET /api/auth/session 200 in 27ms (compile: 1929µs, proxy.ts: 23ms, render: 3ms)
+ GET /api/auth/session 200 in 32ms (compile: 1962µs, proxy.ts: 27ms, render: 3ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/auth/session 200 in 22ms (compile: 3ms, proxy.ts: 16ms, render: 3ms)
+ GET /api/subscription 200 in 29ms (compile: 1804µs, proxy.ts: 18ms, render: 10ms)
+ GET / 200 in 51ms (compile: 2ms, proxy.ts: 27ms, render: 21ms)
+ GET /api/auth/session 200 in 30ms (compile: 2ms, proxy.ts: 23ms, render: 5ms)
+ GET /api/auth/session 200 in 37ms (compile: 1740µs, proxy.ts: 32ms, render: 3ms)
+ GET /api/auth/session 200 in 24ms (compile: 2ms, proxy.ts: 17ms, render: 5ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 37ms (compile: 5ms, proxy.ts: 26ms, render: 6ms)
+ GET / 200 in 60ms (compile: 2ms, proxy.ts: 36ms, render: 22ms)
+ GET /api/auth/session 200 in 25ms (compile: 1845µs, proxy.ts: 19ms, render: 4ms)
+ GET /api/auth/session 200 in 29ms (compile: 1510µs, proxy.ts: 25ms, render: 2ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 25ms (compile: 1780µs, proxy.ts: 17ms, render: 7ms)
+ GET /api/auth/session 200 in 22ms (compile: 1424µs, proxy.ts: 17ms, render: 3ms)
+ GET /api/auth/session 200 in 40ms (compile: 1742µs, proxy.ts: 36ms, render: 3ms)
+ GET /api/auth/session 200 in 25ms (compile: 1677µs, proxy.ts: 20ms, render: 3ms)
+ GET /api/auth/session 200 in 31ms (compile: 2ms, proxy.ts: 25ms, render: 4ms)
+ GET /api/auth/session 200 in 27ms (compile: 4ms, proxy.ts: 20ms, render: 3ms)
+ GET /api/auth/session 200 in 26ms (compile: 1934µs, proxy.ts: 20ms, render: 3ms)
+ GET /api/auth/session 200 in 28ms (compile: 2ms, proxy.ts: 23ms, render: 3ms)
+ GET /api/auth/session 200 in 95ms (compile: 4ms, proxy.ts: 88ms, render: 3ms)
+ GET /api/auth/session 200 in 23ms (compile: 1995µs, proxy.ts: 18ms, render: 3ms)
+ GET /api/auth/session 200 in 59ms (compile: 2ms, proxy.ts: 52ms, render: 5ms)
+ GET /api/auth/session 200 in 25ms (compile: 1728µs, proxy.ts: 21ms, render: 3ms)
+ GET /api/auth/session 200 in 26ms (compile: 1980µs, proxy.ts: 21ms, render: 3ms)
+ GET /api/auth/session 200 in 36ms (compile: 2ms, proxy.ts: 30ms, render: 4ms)
+ GET /api/auth/session 200 in 57ms (compile: 2ms, proxy.ts: 51ms, render: 4ms)
+ GET /api/auth/session 200 in 27ms (compile: 2ms, proxy.ts: 21ms, render: 3ms)
+ GET /api/auth/session 200 in 27ms (compile: 3ms, proxy.ts: 21ms, render: 3ms)
+ GET /api/auth/session 200 in 35ms (compile: 3ms, proxy.ts: 28ms, render: 4ms)
+ GET /api/auth/session 200 in 32ms (compile: 5ms, proxy.ts: 24ms, render: 4ms)
+ GET /api/auth/session 200 in 24ms (compile: 2ms, proxy.ts: 19ms, render: 3ms)
+ GET /api/auth/session 200 in 32ms (compile: 1820µs, proxy.ts: 25ms, render: 5ms)
+ GET /api/auth/session 200 in 21ms (compile: 1980µs, proxy.ts: 16ms, render: 3ms)
+ GET /api/auth/session 200 in 22ms (compile: 1786µs, proxy.ts: 16ms, render: 5ms)
+ GET /api/auth/session 200 in 26ms (compile: 1877µs, proxy.ts: 19ms, render: 5ms)
+ GET /api/auth/session 200 in 36ms (compile: 2ms, proxy.ts: 27ms, render: 6ms)
+ GET /api/auth/session 200 in 24ms (compile: 1917µs, proxy.ts: 19ms, render: 3ms)
+ GET / 200 in 53ms (compile: 4ms, proxy.ts: 27ms, render: 22ms)
+ GET /api/auth/session 200 in 28ms (compile: 2ms, proxy.ts: 22ms, render: 4ms)
+ GET /api/auth/session 200 in 38ms (compile: 1764µs, proxy.ts: 33ms, render: 4ms)
+ GET /api/auth/session 200 in 34ms (compile: 1602µs, proxy.ts: 28ms, render: 5ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 27ms (compile: 2ms, proxy.ts: 15ms, render: 10ms)
+ GET /api/auth/session 200 in 21ms (compile: 2ms, proxy.ts: 15ms, render: 4ms)
+ GET /api/auth/session 200 in 47ms (compile: 3ms, proxy.ts: 39ms, render: 5ms)
+ GET /api/auth/session 200 in 35ms (compile: 2ms, proxy.ts: 29ms, render: 3ms)
+ GET /api/auth/session 200 in 31ms (compile: 2ms, proxy.ts: 25ms, render: 4ms)
+ GET /api/auth/session 200 in 33ms (compile: 1902µs, proxy.ts: 27ms, render: 4ms)
+ GET /api/auth/session 200 in 36ms (compile: 3ms, proxy.ts: 26ms, render: 7ms)
+ GET /api/auth/session 200 in 28ms (compile: 1954µs, proxy.ts: 22ms, render: 4ms)
+ GET /api/auth/session 200 in 43ms (compile: 1766µs, proxy.ts: 38ms, render: 4ms)
+ GET /api/auth/session 200 in 29ms (compile: 2ms, proxy.ts: 22ms, render: 5ms)
+ GET /api/auth/session 200 in 54ms (compile: 4ms, proxy.ts: 44ms, render: 6ms)
+ GET /api/auth/session 200 in 27ms (compile: 2ms, proxy.ts: 20ms, render: 5ms)
+ GET /api/auth/session 200 in 31ms (compile: 1849µs, proxy.ts: 25ms, render: 4ms)
+ GET /api/auth/session 200 in 30ms (compile: 3ms, proxy.ts: 23ms, render: 4ms)
+ GET /api/auth/session 200 in 27ms (compile: 4ms, proxy.ts: 20ms, render: 4ms)
+ GET / 200 in 50ms (compile: 2ms, proxy.ts: 18ms, render: 29ms)
+ GET /api/auth/session 200 in 37ms (compile: 4ms, proxy.ts: 28ms, render: 5ms)
+ GET /api/auth/session 200 in 30ms (compile: 2ms, proxy.ts: 22ms, render: 6ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 41ms (compile: 2ms, proxy.ts: 24ms, render: 14ms)
+ GET /api/auth/session 200 in 30ms (compile: 1971µs, proxy.ts: 25ms, render: 3ms)
+ GET /api/auth/session 200 in 46ms (compile: 3ms, proxy.ts: 39ms, render: 5ms)
+ GET /api/auth/session 200 in 33ms (compile: 2ms, proxy.ts: 26ms, render: 5ms)
+ GET /api/auth/session 200 in 24ms (compile: 1725µs, proxy.ts: 20ms, render: 3ms)
+ GET /api/auth/session 200 in 35ms (compile: 2ms, proxy.ts: 26ms, render: 6ms)
+ GET /api/auth/session 200 in 33ms (compile: 2ms, proxy.ts: 27ms, render: 4ms)
+ GET /api/auth/session 200 in 28ms (compile: 4ms, proxy.ts: 20ms, render: 4ms)
+ GET /api/auth/session 200 in 34ms (compile: 2ms, proxy.ts: 28ms, render: 4ms)
+ GET /api/auth/session 200 in 25ms (compile: 2ms, proxy.ts: 16ms, render: 7ms)
+ GET /api/auth/session 200 in 40ms (compile: 1903µs, proxy.ts: 34ms, render: 4ms)
+ GET /api/auth/session 200 in 25ms (compile: 2ms, proxy.ts: 18ms, render: 5ms)
+ GET /api/auth/session 200 in 27ms (compile: 3ms, proxy.ts: 20ms, render: 4ms)
+ GET /api/auth/session 200 in 25ms (compile: 2ms, proxy.ts: 19ms, render: 3ms)
+ GET /api/auth/session 200 in 34ms (compile: 2ms, proxy.ts: 27ms, render: 5ms)
+ GET /api/auth/session 200 in 25ms (compile: 1903µs, proxy.ts: 19ms, render: 4ms)
+ GET /api/auth/session 200 in 29ms (compile: 2ms, proxy.ts: 22ms, render: 5ms)
+ GET /api/auth/session 200 in 29ms (compile: 2ms, proxy.ts: 23ms, render: 4ms)
+ GET /api/auth/session 200 in 91ms (compile: 2ms, proxy.ts: 83ms, render: 6ms)
+ GET /api/auth/session 200 in 27ms (compile: 2ms, proxy.ts: 21ms, render: 4ms)
+ GET / 200 in 79ms (compile: 3ms, proxy.ts: 40ms, render: 37ms)
+ GET /api/auth/session 200 in 32ms (compile: 5ms, proxy.ts: 23ms, render: 4ms)
+ GET /api/auth/session 200 in 34ms (compile: 1778µs, proxy.ts: 29ms, render: 3ms)
+ GET /api/auth/session 200 in 31ms (compile: 5ms, proxy.ts: 20ms, render: 6ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 48ms (compile: 12ms, proxy.ts: 29ms, render: 7ms)
+ GET /api/auth/session 200 in 40ms (compile: 3ms, proxy.ts: 33ms, render: 5ms)
+ GET /api/auth/session 200 in 31ms (compile: 5ms, proxy.ts: 23ms, render: 3ms)
+ GET /api/auth/session 200 in 27ms (compile: 1926µs, proxy.ts: 22ms, render: 3ms)
+ GET /api/auth/session 200 in 23ms (compile: 2000µs, proxy.ts: 18ms, render: 3ms)
+ GET /api/auth/session 200 in 43ms (compile: 3ms, proxy.ts: 36ms, render: 4ms)
+ GET /api/auth/session 200 in 26ms (compile: 1918µs, proxy.ts: 21ms, render: 3ms)
+ GET /api/auth/session 200 in 56ms (compile: 1973µs, proxy.ts: 49ms, render: 5ms)
+ GET /api/auth/session 200 in 24ms (compile: 3ms, proxy.ts: 18ms, render: 3ms)
+ GET /api/auth/session 200 in 27ms (compile: 2ms, proxy.ts: 21ms, render: 4ms)
+ GET /api/auth/session 200 in 45ms (compile: 3ms, proxy.ts: 37ms, render: 5ms)
+ GET /api/auth/session 200 in 26ms (compile: 3ms, proxy.ts: 20ms, render: 3ms)
+ GET /api/auth/session 200 in 26ms (compile: 1723µs, proxy.ts: 20ms, render: 4ms)
+ GET /api/auth/session 200 in 28ms (compile: 1761µs, proxy.ts: 22ms, render: 4ms)
+ GET /api/auth/session 200 in 37ms (compile: 1982µs, proxy.ts: 30ms, render: 4ms)
+ GET /api/auth/session 200 in 29ms (compile: 2ms, proxy.ts: 22ms, render: 4ms)
+ GET /api/auth/session 200 in 32ms (compile: 3ms, proxy.ts: 26ms, render: 3ms)
+ GET /api/auth/session 200 in 25ms (compile: 1838µs, proxy.ts: 19ms, render: 4ms)
+ GET /api/auth/session 200 in 35ms (compile: 1989µs, proxy.ts: 27ms, render: 5ms)
+ GET /api/auth/session 200 in 24ms (compile: 2ms, proxy.ts: 17ms, render: 4ms)
+ GET /api/auth/session 200 in 28ms (compile: 2ms, proxy.ts: 21ms, render: 5ms)
+ GET /api/auth/session 200 in 33ms (compile: 2ms, proxy.ts: 27ms, render: 4ms)
+ GET / 200 in 57ms (compile: 4ms, proxy.ts: 27ms, render: 26ms)
+ GET /api/auth/session 200 in 33ms (compile: 2ms, proxy.ts: 27ms, render: 4ms)
+ GET /api/auth/session 200 in 39ms (compile: 2ms, proxy.ts: 33ms, render: 4ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 35ms (compile: 3ms, proxy.ts: 19ms, render: 13ms)
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/auth/session 200 in 27ms (compile: 3ms, proxy.ts: 20ms, render: 5ms)
+ GET / 200 in 68ms (compile: 3ms, proxy.ts: 26ms, render: 39ms)
+ GET /api/auth/session 200 in 35ms (compile: 5ms, proxy.ts: 26ms, render: 4ms)
+ GET /api/auth/session 200 in 38ms (compile: 9ms, proxy.ts: 25ms, render: 3ms)
+ GET /api/auth/session 200 in 31ms (compile: 5ms, proxy.ts: 19ms, render: 8ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 40ms (compile: 8ms, proxy.ts: 23ms, render: 9ms)
+ GET /api/auth/session 200 in 53ms (compile: 12ms, proxy.ts: 35ms, render: 6ms)
+ GET /api/auth/session 200 in 24ms (compile: 2ms, proxy.ts: 18ms, render: 4ms)
+ GET /api/auth/session 200 in 27ms (compile: 2ms, proxy.ts: 18ms, render: 6ms)
+ GET /api/auth/session 200 in 31ms (compile: 2ms, proxy.ts: 24ms, render: 4ms)
+ GET /api/auth/session 200 in 28ms (compile: 1819µs, proxy.ts: 20ms, render: 6ms)
+ GET /api/auth/session 200 in 45ms (compile: 1723µs, proxy.ts: 40ms, render: 3ms)
+ GET /api/auth/session 200 in 27ms (compile: 1686µs, proxy.ts: 21ms, render: 4ms)
+ GET /api/auth/session 200 in 32ms (compile: 3ms, proxy.ts: 26ms, render: 3ms)
+ GET /api/auth/session 200 in 50ms (compile: 5ms, proxy.ts: 42ms, render: 3ms)
+ GET /api/auth/session 200 in 39ms (compile: 2ms, proxy.ts: 32ms, render: 5ms)
+ GET /api/auth/session 200 in 30ms (compile: 3ms, proxy.ts: 24ms, render: 3ms)
+ GET /api/auth/session 200 in 29ms (compile: 1703µs, proxy.ts: 24ms, render: 3ms)
+ GET /api/auth/session 200 in 76ms (compile: 1841µs, proxy.ts: 69ms, render: 5ms)
+ GET /api/auth/session 200 in 23ms (compile: 3ms, proxy.ts: 17ms, render: 3ms)
+ GET /api/auth/session 200 in 32ms (compile: 1804µs, proxy.ts: 25ms, render: 5ms)
+ GET /api/auth/session 200 in 30ms (compile: 2ms, proxy.ts: 22ms, render: 5ms)
+ GET /api/auth/session 200 in 104ms (compile: 4ms, proxy.ts: 97ms, render: 4ms)
+ GET /api/auth/session 200 in 27ms (compile: 2ms, proxy.ts: 21ms, render: 4ms)
+ GET /api/auth/session 200 in 31ms (compile: 2ms, proxy.ts: 25ms, render: 4ms)
+ GET /api/auth/session 200 in 30ms (compile: 4ms, proxy.ts: 22ms, render: 4ms)
+ GET / 200 in 53ms (compile: 4ms, proxy.ts: 25ms, render: 25ms)
+ GET /api/auth/session 200 in 27ms (compile: 1895µs, proxy.ts: 21ms, render: 3ms)
+ GET /api/auth/session 200 in 28ms (compile: 1773µs, proxy.ts: 22ms, render: 4ms)
+ GET /api/auth/session 200 in 25ms (compile: 1714µs, proxy.ts: 20ms, render: 3ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 38ms (compile: 1983µs, proxy.ts: 28ms, render: 8ms)
+ GET /api/auth/session 200 in 54ms (compile: 3ms, proxy.ts: 43ms, render: 8ms)
+ GET /api/auth/session 200 in 26ms (compile: 2ms, proxy.ts: 21ms, render: 3ms)
+ GET /api/auth/session 200 in 39ms (compile: 2ms, proxy.ts: 33ms, render: 3ms)
+ GET /api/auth/session 200 in 30ms (compile: 1813µs, proxy.ts: 23ms, render: 4ms)
+ GET /api/auth/session 200 in 48ms (compile: 3ms, proxy.ts: 41ms, render: 4ms)
+ GET /api/auth/session 200 in 34ms (compile: 4ms, proxy.ts: 26ms, render: 4ms)
+ GET /api/auth/session 200 in 30ms (compile: 2ms, proxy.ts: 23ms, render: 5ms)
+ GET /api/auth/session 200 in 24ms (compile: 3ms, proxy.ts: 17ms, render: 4ms)
+ GET /api/auth/session 200 in 24ms (compile: 2ms, proxy.ts: 19ms, render: 3ms)
+ GET /api/auth/session 200 in 28ms (compile: 2ms, proxy.ts: 21ms, render: 5ms)
+ GET / 200 in 56ms (compile: 2ms, proxy.ts: 29ms, render: 25ms)
+ GET /api/auth/session 200 in 28ms (compile: 3ms, proxy.ts: 21ms, render: 4ms)
+ GET /api/auth/session 200 in 27ms (compile: 1603µs, proxy.ts: 22ms, render: 3ms)
+ GET /api/auth/session 200 in 25ms (compile: 3ms, proxy.ts: 16ms, render: 6ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 35ms (compile: 5ms, proxy.ts: 23ms, render: 7ms)
+ GET /api/auth/session 200 in 32ms (compile: 2ms, proxy.ts: 25ms, render: 5ms)
+ GET /api/auth/session 200 in 26ms (compile: 1804µs, proxy.ts: 21ms, render: 3ms)
+ GET /api/auth/session 200 in 31ms (compile: 2ms, proxy.ts: 24ms, render: 5ms)
+ GET /api/auth/session 200 in 26ms (compile: 3ms, proxy.ts: 19ms, render: 4ms)
+ GET /api/auth/session 200 in 27ms (compile: 1705µs, proxy.ts: 21ms, render: 4ms)
+ GET /api/auth/session 200 in 44ms (compile: 1839µs, proxy.ts: 38ms, render: 4ms)
+ GET /api/auth/session 200 in 31ms (compile: 3ms, proxy.ts: 24ms, render: 4ms)
+ GET /api/auth/session 200 in 36ms (compile: 1603µs, proxy.ts: 31ms, render: 3ms)
+ GET /api/auth/session 200 in 27ms (compile: 1642µs, proxy.ts: 22ms, render: 3ms)
+ GET /api/auth/session 200 in 36ms (compile: 1934µs, proxy.ts: 30ms, render: 4ms)
+ GET /api/auth/session 200 in 41ms (compile: 1768µs, proxy.ts: 35ms, render: 4ms)
+ GET /api/auth/session 200 in 26ms (compile: 2ms, proxy.ts: 19ms, render: 5ms)
+ GET /api/auth/session 200 in 47ms (compile: 1947µs, proxy.ts: 43ms, render: 3ms)
+ GET /api/auth/session 200 in 29ms (compile: 3ms, proxy.ts: 23ms, render: 3ms)
+ GET /api/auth/session 200 in 23ms (compile: 1747µs, proxy.ts: 18ms, render: 3ms)
+ GET /api/auth/session 200 in 34ms (compile: 1653µs, proxy.ts: 29ms, render: 3ms)
+ GET / 200 in 105ms (compile: 2ms, proxy.ts: 79ms, render: 23ms)
+ GET /api/auth/session 200 in 30ms (compile: 3ms, proxy.ts: 24ms, render: 3ms)
+ GET /api/auth/session 200 in 29ms (compile: 1697µs, proxy.ts: 24ms, render: 3ms)
+ GET /api/auth/session 200 in 36ms (compile: 4ms, proxy.ts: 27ms, render: 6ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 33ms (compile: 5ms, proxy.ts: 21ms, render: 7ms)
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/auth/session 200 in 71ms (compile: 2ms, proxy.ts: 64ms, render: 5ms)
+ GET /api/auth/session 200 in 26ms (compile: 1944µs, proxy.ts: 21ms, render: 3ms)
+ GET /api/auth/session 200 in 83ms (compile: 1842µs, proxy.ts: 77ms, render: 4ms)
+ GET /api/auth/session 200 in 27ms (compile: 2ms, proxy.ts: 20ms, render: 5ms)
+ GET /api/auth/session 200 in 23ms (compile: 1908µs, proxy.ts: 18ms, render: 3ms)
+ GET /api/auth/session 200 in 26ms (compile: 3ms, proxy.ts: 19ms, render: 4ms)
+ GET / 200 in 66ms (compile: 2ms, proxy.ts: 41ms, render: 23ms)
+ GET /api/auth/session 200 in 24ms (compile: 2ms, proxy.ts: 19ms, render: 3ms)
+ GET /api/auth/session 200 in 31ms (compile: 1495µs, proxy.ts: 27ms, render: 3ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 28ms (compile: 2ms, proxy.ts: 19ms, render: 7ms)
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/auth/session 200 in 29ms (compile: 3ms, proxy.ts: 22ms, render: 3ms)
+ GET / 200 in 65ms (compile: 2ms, proxy.ts: 39ms, render: 24ms)
+ GET /api/auth/session 200 in 25ms (compile: 1811µs, proxy.ts: 20ms, render: 3ms)
+ GET /api/auth/session 200 in 26ms (compile: 1517µs, proxy.ts: 22ms, render: 3ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 25ms (compile: 1664µs, proxy.ts: 17ms, render: 6ms)
+ GET /api/auth/session 200 in 21ms (compile: 1402µs, proxy.ts: 17ms, render: 3ms)
+ GET / 200 in 119ms (compile: 2ms, proxy.ts: 92ms, render: 25ms)
+ GET /api/auth/session 200 in 21ms (compile: 1723µs, proxy.ts: 16ms, render: 3ms)
+ GET /api/auth/session 200 in 26ms (compile: 3ms, proxy.ts: 20ms, render: 3ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 27ms (compile: 1931µs, proxy.ts: 18ms, render: 6ms)
+ GET /api/auth/session 200 in 20ms (compile: 1555µs, proxy.ts: 15ms, render: 4ms)
+ GET /api/auth/session 200 in 44ms (compile: 1817µs, proxy.ts: 39ms, render: 3ms)
+ GET /api/auth/session 200 in 25ms (compile: 1843µs, proxy.ts: 20ms, render: 3ms)
+ GET /api/auth/session 200 in 64ms (compile: 1821µs, proxy.ts: 59ms, render: 4ms)
+ GET /api/auth/session 200 in 24ms (compile: 2ms, proxy.ts: 19ms, render: 3ms)
+ GET /api/auth/session 200 in 142ms (compile: 12ms, proxy.ts: 128ms, render: 3ms)
+ GET /api/auth/session 200 in 31ms (compile: 1793µs, proxy.ts: 26ms, render: 3ms)
+ GET /api/auth/session 200 in 67ms (compile: 2ms, proxy.ts: 61ms, render: 4ms)
+ GET /api/auth/session 200 in 28ms (compile: 2ms, proxy.ts: 23ms, render: 3ms)
+ GET / 200 in 58ms (compile: 2ms, proxy.ts: 33ms, render: 23ms)
+ GET /api/auth/session 200 in 24ms (compile: 1903µs, proxy.ts: 19ms, render: 3ms)
+ GET /api/auth/session 200 in 21ms (compile: 1656µs, proxy.ts: 17ms, render: 3ms)
+ GET /api/auth/session 200 in 28ms (compile: 2ms, proxy.ts: 21ms, render: 5ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 26ms (compile: 1819µs, proxy.ts: 17ms, render: 7ms)
+ GET /api/auth/session 200 in 34ms (compile: 2ms, proxy.ts: 27ms, render: 5ms)
+ GET /api/auth/session 200 in 23ms (compile: 1906µs, proxy.ts: 17ms, render: 4ms)
+ GET /api/auth/session 200 in 30ms (compile: 2ms, proxy.ts: 22ms, render: 5ms)
+ GET /api/auth/session 200 in 27ms (compile: 2ms, proxy.ts: 21ms, render: 4ms)
+ GET /api/auth/session 200 in 24ms (compile: 2ms, proxy.ts: 16ms, render: 6ms)
+ GET /api/auth/session 200 in 44ms (compile: 2ms, proxy.ts: 37ms, render: 4ms)
+ GET /api/auth/session 200 in 32ms (compile: 3ms, proxy.ts: 23ms, render: 6ms)
+ GET /api/auth/session 200 in 28ms (compile: 1900µs, proxy.ts: 22ms, render: 4ms)
+ GET /api/auth/session 200 in 31ms (compile: 2ms, proxy.ts: 24ms, render: 5ms)
+ GET /api/auth/session 200 in 56ms (compile: 1924µs, proxy.ts: 50ms, render: 4ms)
+ GET /api/auth/session 200 in 27ms (compile: 1859µs, proxy.ts: 23ms, render: 3ms)
+ GET /api/auth/session 200 in 33ms (compile: 1911µs, proxy.ts: 28ms, render: 3ms)
+ GET /api/auth/session 200 in 33ms (compile: 2ms, proxy.ts: 28ms, render: 3ms)
+ GET /api/auth/session 200 in 29ms (compile: 4ms, proxy.ts: 20ms, render: 5ms)
+ POST /api/auth/_log 200 in 166ms (compile: 82ms, proxy.ts: 34ms, render: 50ms)
+ GET / 200 in 174ms (compile: 1868µs, proxy.ts: 16ms, render: 155ms)
+ GET /api/auth/session 200 in 24ms (compile: 2ms, proxy.ts: 17ms, render: 4ms)
+ GET /api/auth/session 200 in 30ms (compile: 1888µs, proxy.ts: 24ms, render: 4ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`email`, `main`.`users`.`role` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`subscriptions`.`id`, `main`.`subscriptions`.`userId`, `main`.`subscriptions`.`planId`, `main`.`subscriptions`.`status`, `main`.`subscriptions`.`stripeCustomerId`, `main`.`subscriptions`.`stripeSubscriptionId`, `main`.`subscriptions`.`stripePriceId`, `main`.`subscriptions`.`stripeCurrentPeriodEnd`, `main`.`subscriptions`.`trialStartsAt`, `main`.`subscriptions`.`trialEndsAt`, `main`.`subscriptions`.`currentPeriodStart`, `main`.`subscriptions`.`currentPeriodEnd`, `main`.`subscriptions`.`cancelAtPeriodEnd`, `main`.`subscriptions`.`sessionsUsed`, `main`.`subscriptions`.`sessionsLimit`, `main`.`subscriptions`.`createdAt`, `main`.`subscriptions`.`updatedAt` FROM `main`.`subscriptions` WHERE (`main`.`subscriptions`.`userId` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/subscription 200 in 35ms (compile: 3ms, proxy.ts: 18ms, render: 14ms)
+ GET /api/auth/session 200 in 32ms (compile: 3ms, proxy.ts: 26ms, render: 4ms)
+ GET /api/auth/session 200 in 43ms (compile: 2ms, proxy.ts: 38ms, render: 3ms)
+✓ Compiled in 184ms
+ GET /api/auth/session 200 in 32ms (compile: 2ms, proxy.ts: 25ms, render: 5ms)
+✓ Compiled in 135ms
+✓ Compiled in 121ms
+✓ Compiled in 170ms

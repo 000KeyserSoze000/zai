@@ -11,10 +11,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { AlertCircle, Loader2, LogIn, MousePointerClick } from 'lucide-react'
 import { OAuthButtons } from '@/components/oauth-buttons'
 
-// Demo credentials
+// Demo credentials - ContentPro
 const DEMO_CREDENTIALS = {
-  admin: { email: 'admin@aicmd.com', password: 'Admin123!', role: 'ADMIN' },
-  client: { email: 'client@test.com', password: 'Admin123!', role: 'CLIENT' },
+  admin: { email: 'admin@contentpro.fr', password: 'Admin123!', role: 'ADMIN' },
+  client: { email: 'client@contentpro.fr', password: 'Client123!', role: 'CLIENT' },
 }
 
 function LoginContent() {
@@ -110,7 +110,7 @@ function LoginContent() {
                 ) : (
                   <span className="px-2 py-0.5 bg-orange-500 text-white text-xs font-medium rounded">ADMIN</span>
                 )}
-                <span className="text-sm text-white font-mono">admin@aicmd.com</span>
+                <span className="text-sm text-white font-mono">admin@contentpro.fr</span>
               </div>
               <span className="text-sm text-neutral-300 font-mono">Admin123!</span>
             </button>
@@ -127,11 +127,10 @@ function LoginContent() {
                 ) : (
                   <span className="px-2 py-0.5 bg-cyan-500 text-white text-xs font-medium rounded">CLIENT</span>
                 )}
-                <span className="text-sm text-white font-mono">client@test.com</span>
+                <span className="text-sm text-white font-mono">client@contentpro.fr</span>
               </div>
-              <span className="text-sm text-neutral-300 font-mono">Admin123!</span>
+              <span className="text-sm text-neutral-300 font-mono">Client123!</span>
             </button>
-          </div>
         </div>
       </div>
       
