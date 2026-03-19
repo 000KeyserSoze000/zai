@@ -4,7 +4,8 @@ import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { 
   FolderOpen, Bot, Zap, Hammer, 
-  LayoutDashboard, History, Calendar, Terminal
+  LayoutDashboard, History, Calendar, Terminal,
+  Box
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -46,6 +47,13 @@ export default function OrchestratorLayout({
       icon: Zap,
       color: "text-orange-500",
       bg: "bg-orange-500/10"
+    },
+    {
+      name: t("nav.escCollection"),
+      href: "/admin/orchestrator/esc-collection",
+      icon: Box,
+      color: "text-orange-400",
+      bg: "bg-orange-400/10"
     },
     {
       name: t("nav.tools"),

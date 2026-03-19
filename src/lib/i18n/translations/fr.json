@@ -70,7 +70,8 @@
         "skills": "COMPÉTENCES",
         "tools": "OUTILS",
         "scheduler": "SCHEDULER",
-        "observability": "OBSERVABILITÉ"
+        "observability": "OBSERVABILITÉ",
+        "escCollection": "COLLECTION ESC"
     },
     "auth": {
         "login": "Connexion",

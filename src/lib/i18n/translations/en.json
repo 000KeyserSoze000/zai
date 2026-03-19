@@ -70,7 +70,8 @@
         "skills": "SKILLS",
         "tools": "TOOLS",
         "scheduler": "SCHEDULER",
-        "observability": "OBSERVABILITY"
+        "observability": "OBSERVABILITY",
+        "escCollection": "ESC COLLECTION"
     },
     "auth": {
         "login": "Login",
