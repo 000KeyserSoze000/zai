@@ -67,7 +67,7 @@ export async function generateAIResponse(
   }
 
   const temperature = options.temperature ?? 0.7;
-  const maxTokens = Math.min(options.maxTokens ?? 1000, 1000); // Allow up to 1000 tokens
+  const maxTokens = options.maxTokens ?? 2000; // Increased to 2000 to support complex JSON outputs in Content Studio
 
   console.log('[AI Provider] ========== STARTING AI GENERATION ==========');
   console.log('[AI Provider] System prompt length:', finalSystemPrompt.length);

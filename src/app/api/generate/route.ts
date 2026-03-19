@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
     const processedContext = await applyBrandSubstitutions(context, brandSubs)
     const processedTitle = title ? await applyBrandSubstitutions(title, brandSubs) : undefined
 
-    let result: Awaited<ReturnType<typeof generateAIResponse>>
+    let result: any
 
     switch (type) {
       case 'metadata': {
@@ -199,13 +199,17 @@ ${processedContext}
 
 Provide 3 different title options, a comprehensive description with timestamps, relevant tags, hashtags, SEO score, target audience description, and key moments for chapters.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
+        const aiResponse = await generateAIResponse(systemPrompt, userPrompt, { 
+          temperature: temperature || 0.7,
+          userId: effectiveUserId 
+        })
+        result = aiResponse.content
 
         // Try to parse the JSON from the response
         let parsedData
         try {
           // Extract JSON if it's wrapped in markdown code blocks
-          const content = result.content
+          const content = result
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
@@ -227,8 +231,8 @@ Provide 3 different title options, a comprehensive description with timestamps, 
         }
 
         // Sauvegarder en DB si sessionId fourni
-        if (sessionId && userId) {
-          await saveToSession(sessionId, userId, 'metadata', parsedData, 1500, 0.02)
+        if (sessionId && effectiveUserId) {
+          await saveToSession(sessionId, effectiveUserId, 'metadata', parsedData, 1500, 0.02)
         }
 
         return NextResponse.json({
@@ -280,11 +284,15 @@ Context: ${processedContext}
 
 Each direction should have a unique style, color palette, typography recommendations, mood keywords, and a brief concept for the thumbnail design.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
+        const aiResponse = await generateAIResponse(systemPrompt, userPrompt, { 
+          temperature: temperature || 0.7,
+          userId: effectiveUserId 
+        })
+        result = aiResponse.content
 
         let parsedData
         try {
-          const content = result.content
+          const content = result
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
@@ -320,8 +328,8 @@ Each direction should have a unique style, color palette, typography recommendat
         }
 
         // Sauvegarder en DB si sessionId fourni
-        if (sessionId && userId) {
-          await saveToSession(sessionId, userId, 'artistic', parsedData, 1000, 0.015)
+        if (sessionId && effectiveUserId) {
+          await saveToSession(sessionId, effectiveUserId, 'artistic', parsedData, 1000, 0.015)
         }
 
         return NextResponse.json({
@@ -363,11 +371,15 @@ Video Tags: ${metadata?.tags?.join(', ') || 'N/A'}
 
 Create platform-optimized posts that will drive engagement and views. Each post must be unique and tailored to the platform's audience.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
+        const aiResponse = await generateAIResponse(systemPrompt, userPrompt, { 
+          temperature: temperature || 0.7,
+          userId: effectiveUserId 
+        })
+        result = aiResponse.content
 
         let parsedData
         try {
-          const content = result.content
+          const content = result
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
@@ -376,42 +388,42 @@ Create platform-optimized posts that will drive engagement and views. Each post 
             posts: [
               {
                 platform: 'linkedin',
-                content: `Nouvelle video ! ${metadata?.title || 'Nouveau contenu'}\n\nDecouvrez comment ameliorer votre productivite avec l'IA.`,
+                content: `Nouvelle video ! Decouvrez comment ameliorer votre productivite avec l'IA.`,
                 hashtags: ['#ContentCreation', '#AITools', '#YouTube']
               },
               {
                 platform: 'youtube_community',
-                content: `Nouvelle video en ligne ! ${metadata?.title || 'Nouveau contenu'}`,
+                content: `Nouvelle video en ligne !`,
                 hashtags: ['#YouTube', '#ContentCreator']
               },
               {
                 platform: 'tiktok',
-                content: `POV: Tu decouvre cette technique 🤯 ${metadata?.title || 'Nouveau contenu'}`,
+                content: `POV: Tu decouvre cette technique 🤯`,
                 hashtags: ['#fyp', '#pourtoi', '#tutoriel']
               },
               {
                 platform: 'x',
-                content: `${metadata?.title || 'Nouveau contenu'} - Tu ne vas pas en revenir... 👀`,
+                content: `Tu ne vas pas en revenir... 👀`,
                 hashtags: ['#Nouveau']
               },
               {
                 platform: 'instagram',
-                content: `Nouvelle video en ligne ! 🎬\n\n${metadata?.title || 'Nouveau contenu'}\n\nLien en bio 👆`,
+                content: `Nouvelle video en ligne ! 🎬\n\nLien en bio 👆`,
                 hashtags: ['#ContentCreator', '#YouTube']
               },
               {
                 platform: 'facebook',
-                content: `Nouvelle video publiee ! ${metadata?.title || 'Nouveau contenu'}\n\nLikez et partagez !`,
+                content: `Nouvelle video publiee ! Likez et partagez !`,
                 hashtags: ['#Video', '#Contenu']
               },
               {
                 platform: 'threads',
-                content: `Quoi de neuf ? Une nouvelle video ! ${metadata?.title || 'Nouveau contenu'}`,
+                content: `Quoi de neuf ? Une nouvelle video !`,
                 hashtags: ['#Nouveau']
               },
               {
                 platform: 'school',
-                content: `Apprenez a ${metadata?.title?.toLowerCase() || 'creer du contenu'} avec cette nouvelle formation.`,
+                content: `Apprenez a creer du contenu avec cette nouvelle formation.`,
                 hashtags: ['#Formation', '#YouTube']
               }
             ]
@@ -419,8 +431,8 @@ Create platform-optimized posts that will drive engagement and views. Each post 
         }
 
         // Sauvegarder en DB si sessionId fourni
-        if (sessionId && userId) {
-          await saveToSession(sessionId, userId, 'social', parsedData, 1500, 0.02)
+        if (sessionId && effectiveUserId) {
+          await saveToSession(sessionId, effectiveUserId, 'social', parsedData, 1500, 0.02)
         }
 
         return NextResponse.json({
@@ -446,11 +458,15 @@ The prompt should:
 - Be optimized for AI image generation
 - Result in a 16:9 aspect ratio image`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
+        const aiResponse = await generateAIResponse(systemPrompt, userPrompt, { 
+          temperature: temperature || 0.7,
+          userId: effectiveUserId 
+        })
+        result = aiResponse.content
 
         return NextResponse.json({
           success: true,
-          data: finalizeResult(result.content),
+          data: finalizeResult(result),
           usage: { totalTokens: 500 }
         })
       }
@@ -476,17 +492,21 @@ Respond with a JSON object containing:
   ]
 }`
 
-        const userPrompt = `Generate catchy thumbnail titles for a YouTube video titled:
+        const userPrompt = `Generate catchy thumbnail titles for a YouTube video based on:
 
 "${processedContext}"
 
 Create a main title (2-4 words, uppercase) and a short title (1-2 words, uppercase) that will make people want to click. Focus on the core benefit or curiosity factor.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
+        const aiResponse = await generateAIResponse(systemPrompt, userPrompt, { 
+          temperature: temperature || 0.7,
+          userId: effectiveUserId 
+        })
+        result = aiResponse.content
 
         let parsedData
         try {
-          const content = result.content
+          const content = result
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
@@ -533,11 +553,15 @@ Respond with a JSON object containing:
 
         const userPrompt = `Analyze and generate financial projections for:\n\n${processedContext}\n\nProvide a comprehensive financial report with revenue projections, expense analysis, cashflow forecasting, KPIs, risks, and strategic recommendations.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
+        const aiResponse = await generateAIResponse(systemPrompt, userPrompt, { 
+          temperature: temperature || 0.7,
+          userId: effectiveUserId 
+        })
+        result = aiResponse.content
 
         let parsedData
         try {
-          const content = result.content
+          const content = result
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
@@ -612,11 +636,15 @@ Respond with a JSON object containing:
 
         const userPrompt = `Create a comprehensive marketing strategy for:\n\n${processedContext}\n\nInclude buyer personas, campaign ideas, content calendar, funnel strategy, budget allocation, and timeline.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
+        const aiResponse = await generateAIResponse(systemPrompt, userPrompt, { 
+          temperature: temperature || 0.7,
+          userId: effectiveUserId 
+        })
+        result = aiResponse.content
 
         let parsedData
         try {
-          const content = result.content
+          const content = result
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
@@ -686,11 +714,15 @@ Respond with a JSON object containing:
 
         const userPrompt = `Generate a professional business document for:\n\n${processedContext}\n\nCreate a comprehensive, well-structured document with all necessary sections, metrics, and action items.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
+        const aiResponse = await generateAIResponse(systemPrompt, userPrompt, { 
+          temperature: temperature || 0.7,
+          userId: effectiveUserId 
+        })
+        result = aiResponse.content
 
         let parsedData
         try {
-          const content = result.content
+          const content = result
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
@@ -754,11 +786,15 @@ Respond with a JSON object containing:
 
         const userPrompt = `Generate a batch of social media content for:\n\n${processedContext}\n\nCreate viral hooks, platform-optimized posts, a weekly calendar, trend suggestions, and A/B test ideas. Focus on maximum engagement.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
+        const aiResponse = await generateAIResponse(systemPrompt, userPrompt, { 
+          temperature: temperature || 0.7,
+          userId: effectiveUserId 
+        })
+        result = aiResponse.content
 
         let parsedData
         try {
-          const content = result.content
+          const content = result
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
@@ -767,31 +803,18 @@ Respond with a JSON object containing:
             hooks: [
               { text: "Arretez de poster du contenu. Faites CECI a la place 👇", platform: "tiktok", viralScore: 92, type: "shock" },
               { text: "J'ai gagne 10K abonnes en 30 jours avec cette methode...", platform: "instagram", viralScore: 88, type: "curiosity" },
-              { text: "Le secret que les gros comptes ne veulent pas que vous sachiez", platform: "x", viralScore: 85, type: "curiosity" },
-              { text: "Vous faites tous la meme erreur sur LinkedIn. Voici pourquoi.", platform: "x", viralScore: 90, type: "shock" },
-              { text: "POV: Tu decouvres l'IA qui fait ton contenu a ta place", platform: "tiktok", viralScore: 87, type: "curiosity" },
             ],
             posts: [
-              { platform: "instagram", content: "5 outils IA que j'utilise chaque jour 🔧\n\n1️⃣ ChatGPT - Ideation\n2️⃣ Midjourney - Visuels\n3️⃣ Descript - Montage\n4️⃣ Canva - Design\n5️⃣ Notre outil - Tout automatiser\n\n💾 Enregistre ce post pour plus tard !", hashtags: ["#IA", "#ContentCreator", "#Tools", "#Productivite"], bestTime: "12:00", estimatedReach: "5K-15K", type: "carousel" },
-              { platform: "tiktok", content: "POV: Tu passes de 3h a 15min pour creer ton contenu 🤯\n\n#productivite #ia #contentcreator", hashtags: ["#fyp", "#pourtoi", "#ia", "#contentcreator"], bestTime: "18:00", estimatedReach: "10K-50K", type: "reel" },
-              { platform: "linkedin", content: "J'ai automatise 80% de ma creation de contenu.\n\nVoici ce que j'ai appris en 3 mois :\n\n📌 L'IA ne remplace pas la creativite\n📌 Elle accelere l'execution\n📌 La qualite augmente quand on a plus de temps\n\nResultat : 3x plus de contenu, meilleur engagement.\n\nQuel outil utilisez-vous pour votre contenu ?", hashtags: ["#ContentMarketing", "#IA", "#Productivite"], bestTime: "08:30", estimatedReach: "2K-8K", type: "post" },
-              { platform: "x", content: "Les createurs qui n'utilisent pas l'IA en 2024 sont comme ceux qui refusaient les reseaux sociaux en 2015.\n\nDans 2 ans, ils regretteront.", hashtags: ["#IA", "#Content"], bestTime: "09:00", estimatedReach: "1K-5K", type: "post" },
+              { platform: "instagram", content: "5 outils IA que j'utilise chaque jour 🔧", hashtags: ["#IA", "#ContentCreator"], bestTime: "12:00", estimatedReach: "5K-15K", type: "carousel" },
             ],
             calendar: [
-              { day: "Lundi", posts: [{ time: "08:30", platform: "LinkedIn", content_summary: "Post educatif IA" }, { time: "12:00", platform: "Instagram", content_summary: "Carrousel tips" }] },
-              { day: "Mardi", posts: [{ time: "09:00", platform: "X", content_summary: "Take controverse" }, { time: "18:00", platform: "TikTok", content_summary: "Reel POV" }] },
-              { day: "Mercredi", posts: [{ time: "12:00", platform: "YouTube", content_summary: "Video longue" }, { time: "14:00", platform: "LinkedIn", content_summary: "Behind the scenes" }] },
-              { day: "Jeudi", posts: [{ time: "08:30", platform: "Instagram", content_summary: "Story interactive" }, { time: "18:00", platform: "TikTok", content_summary: "Hook viral" }] },
-              { day: "Vendredi", posts: [{ time: "09:00", platform: "X", content_summary: "Thread temoignage" }, { time: "12:00", platform: "LinkedIn", content_summary: "Recap semaine" }] },
+              { day: "Lundi", posts: [{ time: "08:30", platform: "LinkedIn", content_summary: "Post educatif IA" }] },
             ],
             trends: [
-              { trend: "IA generative", relevance: "high", suggestion: "Creer du contenu montrant les coulisses de l'utilisation IA" },
-              { trend: "Authenticite", relevance: "high", suggestion: "Montrer les echecs et les apprentissages" },
-              { trend: "Format court", relevance: "medium", suggestion: "Adapter les contenus longs en shorts/reels" },
+              { trend: "IA generative", relevance: "high", suggestion: "Creer du contenu montrant les coulisses" },
             ],
             abTests: [
               { variant_a: "Hook: Question directe", variant_b: "Hook: Statistique choc", metric: "Taux d'engagement" },
-              { variant_a: "Post avec emojis", variant_b: "Post sans emojis", metric: "Taux de clic" },
             ]
           }
         }
@@ -800,151 +823,66 @@ Respond with a JSON object containing:
       }
 
       case 'skill_execution': {
-        // Handle different skill types with proper JSON output
-        const effectiveSkillSlug = skillSlug || 'default'
-        
-        // Metadata skill - returns titles, description, tags
-        if (effectiveSkillSlug === 'youtube-extraction' || effectiveSkillSlug === 'metadata') {
-          const systemPrompt = `You are a YouTube SEO expert. Generate metadata for the given content.
+        if (!skillSlug) {
+          return NextResponse.json({ error: 'skillSlug is required for skill_execution' }, { status: 400 })
+        }
 
-Respond ONLY with valid JSON (no markdown):
-{
-  "titles": ["title1", "title2", "title3"],
-  "description": "Full description with timestamps",
-  "tags": ["tag1", "tag2", "tag3"],
-  "hashtags": ["#hashtag1", "#hashtag2"],
-  "seoScore": 85,
-  "targetAudience": "Description of target audience",
-  "keyMoments": ["moment1", "moment2", "moment3"]
-}`
+        // 1. Try to find the skill in the main Skill table
+        let skill = await db.skill.findUnique({
+          where: { slug: skillSlug }
+        })
+
+        let skillSystemPrompt: string
+        let skillName: string
+
+        if (skill) {
+          skillSystemPrompt = skill.promptTemplate
+          skillName = skill.name
+        } else {
+          // 2. Try to find it in the EscSkill table if it's active
+          const escSkill = await db.escSkill.findUnique({
+            where: { slug: skillSlug, isActive: true }
+          })
           
-          result = await generateAIResponse(systemPrompt, processedContext, { temperature: temperature || 0.7 })
-          
-          let parsedData
-          try {
-            const content = result.content
-            const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
-            const jsonStr = jsonMatch ? jsonMatch[1] : content
-            parsedData = JSON.parse(jsonStr)
-          } catch {
-            parsedData = {
-              titles: ["Titre optimisé SEO 1", "Titre optimisé SEO 2", "Titre optimisé SEO 3"],
-              description: processedContext,
-              tags: ["youtube", "seo", "content"],
-              hashtags: ["#YouTube", "#SEO"],
-              seoScore: 85,
-              targetAudience: "Créateurs de contenu",
-              keyMoments: ["Introduction", "Contenu principal", "Conclusion"]
+          if (escSkill) {
+            skillSystemPrompt = escSkill.promptContent
+            skillName = escSkill.name
+          } else {
+            // Fallback for known critical skills if DB is empty or connection fails
+            const fallbacks: Record<string, string> = {
+              'content-analyst': "You are a senior content analyst. Create a 'Content Blueprint' for the given context. Respond in JSON.",
+              'youtube-extraction': "You are a YouTube SEO expert. Extract metadata (titles, description, tags) from the context. Respond in JSON.",
+              'artistic-directions': "You are a creative director. Generate 3 artistic directions for thumbnails. Respond in JSON.",
+              'social-posts': "You are a social media manager. Generate posts for multiple platforms. Respond in JSON."
+            }
+            
+            if (fallbacks[skillSlug]) {
+              skillSystemPrompt = fallbacks[skillSlug]
+              skillName = `Fallback ${skillSlug}`
+            } else {
+              skillSystemPrompt = `You are an expert AI assistant executing the skill: ${skillSlug}.`
+              skillName = skillSlug
             }
           }
-          
-          return NextResponse.json({ 
-            success: true, 
-            data: finalizeResult(parsedData), 
-            usage: { totalTokens: 1000 } 
-          })
         }
         
-        // Artistic directions skill
-        if (effectiveSkillSlug === 'artistic-directions') {
-          const systemPrompt = `You are a creative director. Generate 3 artistic directions for thumbnails.
+        // Apply tags if any (e.g. {{context}})
+        const finalSystemPrompt = skillSystemPrompt.replace(/\{\{context\}\}/g, processedContext)
+        const userPrompt = `Context: ${processedContext}\n\nExecute the skill and return the expected structured output.`
 
-Respond ONLY with valid JSON (no markdown):
-{
-  "directions": [
-    {
-      "name": "Direction Name",
-      "style": "modern|retro|minimalist|bold|elegant|playful",
-      "colorPalette": {"primary": "#hex", "secondary": "#hex", "accent": "#hex", "background": "#hex", "text": "#hex"},
-      "typography": {"headingFont": "Font", "bodyFont": "Font", "headingWeight": "700", "emphasis": "uppercase"},
-      "moodKeywords": ["keyword1", "keyword2"],
-      "thumbnailConcept": "Brief concept"
-    }
-  ]
-}`
-          
-          result = await generateAIResponse(systemPrompt, processedContext, { temperature: temperature || 0.7 })
-          
-          let parsedData
-          try {
-            const content = result.content
-            const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
-            const jsonStr = jsonMatch ? jsonMatch[1] : content
-            parsedData = JSON.parse(jsonStr)
-          } catch {
-            parsedData = {
-              directions: [
-                { name: "Modern Tech", style: "modern", colorPalette: {primary: "#FF6B00", secondary: "#1A1A2E", accent: "#00D9FF", background: "#0F0F1A", text: "#FFFFFF"}, typography: {headingFont: "Inter", bodyFont: "Inter", headingWeight: "800", emphasis: "uppercase"}, moodKeywords: ["innovant", "tech"], thumbnailConcept: "Design moderne" },
-                { name: "Minimalist", style: "minimalist", colorPalette: {primary: "#2D2D2D", secondary: "#F5F5F5", accent: "#FFD700", background: "#FFFFFF", text: "#1A1A1A"}, typography: {headingFont: "Playfair", bodyFont: "Lato", headingWeight: "700", emphasis: "capitalize"}, moodKeywords: ["élégant", "epuré"], thumbnailConcept: "Design minimaliste" },
-                { name: "Bold Impact", style: "bold", colorPalette: {primary: "#FF0050", secondary: "#000000", accent: "#00FF88", background: "#111111", text: "#FFFFFF"}, typography: {headingFont: "Bebas", bodyFont: "Roboto", headingWeight: "900", emphasis: "uppercase"}, moodKeywords: ["audacieux", "impact"], thumbnailConcept: "Design audacieux" }
-              ]
-            }
-          }
-          
-          return NextResponse.json({ 
-            success: true, 
-            data: finalizeResult(parsedData), 
-            usage: { totalTokens: 1000 } 
-          })
-        }
-        
-        // Social posts skill
-        if (effectiveSkillSlug === 'social-posts') {
-          const systemPrompt = `You are a social media expert. Generate posts for ALL platforms: linkedin, youtube_community, tiktok, x, instagram, facebook, threads, school.
+        console.log(`[API Generate] Executing skill: ${skillName} (${skillSlug})`)
 
-Respond ONLY with valid JSON (no markdown):
-{
-  "posts": [
-    {"platform": "linkedin", "content": "Post content...", "hashtags": ["#hashtag"]},
-    {"platform": "youtube_community", "content": "Post content...", "hashtags": ["#hashtag"]},
-    {"platform": "tiktok", "content": "Post content...", "hashtags": ["#hashtag"]},
-    {"platform": "x", "content": "Post content...", "hashtags": ["#hashtag"]},
-    {"platform": "instagram", "content": "Post content...", "hashtags": ["#hashtag"]},
-    {"platform": "facebook", "content": "Post content...", "hashtags": ["#hashtag"]},
-    {"platform": "threads", "content": "Post content...", "hashtags": ["#hashtag"]},
-    {"platform": "school", "content": "Post content...", "hashtags": ["#hashtag"]}
-  ]
-}`
-          
-          result = await generateAIResponse(systemPrompt, processedContext, { temperature: temperature || 0.7 })
-          
-          let parsedData
-          try {
-            const content = result.content
-            const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
-            const jsonStr = jsonMatch ? jsonMatch[1] : content
-            parsedData = JSON.parse(jsonStr)
-          } catch {
-            parsedData = {
-              posts: [
-                { platform: "linkedin", content: "Nouvelle publication ! Découvrez notre contenu.", hashtags: ["#Content"] },
-                { platform: "youtube_community", content: "Nouvelle vidéo en ligne !", hashtags: ["#YouTube"] },
-                { platform: "tiktok", content: "POV: Tu découvres cette technique 🤯", hashtags: ["#fyp"] },
-                { platform: "x", content: "Nouveau contenu disponible 👀", hashtags: ["#New"] },
-                { platform: "instagram", content: "🎬 NOUVELLE VIDÉO 🔗 Lien en bio", hashtags: ["#Instagram"] },
-                { platform: "facebook", content: "Nouvelle vidéo ! 👍 Likez et partagez !", hashtags: ["#Video"] },
-                { platform: "threads", content: "Quoi de neuf ? Une nouvelle vidéo !", hashtags: ["#Threads"] },
-                { platform: "school", content: "Nouvelle formation disponible !", hashtags: ["#Formation"] }
-              ]
-            }
-          }
-          
-          return NextResponse.json({ 
-            success: true, 
-            data: finalizeResult(parsedData), 
-            usage: { totalTokens: 1500 } 
-          })
-        }
+        const aiResponse = await generateAIResponse(finalSystemPrompt, userPrompt, { 
+          temperature: temperature || 0.7,
+          userId: effectiveUserId 
+        })
         
-        // Default skill execution - return raw result
-        const systemPrompt = `You are an expert AI assistant. Execute the requested task with precision and provide structured, actionable results.`
-        
-        result = await generateAIResponse(systemPrompt, processedContext, { temperature: temperature || 0.7 })
+        result = aiResponse.content
 
         return NextResponse.json({ 
           success: true, 
-          data: finalizeResult(result.content), 
-          usage: { totalTokens: 1000 } 
+          data: finalizeResult(result), 
+          usage: { totalTokens: 1500 } 
         })
       }
 

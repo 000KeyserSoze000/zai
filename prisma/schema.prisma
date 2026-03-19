@@ -1,4 +1,4 @@
-// ContentPro - SQLite Schema
+// ContentPro - PostgreSQL Schema
 // Application SaaS de gestion de contenu et d'automatisation IA
 
 generator client {
@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -551,4 +551,28 @@ model SupportTicket {
   updatedAt DateTime      @updatedAt
 
   @@map("support_tickets")
+}
+
+// ============================================
+// ESC SKILLS COLLECTION
+// ============================================
+
+model EscSkill {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  description   String?
+  category      String   @default("general")
+  source        String   @default("esc-skills")
+  version       String   @default("1.0.0")
+  contentHash   String?
+  promptContent String   @db.Text
+  isActive      Boolean  @default(false)
+  isInstalled   Boolean  @default(true)
+  icon          String   @default("Zap")
+  color         String   @default("orange")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("esc_skills")
 }
