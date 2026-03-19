@@ -88,13 +88,22 @@ export default function EscCollectionPage() {
       const res = await fetch("/api/admin/esc-skills/import", { method: "POST" })
       if (res.ok) {
         const data = await res.json()
-        toast({
-          title: "Synchronisation réussie",
-          description: `${data.results.added} nouvelles skills, ${data.results.updated} mises à jour.`,
-        })
+        if (data.results.added === 0 && data.results.updated === 0) {
+          toast({
+            title: "Synchronisation terminée (0 skills)",
+            description: "Le manifeste a été lu mais aucun nouveau skill n'a été trouvé ou mis à jour.",
+          })
+          if (data.logs) console.log("ESC Sync Logs:", data.logs)
+        } else {
+          toast({
+            title: "Synchronisation réussie",
+            description: `${data.results.added} nouvelles skills, ${data.results.updated} mises à jour.`,
+          })
+        }
         fetchSkills()
       } else {
-        throw new Error("Sync failed")
+        const errorData = await res.json().catch(() => ({}))
+        throw new Error(errorData.error || "Sync failed")
       }
     } catch (error) {
       toast({
