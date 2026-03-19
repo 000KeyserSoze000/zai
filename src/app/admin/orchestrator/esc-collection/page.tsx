@@ -10,6 +10,9 @@ import {
   ExternalLink,
   Loader2,
   Box,
+  Eye,
+  PlusCircle,
+  Copy
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -30,8 +33,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { useTranslation } from "@/lib/i18n"
+import { Switch } from "@/components/ui/switch"
 
 interface EscSkill {
   id: string
@@ -44,31 +56,45 @@ interface EscSkill {
   isActive: boolean
   icon: string
   color: string
+  promptContent: string
   updatedAt: string
 }
 
 export default function EscCollectionPage() {
   const [skills, setSkills] = useState<EscSkill[]>([])
+  const [agents, setAgents] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
   const [search, setSearch] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
+  
+  // Dialog states
+  const [viewSkill, setViewSkill] = useState<EscSkill | null>(null)
+  const [installSkill, setInstallSkill] = useState<EscSkill | null>(null)
+  const [selectedAgentId, setSelectedAgentId] = useState<string>("")
+  const [installing, setInstalling] = useState(false)
+
   const { toast } = useToast()
   const { t } = useTranslation()
 
-  const fetchSkills = async () => {
+  const fetchData = async () => {
     setLoading(true)
     try {
-      const res = await fetch("/api/admin/esc-skills")
-      if (res.ok) {
-        const data = await res.json()
-        setSkills(data)
+      const [skillsRes, agentsRes] = await Promise.all([
+        fetch("/api/admin/esc-skills"),
+        fetch("/api/admin/orchestrator/agents")
+      ])
+      
+      if (skillsRes.ok) setSkills(await skillsRes.json())
+      if (agentsRes.ok) {
+        const agentsData = await agentsRes.json()
+        setAgents(agentsData.agents || agentsData)
       }
     } catch (error) {
-      console.error("Failed to fetch skills:", error)
+      console.error("Failed to fetch data:", error)
       toast({
         title: t("common.error"),
-        description: "Impossible de charger la collection",
+        description: "Chargement échoué.",
         variant: "destructive",
       })
     } finally {
@@ -94,7 +120,7 @@ export default function EscCollectionPage() {
             description: `${data.results.added} ajoutés, ${data.results.updated} mis à jour.`,
           })
         }
-        fetchSkills()
+        fetchData()
       } else {
         const errorData = await res.json().catch(() => ({}))
         throw new Error(errorData.error || "Sync failed")
@@ -145,8 +171,29 @@ export default function EscCollectionPage() {
     }
   }
 
+  const handleInstall = async () => {
+    if (!installSkill || !selectedAgentId) return
+    setInstalling(true)
+    try {
+      const res = await fetch(`/api/admin/esc-skills/${installSkill.id}/install`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ agentId: selectedAgentId }),
+      })
+      if (res.ok) {
+        toast({ title: "Installé", description: "La skill est prête dans l'Orchestrateur." })
+        setInstallSkill(null)
+        fetchData()
+      }
+    } catch (error) {
+      toast({ title: t("common.error"), variant: "destructive" })
+    } finally {
+      setInstalling(false)
+    }
+  }
+
   useEffect(() => {
-    fetchSkills()
+    fetchData()
   }, [])
 
   const filteredSkills = skills.filter(s => {
@@ -245,8 +292,26 @@ export default function EscCollectionPage() {
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-neutral-600 hover:text-white">
-                      <ExternalLink className="w-4 h-4" />
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-neutral-600 hover:text-white"
+                      onClick={() => setViewSkill(skill)}
+                      title="Voir le prompt"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-neutral-600 hover:text-orange-500"
+                      onClick={() => {
+                        setInstallSkill(skill)
+                        setSelectedAgentId("")
+                      }}
+                      title="Installer / Utiliser"
+                    >
+                      <PlusCircle className="w-4 h-4" />
                     </Button>
                     <Button 
                       variant="ghost" 
@@ -262,6 +327,84 @@ export default function EscCollectionPage() {
             ))}
           </div>
         )}
+
+        {/* View Content Dialog */}
+        <Dialog open={!!viewSkill} onOpenChange={() => setViewSkill(null)}>
+          <DialogContent className="max-w-3xl bg-neutral-900 border-neutral-800 text-white">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Box className="w-5 h-5 text-orange-500" />
+                {viewSkill?.name}
+              </DialogTitle>
+              <DialogDescription className="text-neutral-400">
+                Aperçu du template de prompt (SKILL.md)
+              </DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="max-h-[500px] mt-4 rounded-md border border-neutral-800 bg-black/40 p-4">
+              <pre className="text-xs font-mono whitespace-pre-wrap text-neutral-300">
+                {viewSkill?.promptContent}
+              </pre>
+            </ScrollArea>
+            <DialogFooter className="mt-6">
+              <Button 
+                variant="outline" 
+                onClick={() => setViewSkill(null)}
+                className="border-neutral-800 text-white hover:bg-neutral-800"
+              >
+                Fermer
+              </Button>
+              <Button 
+                className="bg-orange-600 hover:bg-orange-700"
+                onClick={() => {
+                  setInstallSkill(viewSkill)
+                  setViewSkill(null)
+                }}
+              >
+                Installer cette skill
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Install Dialog */}
+        <Dialog open={!!installSkill} onOpenChange={() => setInstallSkill(null)}>
+          <DialogContent className="bg-neutral-900 border-neutral-800 text-white">
+            <DialogHeader>
+              <DialogTitle>Installer dans l'Orchestrateur</DialogTitle>
+              <DialogDescription className="text-neutral-400">
+                Choisissez l'agent qui sera responsable de cette compétence.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-6 space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-neutral-400">Agent responsable</label>
+                <Select value={selectedAgentId} onValueChange={setSelectedAgentId}>
+                  <SelectTrigger className="bg-neutral-950 border-neutral-800">
+                    <SelectValue placeholder="Sélectionner un agent" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-neutral-900 border-neutral-800 text-white">
+                    {agents.map(agent => (
+                      <SelectItem key={agent.id} value={agent.id}>
+                        {agent.name} ({agent.category?.name || "Sans catégorie"})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="ghost" onClick={() => setInstallSkill(null)}>Annuler</Button>
+              <Button 
+                disabled={!selectedAgentId || installing} 
+                onClick={handleInstall}
+                className="bg-orange-600 hover:bg-orange-700"
+              >
+                {installing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
+                Confirmer l'installation
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )
