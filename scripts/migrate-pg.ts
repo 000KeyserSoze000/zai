@@ -7,7 +7,7 @@ dotenv.config()
 const pg = new PgClient({
   datasources: {
     db: {
-      url: 'postgresql://florentpostgree:laureenqWeR55t@212.227.84.152:5432/contentpropostgree'
+      url: process.env.DATABASE_URL
     }
   }
 })
