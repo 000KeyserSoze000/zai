@@ -142,12 +142,13 @@ ${context ? `Additional context: ${context}` : ''}
 
 Each direction should have a unique style, color palette, typography recommendations, mood keywords, and a brief concept for the thumbnail design.`
 
-    const aiResponse = await generateAIResponse(systemPrompt, userPrompt, 0.7)
+    const aiResponse = await generateAIResponse(systemPrompt, userPrompt, { temperature: 0.7 })
 
     let directions = []
     try {
-      const jsonMatch = aiResponse.match(/```json\s*([\s\S]*?)\s*```/) || aiResponse.match(/```\s*([\s\S]*?)\s*```/)
-      const jsonStr = jsonMatch ? jsonMatch[1] : aiResponse
+      const content = aiResponse.content
+      const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
+      const jsonStr = jsonMatch ? jsonMatch[1] : content
       const parsed = JSON.parse(jsonStr)
       directions = parsed.directions || []
     } catch (parseError) {

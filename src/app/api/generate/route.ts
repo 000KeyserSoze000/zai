@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
     const processedContext = await applyBrandSubstitutions(context, brandSubs)
     const processedTitle = title ? await applyBrandSubstitutions(title, brandSubs) : undefined
 
-    let result: string
+    let result: Awaited<ReturnType<typeof generateAIResponse>>
 
     switch (type) {
       case 'metadata': {
@@ -199,14 +199,15 @@ ${processedContext}
 
 Provide 3 different title options, a comprehensive description with timestamps, relevant tags, hashtags, SEO score, target audience description, and key moments for chapters.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, temperature || 0.7)
+        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
 
         // Try to parse the JSON from the response
         let parsedData
         try {
           // Extract JSON if it's wrapped in markdown code blocks
-          const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/) || result.match(/```\s*([\s\S]*?)\s*```/)
-          const jsonStr = jsonMatch ? jsonMatch[1] : result
+          const content = result.content
+          const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
+          const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
         } catch {
           // If parsing fails, create a structured response
@@ -279,12 +280,13 @@ Context: ${processedContext}
 
 Each direction should have a unique style, color palette, typography recommendations, mood keywords, and a brief concept for the thumbnail design.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, temperature || 0.7)
+        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
 
         let parsedData
         try {
-          const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/) || result.match(/```\s*([\s\S]*?)\s*```/)
-          const jsonStr = jsonMatch ? jsonMatch[1] : result
+          const content = result.content
+          const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
+          const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
         } catch {
           parsedData = {
@@ -361,12 +363,13 @@ Video Tags: ${metadata?.tags?.join(', ') || 'N/A'}
 
 Create platform-optimized posts that will drive engagement and views. Each post must be unique and tailored to the platform's audience.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, temperature || 0.7)
+        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
 
         let parsedData
         try {
-          const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/) || result.match(/```\s*([\s\S]*?)\s*```/)
-          const jsonStr = jsonMatch ? jsonMatch[1] : result
+          const content = result.content
+          const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
+          const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
         } catch {
           parsedData = {
@@ -443,11 +446,11 @@ The prompt should:
 - Be optimized for AI image generation
 - Result in a 16:9 aspect ratio image`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, temperature || 0.7)
+        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
 
         return NextResponse.json({
           success: true,
-          data: finalizeResult(result),
+          data: finalizeResult(result.content),
           usage: { totalTokens: 500 }
         })
       }
@@ -479,12 +482,13 @@ Respond with a JSON object containing:
 
 Create a main title (2-4 words, uppercase) and a short title (1-2 words, uppercase) that will make people want to click. Focus on the core benefit or curiosity factor.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, temperature || 0.7)
+        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
 
         let parsedData
         try {
-          const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/) || result.match(/```\s*([\s\S]*?)\s*```/)
-          const jsonStr = jsonMatch ? jsonMatch[1] : result
+          const content = result.content
+          const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
+          const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
         } catch {
           // Fallback based on video title
@@ -529,12 +533,13 @@ Respond with a JSON object containing:
 
         const userPrompt = `Analyze and generate financial projections for:\n\n${processedContext}\n\nProvide a comprehensive financial report with revenue projections, expense analysis, cashflow forecasting, KPIs, risks, and strategic recommendations.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, temperature || 0.7)
+        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
 
         let parsedData
         try {
-          const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/) || result.match(/```\s*([\s\S]*?)\s*```/)
-          const jsonStr = jsonMatch ? jsonMatch[1] : result
+          const content = result.content
+          const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
+          const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
         } catch {
           parsedData = {
@@ -607,12 +612,13 @@ Respond with a JSON object containing:
 
         const userPrompt = `Create a comprehensive marketing strategy for:\n\n${processedContext}\n\nInclude buyer personas, campaign ideas, content calendar, funnel strategy, budget allocation, and timeline.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, temperature || 0.7)
+        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
 
         let parsedData
         try {
-          const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/) || result.match(/```\s*([\s\S]*?)\s*```/)
-          const jsonStr = jsonMatch ? jsonMatch[1] : result
+          const content = result.content
+          const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
+          const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
         } catch {
           parsedData = {
@@ -680,12 +686,13 @@ Respond with a JSON object containing:
 
         const userPrompt = `Generate a professional business document for:\n\n${processedContext}\n\nCreate a comprehensive, well-structured document with all necessary sections, metrics, and action items.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, temperature || 0.7)
+        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
 
         let parsedData
         try {
-          const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/) || result.match(/```\s*([\s\S]*?)\s*```/)
-          const jsonStr = jsonMatch ? jsonMatch[1] : result
+          const content = result.content
+          const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
+          const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
         } catch {
           parsedData = {
@@ -747,12 +754,13 @@ Respond with a JSON object containing:
 
         const userPrompt = `Generate a batch of social media content for:\n\n${processedContext}\n\nCreate viral hooks, platform-optimized posts, a weekly calendar, trend suggestions, and A/B test ideas. Focus on maximum engagement.`
 
-        result = await generateAIResponse(systemPrompt, userPrompt, temperature || 0.7)
+        result = await generateAIResponse(systemPrompt, userPrompt, { temperature: temperature || 0.7 })
 
         let parsedData
         try {
-          const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/) || result.match(/```\s*([\s\S]*?)\s*```/)
-          const jsonStr = jsonMatch ? jsonMatch[1] : result
+          const content = result.content
+          const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
+          const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
         } catch {
           parsedData = {
@@ -810,12 +818,13 @@ Respond ONLY with valid JSON (no markdown):
   "keyMoments": ["moment1", "moment2", "moment3"]
 }`
           
-          result = await generateAIResponse(systemPrompt, processedContext, temperature || 0.7)
+          result = await generateAIResponse(systemPrompt, processedContext, { temperature: temperature || 0.7 })
           
           let parsedData
           try {
-            const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/) || result.match(/```\s*([\s\S]*?)\s*```/)
-            const jsonStr = jsonMatch ? jsonMatch[1] : result
+            const content = result.content
+            const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
+            const jsonStr = jsonMatch ? jsonMatch[1] : content
             parsedData = JSON.parse(jsonStr)
           } catch {
             parsedData = {
@@ -854,12 +863,13 @@ Respond ONLY with valid JSON (no markdown):
   ]
 }`
           
-          result = await generateAIResponse(systemPrompt, processedContext, temperature || 0.7)
+          result = await generateAIResponse(systemPrompt, processedContext, { temperature: temperature || 0.7 })
           
           let parsedData
           try {
-            const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/) || result.match(/```\s*([\s\S]*?)\s*```/)
-            const jsonStr = jsonMatch ? jsonMatch[1] : result
+            const content = result.content
+            const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
+            const jsonStr = jsonMatch ? jsonMatch[1] : content
             parsedData = JSON.parse(jsonStr)
           } catch {
             parsedData = {
@@ -896,12 +906,13 @@ Respond ONLY with valid JSON (no markdown):
   ]
 }`
           
-          result = await generateAIResponse(systemPrompt, processedContext, temperature || 0.7)
+          result = await generateAIResponse(systemPrompt, processedContext, { temperature: temperature || 0.7 })
           
           let parsedData
           try {
-            const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/) || result.match(/```\s*([\s\S]*?)\s*```/)
-            const jsonStr = jsonMatch ? jsonMatch[1] : result
+            const content = result.content
+            const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
+            const jsonStr = jsonMatch ? jsonMatch[1] : content
             parsedData = JSON.parse(jsonStr)
           } catch {
             parsedData = {
@@ -928,11 +939,11 @@ Respond ONLY with valid JSON (no markdown):
         // Default skill execution - return raw result
         const systemPrompt = `You are an expert AI assistant. Execute the requested task with precision and provide structured, actionable results.`
         
-        result = await generateAIResponse(systemPrompt, processedContext, temperature || 0.7)
+        result = await generateAIResponse(systemPrompt, processedContext, { temperature: temperature || 0.7 })
 
         return NextResponse.json({ 
           success: true, 
-          data: finalizeResult(result), 
+          data: finalizeResult(result.content), 
           usage: { totalTokens: 1000 } 
         })
       }
