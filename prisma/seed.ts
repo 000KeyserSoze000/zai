@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -764,6 +765,38 @@ Fournis:
 
   console.log(`✅ Created orchestration config`)
 
+  // Create Default Users
+  console.log('👤 Creating default users...')
+  const adminPassword = await bcrypt.hash('Admin123!', 10)
+  const clientPassword = await bcrypt.hash('Client123!', 10)
+
+  await prisma.user.upsert({
+    where: { email: 'admin@contentpro.fr' },
+    update: {
+        password: adminPassword,
+    },
+    create: {
+      email: 'admin@contentpro.fr',
+      name: 'Administrateur',
+      password: adminPassword,
+      role: 'ADMIN',
+    }
+  })
+
+  await prisma.user.upsert({
+    where: { email: 'client@contentpro.fr' },
+    update: {
+        password: clientPassword,
+    },
+    create: {
+      email: 'client@contentpro.fr',
+      name: 'Utilisateur',
+      password: clientPassword,
+      role: 'CLIENT',
+    }
+  })
+
+  console.log('✅ Created default users (admin@contentpro.fr / client@contentpro.fr)')
   console.log('🎉 Seeding completed successfully!')
 }
 
