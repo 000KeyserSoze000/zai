@@ -205,29 +205,18 @@ Provide 3 different title options, a comprehensive description with timestamps, 
         })
         result = aiResponse.content
 
-        // Try to parse the JSON from the response
         let parsedData
         try {
-          // Extract JSON if it's wrapped in markdown code blocks
           const content = result
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
-        } catch {
-          // If parsing fails, create a structured response
-          parsedData = {
-            titles: [
-              "Comment automatiser votre creation de contenu YouTube",
-              "L'IA qui revolutionne la creation de videos",
-              "Creez 10x plus de contenu YouTube avec cette methode"
-            ],
-            description: context,
-            tags: ['youtube', 'automation', 'ai', 'content creation'],
-            hashtags: ['#YouTubeAutomation', '#AIContent', '#ContentCreator'],
-            seoScore: 85,
-            targetAudience: "Createurs de contenu YouTube",
-            keyMoments: ["Introduction", "Demo", "Resultats"]
-          }
+        } catch (err) {
+          console.error('Metadata parsing error:', err)
+          return NextResponse.json(
+            { error: 'Failed to generate valid metadata JSON', details: err instanceof Error ? err.message : String(err) },
+            { status: 500 }
+          )
         }
 
         // Sauvegarder en DB si sessionId fourni
@@ -296,35 +285,12 @@ Each direction should have a unique style, color palette, typography recommendat
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
-        } catch {
-          parsedData = {
-            directions: [
-              {
-                name: 'Tech Moderne',
-                style: 'modern',
-                colorPalette: { primary: '#FF6B00', secondary: '#1A1A2E', accent: '#00D9FF', background: '#0F0F1A', text: '#FFFFFF' },
-                typography: { headingFont: 'Inter', bodyFont: 'Inter', headingWeight: '800', emphasis: 'uppercase' },
-                moodKeywords: ['innovant', 'professionnel', 'high-tech'],
-                thumbnailConcept: 'Design moderne avec gradient orange'
-              },
-              {
-                name: 'Minimaliste Elegant',
-                style: 'minimalist',
-                colorPalette: { primary: '#2D2D2D', secondary: '#F5F5F5', accent: '#FFD700', background: '#FFFFFF', text: '#1A1A1A' },
-                typography: { headingFont: 'Playfair Display', bodyFont: 'Lato', headingWeight: '700', emphasis: 'capitalize' },
-                moodKeywords: ['elegant', 'epure', 'premium'],
-                thumbnailConcept: 'Design minimaliste avec accent dore'
-              },
-              {
-                name: 'Bold Impact',
-                style: 'bold',
-                colorPalette: { primary: '#FF0050', secondary: '#000000', accent: '#00FF88', background: '#111111', text: '#FFFFFF' },
-                typography: { headingFont: 'Bebas Neue', bodyFont: 'Roboto', headingWeight: '900', emphasis: 'uppercase' },
-                moodKeywords: ['audacieux', 'percutant', 'energique'],
-                thumbnailConcept: 'Design audacieux avec contrastes forts'
-              }
-            ]
-          }
+        } catch (err) {
+          console.error('Artistic directions parsing error:', err)
+          return NextResponse.json(
+            { error: 'Failed to generate valid artistic directions JSON', details: err instanceof Error ? err.message : String(err) },
+            { status: 500 }
+          )
         }
 
         // Sauvegarder en DB si sessionId fourni
@@ -383,51 +349,12 @@ Create platform-optimized posts that will drive engagement and views. Each post 
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
-        } catch {
-          parsedData = {
-            posts: [
-              {
-                platform: 'linkedin',
-                content: `Nouvelle video ! Decouvrez comment ameliorer votre productivite avec l'IA.`,
-                hashtags: ['#ContentCreation', '#AITools', '#YouTube']
-              },
-              {
-                platform: 'youtube_community',
-                content: `Nouvelle video en ligne !`,
-                hashtags: ['#YouTube', '#ContentCreator']
-              },
-              {
-                platform: 'tiktok',
-                content: `POV: Tu decouvre cette technique 🤯`,
-                hashtags: ['#fyp', '#pourtoi', '#tutoriel']
-              },
-              {
-                platform: 'x',
-                content: `Tu ne vas pas en revenir... 👀`,
-                hashtags: ['#Nouveau']
-              },
-              {
-                platform: 'instagram',
-                content: `Nouvelle video en ligne ! 🎬\n\nLien en bio 👆`,
-                hashtags: ['#ContentCreator', '#YouTube']
-              },
-              {
-                platform: 'facebook',
-                content: `Nouvelle video publiee ! Likez et partagez !`,
-                hashtags: ['#Video', '#Contenu']
-              },
-              {
-                platform: 'threads',
-                content: `Quoi de neuf ? Une nouvelle video !`,
-                hashtags: ['#Nouveau']
-              },
-              {
-                platform: 'school',
-                content: `Apprenez a creer du contenu avec cette nouvelle formation.`,
-                hashtags: ['#Formation', '#YouTube']
-              }
-            ]
-          }
+        } catch (err) {
+          console.error('Social posts parsing error:', err)
+          return NextResponse.json(
+            { error: 'Failed to generate valid social posts JSON', details: err instanceof Error ? err.message : String(err) },
+            { status: 500 }
+          )
         }
 
         // Sauvegarder en DB si sessionId fourni
@@ -510,17 +437,12 @@ Create a main title (2-4 words, uppercase) and a short title (1-2 words, upperca
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
-        } catch {
-          // Fallback based on video title
-          const words = context.replace(/[^a-zA-ZÀ-ÿ0-9\s]/g, "").split(" ").filter((w) => w.length > 2)
-          parsedData = {
-            mainTitle: words.slice(0, 2).join(" ").toUpperCase() || "DÉCOUVREZ",
-            shortTitle: words.length > 2 ? words.slice(2, 3).join(" ").toUpperCase() : "MAINTENANT",
-            alternatives: [
-              { mainTitle: "MÉTHODE SECRÈTE", shortTitle: "EXCLU" },
-              { mainTitle: "RÉSULTATS RAPIDES", shortTitle: "VITE" }
-            ]
-          }
+        } catch (err) {
+          console.error('Thumbnail titles parsing error:', err)
+          return NextResponse.json(
+            { error: 'Failed to generate valid thumbnail titles JSON', details: err instanceof Error ? err.message : String(err) },
+            { status: 500 }
+          )
         }
 
         return NextResponse.json({
@@ -565,41 +487,12 @@ Respond with a JSON object containing:
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
-        } catch {
-          parsedData = {
-            summary: "Analyse financiere basee sur les donnees fournies. Croissance projetee a 15% sur 12 mois.",
-            revenue: { current: 50000, projected: 57500, growth: "15%" },
-            expenses: { current: 35000, projected: 33250, optimization: "5%" },
-            profitMargin: "42.2%",
-            cashflow: {
-              monthly: [
-                { month: "Jan", income: 4500, expenses: 3200, net: 1300 },
-                { month: "Fev", income: 4800, expenses: 3100, net: 1700 },
-                { month: "Mar", income: 5200, expenses: 3300, net: 1900 },
-                { month: "Avr", income: 4900, expenses: 3000, net: 1900 },
-                { month: "Mai", income: 5500, expenses: 3400, net: 2100 },
-                { month: "Jun", income: 5800, expenses: 3200, net: 2600 },
-              ],
-              runway: "18 mois"
-            },
-            kpis: [
-              { name: "MRR", value: "4 800€", trend: "up", description: "Revenu mensuel recurrent" },
-              { name: "CAC", value: "45€", trend: "down", description: "Cout d'acquisition client" },
-              { name: "LTV", value: "540€", trend: "up", description: "Valeur vie client" },
-              { name: "Churn", value: "3.2%", trend: "stable", description: "Taux de resiliation" },
-            ],
-            recommendations: [
-              "Investir dans l'acquisition organique pour reduire le CAC",
-              "Automatiser les processus repetitifs pour optimiser les couts",
-              "Diversifier les sources de revenus avec des upsells",
-              "Constituer une reserve de tresorerie de 3 mois",
-            ],
-            risks: [
-              { risk: "Dependance a un seul canal d'acquisition", impact: "high", mitigation: "Diversifier SEO + Paid + Referral" },
-              { risk: "Hausse des couts serveur avec la croissance", impact: "medium", mitigation: "Optimiser l'infrastructure et negocier les contrats" },
-            ],
-            forecast: { optimistic: 72000, realistic: 57500, pessimistic: 45000 }
-          }
+        } catch (err) {
+          console.error('Finance parsing error:', err)
+          return NextResponse.json(
+            { error: 'Failed to generate valid finance JSON', details: err instanceof Error ? err.message : String(err) },
+            { status: 500 }
+          )
         }
 
         return NextResponse.json({ success: true, data: finalizeResult(parsedData), usage: { totalTokens: 2000 } })
@@ -648,47 +541,12 @@ Respond with a JSON object containing:
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
-        } catch {
-          parsedData = {
-            strategy: {
-              positioning: "Solution IA premium pour les createurs de contenu",
-              uniqueValue: "Automatisation intelligente qui preserve l'authenticite",
-              targetMarket: "Createurs de contenu francophones (10K-500K abonnes)"
-            },
-            personas: [
-              { name: "Sophie la Creatrice", age: "25-35", occupation: "YouTubeuse lifestyle", painPoints: ["Manque de temps", "Qualite inconsistante"], goals: ["10K vues/video", "Monetisation"], channels: ["Instagram", "YouTube", "TikTok"] },
-              { name: "Marc l'Entrepreneur", age: "30-45", occupation: "CEO startup", painPoints: ["Budget marketing limite", "Pas d'equipe dediee"], goals: ["Generer des leads", "Etablir l'autorite"], channels: ["LinkedIn", "YouTube", "Newsletter"] },
-            ],
-            campaigns: [
-              { name: "Lancement Beta", channel: "Multi-canal", objective: "500 inscrits beta", budget: "2 000€", duration: "4 semaines", expectedROI: "300%", tactics: ["Influencer outreach", "Content marketing", "Webinaire"] },
-              { name: "Social Proof", channel: "LinkedIn + YouTube", objective: "Credibilite", budget: "1 000€", duration: "Ongoing", expectedROI: "150%", tactics: ["Case studies", "Temoignages video", "Behind the scenes"] },
-            ],
-            contentPlan: [
-              { week: 1, theme: "Problematique", content: ["Article blog", "Carrousel Instagram", "Thread X"], platforms: ["Blog", "Instagram", "X"] },
-              { week: 2, theme: "Solution", content: ["Video demo", "Post LinkedIn", "Newsletter"], platforms: ["YouTube", "LinkedIn", "Email"] },
-              { week: 3, theme: "Social Proof", content: ["Temoignage client", "Before/After", "Tips"], platforms: ["YouTube", "Instagram", "TikTok"] },
-              { week: 4, theme: "CTA", content: ["Webinaire", "Offre limitee", "Recap"], platforms: ["Zoom", "All platforms", "Email"] },
-            ],
-            funnels: {
-              awareness: { tactics: ["SEO", "Reseaux sociaux", "PR"], metrics: ["Impressions", "Reach", "Trafic"] },
-              consideration: { tactics: ["Content marketing", "Webinaires", "Free trial"], metrics: ["Time on page", "Sign-ups", "Engagement"] },
-              conversion: { tactics: ["Email nurturing", "Demo", "Offre limitee"], metrics: ["Conversion rate", "CAC", "Revenue"] },
-              retention: { tactics: ["Onboarding", "Support", "Community"], metrics: ["Churn", "NPS", "LTV"] },
-            },
-            budget: {
-              total: "5 000€/mois", breakdown: [
-                { channel: "Content Creation", amount: "2 000€", percentage: "40%" },
-                { channel: "Paid Ads", amount: "1 500€", percentage: "30%" },
-                { channel: "Tools & Software", amount: "500€", percentage: "10%" },
-                { channel: "Influencer", amount: "1 000€", percentage: "20%" },
-              ]
-            },
-            timeline: [
-              { phase: "Setup", duration: "2 semaines", goals: ["Branding", "Landing page", "Content pipeline"] },
-              { phase: "Launch", duration: "4 semaines", goals: ["500 inscrits", "50 clients beta", "10 temoignages"] },
-              { phase: "Scale", duration: "3 mois", goals: ["2000 utilisateurs", "MRR 10K€", "3 partenariats"] },
-            ]
-          }
+        } catch (err) {
+          console.error('Marketing parsing error:', err)
+          return NextResponse.json(
+            { error: 'Failed to generate valid marketing JSON', details: err instanceof Error ? err.message : String(err) },
+            { status: 500 }
+          )
         }
 
         return NextResponse.json({ success: true, data: finalizeResult(parsedData), usage: { totalTokens: 2500 } })
@@ -726,41 +584,12 @@ Respond with a JSON object containing:
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
-        } catch {
-          parsedData = {
-            document: {
-              type: "business_plan",
-              title: "Business Plan - " + context.slice(0, 50),
-              sections: [
-                { title: "Resume Executif", content: "Ce document presente la strategie et les projections pour le projet decrit.", subsections: [] },
-                {
-                  title: "Analyse de Marche", content: "Le marche cible represente une opportunite significative avec une croissance annuelle estimee a 25%.", subsections: [
-                    { title: "Taille du Marche", content: "Le marche adressable total (TAM) est estime a 5 milliards d'euros." },
-                    { title: "Tendances", content: "Croissance de l'IA, automatisation, et demande de contenu." },
-                  ]
-                },
-                { title: "Modele Economique", content: "Modele SaaS avec abonnements mensuels. 3 tiers : Starter (29€), Pro (79€), Enterprise (199€).", subsections: [] },
-                { title: "Plan Operationnel", content: "Equipe de 5 personnes. Infrastructure cloud scalable. Support client 24/7.", subsections: [] },
-                { title: "Projections Financieres", content: "Objectif de rentabilite a 18 mois. MRR cible : 50K€ a 12 mois.", subsections: [] },
-              ]
-            },
-            executiveSummary: "Projet innovant dans le secteur de l'IA appliquee. Marche en forte croissance. Equipe experimentee. ROI prevu sous 18 mois.",
-            keyMetrics: [
-              { label: "TAM", value: "5 Mds€", description: "Marche adressable total" },
-              { label: "Break-even", value: "18 mois", description: "Point de rentabilite" },
-              { label: "MRR Cible", value: "50K€", description: "Revenu mensuel a 12 mois" },
-              { label: "Equipe", value: "5 pers.", description: "Effectif initial" },
-            ],
-            actionItems: [
-              { task: "Finaliser le MVP", priority: "high", deadline: "T1 2024", owner: "CTO" },
-              { task: "Recruter 2 developpeurs", priority: "high", deadline: "T1 2024", owner: "CEO" },
-              { task: "Lancer la campagne marketing", priority: "medium", deadline: "T2 2024", owner: "CMO" },
-              { task: "Premier round de financement", priority: "high", deadline: "T2 2024", owner: "CEO" },
-            ],
-            appendix: [
-              { title: "Analyse SWOT", content: "Forces: Technologie unique, equipe. Faiblesses: Notoriete. Opportunites: Marche croissant. Menaces: Concurrence." },
-            ]
-          }
+        } catch (err) {
+          console.error('Business parsing error:', err)
+          return NextResponse.json(
+            { error: 'Failed to generate valid business JSON', details: err instanceof Error ? err.message : String(err) },
+            { status: 500 }
+          )
         }
 
         return NextResponse.json({ success: true, data: finalizeResult(parsedData), usage: { totalTokens: 3000 } })
@@ -798,25 +627,12 @@ Respond with a JSON object containing:
           const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
           const jsonStr = jsonMatch ? jsonMatch[1] : content
           parsedData = JSON.parse(jsonStr)
-        } catch {
-          parsedData = {
-            hooks: [
-              { text: "Arretez de poster du contenu. Faites CECI a la place 👇", platform: "tiktok", viralScore: 92, type: "shock" },
-              { text: "J'ai gagne 10K abonnes en 30 jours avec cette methode...", platform: "instagram", viralScore: 88, type: "curiosity" },
-            ],
-            posts: [
-              { platform: "instagram", content: "5 outils IA que j'utilise chaque jour 🔧", hashtags: ["#IA", "#ContentCreator"], bestTime: "12:00", estimatedReach: "5K-15K", type: "carousel" },
-            ],
-            calendar: [
-              { day: "Lundi", posts: [{ time: "08:30", platform: "LinkedIn", content_summary: "Post educatif IA" }] },
-            ],
-            trends: [
-              { trend: "IA generative", relevance: "high", suggestion: "Creer du contenu montrant les coulisses" },
-            ],
-            abTests: [
-              { variant_a: "Hook: Question directe", variant_b: "Hook: Statistique choc", metric: "Taux d'engagement" },
-            ]
-          }
+        } catch (err) {
+          console.error('Social batch parsing error:', err)
+          return NextResponse.json(
+            { error: 'Failed to generate valid social batch JSON', details: err instanceof Error ? err.message : String(err) },
+            { status: 500 }
+          )
         }
 
         return NextResponse.json({ success: true, data: finalizeResult(parsedData), usage: { totalTokens: 2000 } })

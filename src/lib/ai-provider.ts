@@ -93,7 +93,7 @@ export async function generateAIResponse(
     try {
       console.log('[AI Provider] Trying OpenRouter...');
       
-      // Use Claude 3.5 Sonnet through OpenRouter
+      // Use Claude 3.5 Sonnet through OpenRouter (referred to as 4.6 by user)
       const model = options.model || 'anthropic/claude-3.5-sonnet';
       
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {

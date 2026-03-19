@@ -18,118 +18,6 @@ import type {
 } from "@/lib/types"
 import { THUMBNAIL_THEMES } from "../constants"
 
-// ============================================
-// Fallback Data Generators
-// ============================================
-
-function createFallbackMetadata(
-    context: string,
-    sessionId: string
-): VideoMetadata {
-    return {
-        id: "meta-1",
-        sessionId,
-        titles: [
-            "Comment automatiser votre creation de contenu YouTube en 2024",
-            "L'IA qui revolutionne la creation de videos YouTube",
-            "Creez 10x plus de contenu YouTube avec cette methode",
-        ],
-        selectedTitle: 0,
-        description: `${context}\n\nTimestamps:\n00:00 Introduction\n02:30 Demo\n05:00 Resultats`,
-        tags: ["youtube automation", "ai content creation", "seo youtube"],
-        hashtags: ["#YouTubeAutomation", "#AIContent", "#ContentCreator"],
-        seoScore: 82,
-        targetAudience: "Createurs de contenu YouTube",
-        keyMoments: ["Introduction", "Demo", "Resultats"],
-    }
-}
-
-function createFallbackDirections(sessionId: string): ArtisticDirection[] {
-    return [
-        {
-            id: "dir-1",
-            sessionId,
-            name: "Tech Moderne",
-            style: "modern",
-            colorPalette: { primary: "#FF6B00", secondary: "#1A1A2E", accent: "#00D9FF", background: "#0F0F1A", text: "#FFFFFF" },
-            typography: { headingFont: "Inter", bodyFont: "Inter", headingWeight: "800", emphasis: "uppercase" },
-            moodKeywords: ["innovant", "professionnel", "high-tech"],
-            selected: true,
-        },
-        {
-            id: "dir-2",
-            sessionId,
-            name: "Minimaliste Elegant",
-            style: "minimalist",
-            colorPalette: { primary: "#2D2D2D", secondary: "#F5F5F5", accent: "#FFD700", background: "#FFFFFF", text: "#1A1A1A" },
-            typography: { headingFont: "Playfair Display", bodyFont: "Lato", headingWeight: "700", emphasis: "capitalize" },
-            moodKeywords: ["elegant", "epure", "premium"],
-            selected: false,
-        },
-        {
-            id: "dir-3",
-            sessionId,
-            name: "Bold Impact",
-            style: "bold",
-            colorPalette: { primary: "#FF0050", secondary: "#000000", accent: "#00FF88", background: "#111111", text: "#FFFFFF" },
-            typography: { headingFont: "Bebas Neue", bodyFont: "Roboto", headingWeight: "900", emphasis: "uppercase" },
-            moodKeywords: ["audacieux", "percutant", "energique"],
-            selected: false,
-        },
-    ]
-}
-
-function createFallbackPosts(
-    title: string,
-    metadata: VideoMetadata | null,
-    sessionId: string
-): SocialPost[] {
-    const platforms = [
-        "linkedin", "youtube_community", "tiktok", "x",
-        "instagram", "facebook", "threads", "school",
-    ] as const
-
-    const templates: Record<string, (t: string, m: VideoMetadata | null) => string> = {
-        linkedin: (t, m) => `🚀 Nouvelle vidéo publiée !\n\n"${t}"\n\n${m?.description?.slice(0, 300) || ''}\n\nAbonnez-vous pour plus de contenu !`,
-        youtube_community: (t, m) => `📢 Nouvelle vidéo en ligne !\n\n${t}\n\n${m?.description?.slice(0, 150) || ''}\n\nDites-moi en commentaire ! 👇`,
-        tiktok: (t) => `POV: Tu découvres cette technique 🤯\n\n${t.slice(0, 50)}...\n\nAbonne-toi pour la suite ! 👆`,
-        x: (t) => `${t}\n\nTu ne vas pas en revenir... 👀\n\nLien en bio 🔗`,
-        instagram: (t, m) => `🎬 NOUVELLE VIDÉO\n\n${t}\n\n${m?.description?.slice(0, 200) || ''}\n\n🔗 Lien en bio`,
-        facebook: (t, m) => `📺 Nouvelle vidéo !\n\n${t}\n\n${m?.description?.slice(0, 200) || ''}\n\n👍 Likez et partagez !`,
-        threads: (t) => `Quoi de neuf ? Une nouvelle vidéo ! 🎬\n\n${t}\n\nVous en pensez quoi ?`,
-        school: (t, m) => `📚 Nouvelle formation\n\n${t}\n\nPublic : ${m?.targetAudience || 'Créateurs de contenu'}`,
-    }
-
-    return platforms.map((platform, i) => ({
-        id: `post-${i + 1}`,
-        sessionId,
-        platform,
-        content: templates[platform](title, metadata),
-        hashtags: metadata?.hashtags || ["#YouTube", "#Content"],
-        status: "draft" as const,
-    }))
-}
-
-// Create a fallback post for a single platform
-function createFallbackPostForPlatform(
-    platform: string,
-    title: string,
-    metadata: VideoMetadata | null
-): string {
-    const templates: Record<string, (t: string, m: VideoMetadata | null) => string> = {
-        linkedin: (t, m) => `🚀 Nouvelle publication !\n\n"${t}"\n\n${m?.description?.slice(0, 200) || 'Découvrez notre nouveau contenu exclusif.'}\n\nAbonnez-vous pour plus !`,
-        youtube_community: (t) => `📢 Nouvelle vidéo en ligne !\n\n${t}\n\nDites-moi ce que vous en pensez en commentaire ! 👇`,
-        tiktok: (t) => `POV: Tu découvres cette technique 🤯\n\n${t.slice(0, 40)}...\n\n#fyp #pourtoi`,
-        x: (t) => `${t}\n\nTu ne vas pas en revenir... 👀`,
-        instagram: (t) => `🎬 NOUVELLE VIDÉO\n\n${t}\n\n🔗 Lien en bio`,
-        facebook: (t) => `📺 Nouvelle vidéo !\n\n${t}\n\n👍 Likez et partagez !`,
-        threads: (t) => `Quoi de neuf ? Une nouvelle vidéo ! 🎬\n\n${t}`,
-        school: (t) => `📚 Nouvelle formation : ${t}`,
-    }
-    
-    const key = platform === "youtube_community" ? "youtube_community" : platform
-    return templates[key] ? templates[key](title, metadata) : `Nouveau contenu : ${title}`
-}
 
 // ============================================
 // Parallel Task State
@@ -328,17 +216,21 @@ export function useContentGeneration(): ContentGenerationState {
                 console.log("[Content Studio] Using AI titles:", !!aiTitles, aiTitles?.length)
                 console.log("[Content Studio] Using AI description:", !!aiDescription, aiDescription?.length)
 
+                if (!aiTitles || !aiDescription) {
+                    throw new Error("L'IA n'a pas généré de métadonnées valides.")
+                }
+
                 const generated: VideoMetadata = {
                     id: "meta-" + Date.now(),
                     sessionId,
-                    titles: aiTitles || createFallbackMetadata(context, sessionId).titles,
+                    titles: aiTitles,
                     selectedTitle: 0,
-                    description: aiDescription || context,
-                    tags: apiData?.tags || ["youtube", "ai", "content creation"],
-                    hashtags: apiData?.hashtags || ["#YouTube", "#AI", "#Content"],
-                    seoScore: apiData?.seoScore || 85,
-                    targetAudience: apiData?.targetAudience || "Createurs de contenu",
-                    keyMoments: apiData?.keyMoments || ["Introduction", "Demo", "Resultats"],
+                    description: aiDescription,
+                    tags: apiData?.tags || [],
+                    hashtags: apiData?.hashtags || [],
+                    seoScore: apiData?.seoScore || 0,
+                    targetAudience: apiData?.targetAudience || "",
+                    keyMoments: apiData?.keyMoments || [],
                 }
 
                 setMetadata(generated)
@@ -354,16 +246,10 @@ export function useContentGeneration(): ContentGenerationState {
                     cost: 0.002,
                 })
             } catch (error) {
-                clearInterval(interval)
-                console.error("Generation error:", error)
-                setMetadata(createFallbackMetadata(context, sessionId))
-                addLog({
-                    sessionId,
-                    operation: "Metadata Generation (fallback)",
-                    model: "z-ai/default",
-                    status: "success",
-                    requestTime: Date.now() - startTime,
-                    cost: 0,
+                toast({
+                    title: "Erreur de génération SEO",
+                    description: error instanceof Error ? error.message : "Impossible de générer les métadonnées",
+                    variant: "destructive",
                 })
             }
 
@@ -456,19 +342,20 @@ export function useContentGeneration(): ContentGenerationState {
                 }
                 const apiDirections = artisticData?.directions || artisticData || []
 
-                const directions: ArtisticDirection[] =
-                    apiDirections.length > 0
-                        ? apiDirections.map((dir: Partial<ArtisticDirection>, i: number) => ({
-                            id: "dir-" + i,
-                            sessionId,
-                            name: dir.name || `Direction ${i + 1}`,
-                            style: dir.style || "modern",
-                            colorPalette: dir.colorPalette || { primary: "#FF6B00", secondary: "#1A1A2E", accent: "#00D9FF", background: "#0F0F1A", text: "#FFFFFF" },
-                            typography: dir.typography || { headingFont: "Inter", bodyFont: "Inter", headingWeight: "800", emphasis: "uppercase" },
-                            moodKeywords: dir.moodKeywords || ["innovant", "moderne"],
-                            selected: i === 0,
-                        }))
-                        : createFallbackDirections(sessionId)
+                if (!Array.isArray(apiDirections) || apiDirections.length === 0) {
+                    throw new Error("Aucune direction artistique générée par l'IA.")
+                }
+
+                const directions: ArtisticDirection[] = apiDirections.map((dir: any, i: number) => ({
+                    id: "dir-" + i,
+                    sessionId,
+                    name: dir.name || `Direction ${i + 1}`,
+                    style: dir.style || "modern",
+                    colorPalette: dir.colorPalette || { primary: "#FF6B00", secondary: "#1A1A2E", accent: "#00D9FF", background: "#0F0F1A", text: "#FFFFFF" },
+                    typography: dir.typography || { headingFont: "Inter", bodyFont: "Inter", headingWeight: "800", emphasis: "uppercase" },
+                    moodKeywords: dir.moodKeywords || [],
+                    selected: i === 0,
+                }))
 
                 setArtisticDirections(directions)
 
@@ -479,35 +366,26 @@ export function useContentGeneration(): ContentGenerationState {
                     try { socialData = parseAIJson(socialRawData) } catch (e) { console.error("Failed to parse social JSON:", e) }
                 }
                 
-                console.log("[Content Studio] Social API Response:", socialData)
-                
                 const apiPosts = socialData?.posts || socialData || []
-
                 const platformOrder = ["linkedin", "youtube_community", "tiktok", "x", "instagram", "facebook", "threads", "school"]
-                const title = metadata?.titles[metadata?.selectedTitle || 0] || "Nouveau contenu"
 
-                // Check if we have valid posts with content
-                const hasValidPosts = Array.isArray(apiPosts) && apiPosts.length > 0 && 
-                    apiPosts.some((p: any) => p.content && p.content.trim().length > 0)
+                if (!Array.isArray(apiPosts) || apiPosts.length === 0) {
+                    throw new Error("Aucun post social généré par l'IA.")
+                }
 
-                console.log("[Content Studio] Has valid posts:", hasValidPosts, "apiPosts length:", apiPosts.length)
-
-                const posts: SocialPost[] =
-                    hasValidPosts
-                        ? platformOrder.map((platform, i) => {
-                            const apiPost = Array.isArray(apiPosts) 
-                                ? apiPosts.find((p: { platform: string }) => p.platform === platform) || apiPosts[i] || {}
-                                : {}
-                            return {
-                                id: `post-${i + 1}`,
-                                sessionId,
-                                platform: platform as SocialPost["platform"],
-                                content: apiPost.content && apiPost.content.trim() ? apiPost.content : createFallbackPostForPlatform(platform, title, metadata),
-                                hashtags: apiPost.hashtags || metadata?.hashtags || [],
-                                status: "draft" as const,
-                            }
-                        })
-                        : createFallbackPosts(title, metadata, sessionId)
+                const posts: SocialPost[] = platformOrder.map((platform, i) => {
+                    const apiPost = Array.isArray(apiPosts)
+                        ? apiPosts.find((p: any) => p.platform === platform) || apiPosts[i] || {}
+                        : {}
+                    return {
+                        id: `post-${i + 1}`,
+                        sessionId,
+                        platform: platform as SocialPost["platform"],
+                        content: apiPost.content || "",
+                        hashtags: apiPost.hashtags || metadata?.hashtags || [],
+                        status: "draft" as const,
+                    }
+                })
 
                 setSocialPosts(posts)
 
@@ -518,14 +396,13 @@ export function useContentGeneration(): ContentGenerationState {
                     model: "z-ai/default",
                     status: "success",
                     requestTime: totalTime,
-                    tokensUsed: (artisticResult.usage?.totalTokens || 892) + (socialResult.usage?.totalTokens || 1500),
+                    tokensUsed: (artisticResult.usage?.totalTokens || 0) + (socialResult.usage?.totalTokens || 0),
                     cost: 0.004,
                 })
 
                 toast({
-                    title: "Parallelisation reussie !",
-                    description: `Artistic + Social generes en ${(totalTime / 1000).toFixed(1)}s`,
-                    duration: 3000,
+                    title: "Génération terminée !",
+                    description: `Artistic + Social générés en ${(totalTime / 1000).toFixed(1)}s`,
                 })
 
                 setStep(2)
@@ -544,15 +421,15 @@ export function useContentGeneration(): ContentGenerationState {
                     social: { status: "error", progress: 0 },
                 })
                 toast({
-                    title: "Erreur de generation",
-                    description: "Veuillez reessayer",
+                    title: "Erreur de génération",
+                    description: error instanceof Error ? error.message : "Veuillez réessayer",
                     variant: "destructive",
                 })
             }
 
             setIsGenerating(false)
         },
-        [sessionId, metadata, addLog, toast, setStep]
+        [sessionId, metadata, addLog, toast, setStep, skillMapping, contentBlueprint]
     )
 
     // -----------------------------------------------
@@ -590,24 +467,22 @@ export function useContentGeneration(): ContentGenerationState {
 
                 const artisticRawData = result.data
                 let artisticData: any = artisticRawData
-                if (typeof artisticRawData === 'string') {
-                    try { artisticData = parseAIJson(artisticRawData) } catch (e) {}
-                }
                 const apiDirections = artisticData?.directions || artisticData || []
+                
+                const directions: ArtisticDirection[] = apiDirections.map((dir: any, i: number) => ({
+                    id: "dir-" + i,
+                    sessionId,
+                    name: dir.name || `Direction ${i + 1}`,
+                    style: dir.style || "modern",
+                    colorPalette: dir.colorPalette || { primary: "#FF6B00", secondary: "#1A1A2E", accent: "#00D9FF", background: "#0F0F1A", text: "#FFFFFF" },
+                    typography: dir.typography || { headingFont: "Inter", bodyFont: "Inter", headingWeight: "800", emphasis: "uppercase" },
+                    moodKeywords: dir.moodKeywords || [],
+                    selected: i === 0,
+                }))
 
-                const directions: ArtisticDirection[] =
-                    apiDirections.length > 0
-                        ? apiDirections.map((dir: Partial<ArtisticDirection>, i: number) => ({
-                            id: "dir-" + i,
-                            sessionId,
-                            name: dir.name || `Direction ${i + 1}`,
-                            style: dir.style || "modern",
-                            colorPalette: dir.colorPalette || { primary: "#FF6B00", secondary: "#1A1A2E", accent: "#00D9FF", background: "#0F0F1A", text: "#FFFFFF" },
-                            typography: dir.typography || { headingFont: "Inter", bodyFont: "Inter", headingWeight: "800", emphasis: "uppercase" },
-                            moodKeywords: dir.moodKeywords || ["innovant", "moderne"],
-                            selected: i === 0,
-                        }))
-                        : createFallbackDirections(sessionId)
+                if (directions.length === 0) {
+                    throw new Error("Aucune direction artistique générée.")
+                }
 
                 setArtisticDirections(directions)
                 addLog({
@@ -620,9 +495,11 @@ export function useContentGeneration(): ContentGenerationState {
                     cost: 0.002,
                 })
             } catch (error) {
-                clearInterval(interval)
-                console.error("Artistic directions error:", error)
-                setArtisticDirections(createFallbackDirections(sessionId))
+                toast({
+                    title: "Erreur Direction Artistique",
+                    description: error instanceof Error ? error.message : "Impossible de générer les directions",
+                    variant: "destructive",
+                })
             }
 
             setIsGenerating(false)
@@ -725,25 +602,11 @@ export function useContentGeneration(): ContentGenerationState {
         } catch (error) {
             clearInterval(interval)
             console.error("Thumbnail generation error:", error)
-            // Set empty thumbnails with fallback gradients
-            setThumbnails(
-                THUMBNAIL_THEMES.map((theme, i) => ({
-                    id: `thumb-${i + 1}`,
-                    sessionId,
-                    directionId: selectedDirection.id,
-                    imageUrl: "",
-                    textOverlay: [
-                        { id: `t${i}-1`, content: line1, position: { x: 20, y: 35 }, fontSize: 64, fontFamily: selectedDirection.typography.headingFont, color: colors.primary, strokeColor: colors.background, strokeWidth: 3, rotation: 0 },
-                        { id: `t${i}-2`, content: line2, position: { x: 20, y: 55 }, fontSize: 42, fontFamily: selectedDirection.typography.bodyFont, color: colors.text, strokeColor: colors.background, strokeWidth: 2, rotation: 0 },
-                    ],
-                    resolution: "1280x720",
-                    compressed: false,
-                    selected: i === 0,
-                    status: "ready",
-                    theme: theme.name,
-                    referencePhoto: options?.referencePhoto || undefined,
-                }))
-            )
+            toast({
+                title: "Erreur de génération d'images",
+                description: error instanceof Error ? error.message : "Impossible de générer les miniatures",
+                variant: "destructive",
+            })
         }
 
         setIsGeneratingThumbnails(false)
@@ -792,24 +655,29 @@ export function useContentGeneration(): ContentGenerationState {
                     try { socialData = parseAIJson(socialRawData) } catch (e) {}
                 }
                 const apiPosts = socialData?.posts || socialData || []
-
                 const platformOrder = ["linkedin", "youtube_community", "tiktok", "x", "instagram", "facebook", "threads", "school"]
-                const posts: SocialPost[] =
-                    apiPosts.length > 0
-                        ? platformOrder.map((platform, i) => {
-                            const apiPost = Array.isArray(apiPosts)
-                                ? apiPosts.find((p: { platform: string }) => p.platform === platform) || apiPosts[i] || {}
-                                : {}
-                            return {
-                                id: `post-${i + 1}`,
-                                sessionId,
-                                platform: platform as SocialPost["platform"],
-                                content: apiPost.content || "",
-                                hashtags: apiPost.hashtags || metadata?.hashtags || [],
-                                status: "draft" as const,
-                            }
-                        })
-                        : createFallbackPosts(title, metadata, sessionId)
+
+                if (!Array.isArray(apiPosts) || apiPosts.length === 0) {
+                    throw new Error("Aucun post social généré.")
+                }
+
+                const posts: SocialPost[] = platformOrder.map((platform, i) => {
+                    const apiPost = Array.isArray(apiPosts)
+                        ? apiPosts.find((p: any) => p.platform === platform) || apiPosts[i] || {}
+                        : {}
+                    return {
+                        id: `post-${i + 1}`,
+                        sessionId,
+                        platform: platform as SocialPost["platform"],
+                        content: apiPost.content || "",
+                        hashtags: apiPost.hashtags || metadata?.hashtags || [],
+                        status: "draft" as const,
+                    }
+                })
+
+                if (posts.every(p => !p.content)) {
+                    throw new Error("Aucun post social généré.")
+                }
 
                 setSocialPosts(posts)
                 addLog({
@@ -824,7 +692,11 @@ export function useContentGeneration(): ContentGenerationState {
             } catch (error) {
                 clearInterval(interval)
                 console.error("Social posts error:", error)
-                setSocialPosts(createFallbackPosts(title, metadata, sessionId))
+                toast({
+                    title: "Erreur Posts Sociaux",
+                    description: error instanceof Error ? error.message : "Impossible de générer les posts",
+                    variant: "destructive",
+                })
             }
 
             setIsGenerating(false)

@@ -148,42 +148,21 @@ Each direction should have a unique style, color palette, typography recommendat
     })
     const aiResponse = aiResponseRaw.content
 
-    let directions: any[] = []
+    const directions: any[] = []
     try {
       const content = aiResponse
       const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/)
       const jsonStr = jsonMatch ? jsonMatch[1] : content
       const parsed = JSON.parse(jsonStr)
-      directions = parsed.directions || []
+      directions.push(...(parsed.directions || []))
+      
+      if (directions.length === 0) throw new Error('No directions generated')
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError)
-      // Fallback directions
-      directions = [
-        {
-          name: 'Tech Moderne',
-          style: 'modern',
-          colorPalette: { primary: '#FF6B00', secondary: '#1A1A2E', accent: '#00D9FF', background: '#0F0F1A', text: '#FFFFFF' },
-          typography: { headingFont: 'Inter', bodyFont: 'Inter', headingWeight: '800', emphasis: 'uppercase' },
-          moodKeywords: ['innovant', 'professionnel', 'high-tech'],
-          thumbnailConcept: 'Design moderne avec gradient orange'
-        },
-        {
-          name: 'Minimaliste Elegant',
-          style: 'minimalist',
-          colorPalette: { primary: '#2D2D2D', secondary: '#F5F5F5', accent: '#FFD700', background: '#FFFFFF', text: '#1A1A1A' },
-          typography: { headingFont: 'Playfair Display', bodyFont: 'Lato', headingWeight: '700', emphasis: 'capitalize' },
-          moodKeywords: ['elegant', 'epure', 'premium'],
-          thumbnailConcept: 'Design minimaliste avec accent dore'
-        },
-        {
-          name: 'Bold Impact',
-          style: 'bold',
-          colorPalette: { primary: '#FF0050', secondary: '#000000', accent: '#00FF88', background: '#111111', text: '#FFFFFF' },
-          typography: { headingFont: 'Bebas Neue', bodyFont: 'Roboto', headingWeight: '900', emphasis: 'uppercase' },
-          moodKeywords: ['audacieux', 'percutant', 'energique'],
-          thumbnailConcept: 'Design audacieux avec contrastes forts'
-        }
-      ]
+      return NextResponse.json(
+        { error: 'Failed to generate valid artistic directions JSON', details: parseError instanceof Error ? parseError.message : String(parseError) },
+        { status: 500 }
+      )
     }
 
     // Create direction objects with IDs
