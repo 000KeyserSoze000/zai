@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { 
   Zap, Plus, Search, RefreshCw, Loader2,
-  Edit, Trash2, Code, FileJson, Sparkles, Layers, Hammer
+  Edit, Trash2, Code, FileJson, Sparkles, Layers, Hammer, Box
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -184,6 +184,14 @@ export default function AdminSkillsPage() {
           <Button onClick={openCreate} className="bg-purple-500 hover:bg-purple-600">
             <Plus className="w-4 h-4 mr-2" />
             {t("orchestrator.skillsPage.newSkill")}
+          </Button>
+          <Button 
+            onClick={() => window.location.href = "/admin/orchestrator/esc-collection"} 
+            variant="outline" 
+            className="border-orange-500/50 text-orange-500 hover:bg-orange-500/10"
+          >
+            <Box className="w-4 h-4 mr-2" />
+            {t("nav.escCollection")}
           </Button>
           <Button onClick={fetchData} variant="outline" className="border-neutral-700 text-neutral-300">
             <RefreshCw className="w-4 h-4 mr-2" />

@@ -28,13 +28,6 @@ export default function OrchestratorLayout({
       bg: "bg-purple-500/10"
     },
     {
-      name: t("nav.playground"),
-      href: "/admin/orchestrator/playground",
-      icon: Terminal,
-      color: "text-amber-500",
-      bg: "bg-amber-500/10"
-    },
-    {
       name: t("nav.agents"),
       href: "/admin/orchestrator/agents",
       icon: Bot,
@@ -68,6 +61,13 @@ export default function OrchestratorLayout({
       icon: Calendar,
       color: "text-pink-500",
       bg: "bg-pink-500/10"
+    },
+    {
+      name: t("nav.playground"),
+      href: "/admin/orchestrator/playground",
+      icon: Terminal,
+      color: "text-amber-500",
+      bg: "bg-amber-500/10"
     },
     {
       name: t("nav.observability"),

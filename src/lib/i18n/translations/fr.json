@@ -71,7 +71,7 @@
         "tools": "OUTILS",
         "scheduler": "SCHEDULER",
         "observability": "OBSERVABILITÉ",
-        "escCollection": "COLLECTION ESC"
+        "escCollection": "BIBLIOTHÈQUE"
     },
     "auth": {
         "login": "Connexion",
