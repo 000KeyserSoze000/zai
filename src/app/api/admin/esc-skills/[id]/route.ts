@@ -8,7 +8,7 @@ import { requireAuth } from "@/lib/api-utils"
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const user = await requireAuth(request)
@@ -16,27 +16,37 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 
-    const { id } = params
+    // Await params for Next.js 15+ support
+    const resolvedParams = await (params as any)
+    const id = resolvedParams.id
+    
+    console.log(`[ESC Skill PATCH] Updating skill ${id}`)
+    
     const body = await request.json()
+
+    // Clean data to avoid sending undefined to required fields if they are in the body
+    const updateData: any = {}
+    if (body.name !== undefined) updateData.name = body.name
+    if (body.slug !== undefined) updateData.slug = body.slug
+    if (body.description !== undefined) updateData.description = body.description
+    if (body.category !== undefined) updateData.category = body.category
+    if (body.isActive !== undefined) updateData.isActive = body.isActive
+    if (body.icon !== undefined) updateData.icon = body.icon
+    if (body.color !== undefined) updateData.color = body.color
+    if (body.promptContent !== undefined) updateData.promptContent = body.promptContent
 
     const skill = await db.escSkill.update({
       where: { id },
-      data: {
-        name: body.name,
-        slug: body.slug,
-        description: body.description,
-        category: body.category,
-        isActive: body.isActive,
-        icon: body.icon,
-        color: body.color,
-        promptContent: body.promptContent,
-      },
+      data: updateData,
     })
 
     return NextResponse.json(skill)
   } catch (error) {
     console.error("[ESC Skill PATCH] Error:", error)
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+    return NextResponse.json({ 
+      error: "Internal Server Error",
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 })
   }
 }
 
@@ -46,7 +56,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const user = await requireAuth(request)
@@ -54,12 +64,17 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 
-    const { id } = params
+    const resolvedParams = await (params as any)
+    const id = resolvedParams.id
+    
     await db.escSkill.delete({ where: { id } })
 
     return NextResponse.json({ success: true, message: "Skill supprimée" })
   } catch (error) {
     console.error("[ESC Skill DELETE] Error:", error)
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+    return NextResponse.json({ 
+      error: "Internal Server Error",
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 })
   }
 }
