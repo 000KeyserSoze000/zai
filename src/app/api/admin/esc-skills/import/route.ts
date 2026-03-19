@@ -30,19 +30,29 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Parcourir les skills du manifeste
-    // Le format du manifeste ESC est généralement { skills: [ { name, slug, category, path } ] }
-    const skillsToImport = manifest.skills || []
+    // Le format est { skills: { "slug": { path, version, hash } } }
+    const skillsMap = manifest.skills || {}
+    const skillEntries = Object.entries(skillsMap)
 
-    for (const skillData of skillsToImport) {
+    console.log(`[ESC Import] Found ${skillEntries.length} skills in manifest`)
+
+    for (const [slug, skillInfo] of skillEntries) {
       try {
-        const { name, slug, category, path } = skillData
+        const { path, version } = skillInfo as any
+        
+        // Generer un nom lisible depuis le slug
+        const name = slug
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
         
         // Fetch the SKILL.md content
-        const skillMdUrl = `${GITHUB_BASE_URL}/${path}/SKILL.md`
-        console.log(`[ESC Import] Fetching ${slug} from:`, skillMdUrl)
+        const skillMdUrl = `${GITHUB_BASE_URL}/${path}`
+        console.log(`[ESC Import] Fetching ${slug} content from:`, skillMdUrl)
+        
         const skillMdRes = await fetch(skillMdUrl)
         if (!skillMdRes.ok) {
-          console.error(`[ESC Import] Failed to fetch SKILL.md for ${slug}`)
+          console.error(`[ESC Import] Failed to fetch content for ${slug} at ${skillMdUrl}`)
           results.errors++
           continue
         }
@@ -52,12 +62,12 @@ export async function POST(request: NextRequest) {
         const existing = await db.escSkill.findUnique({ where: { slug } })
 
         if (existing) {
-          // Update if content changed or manually forced
+          // Update
           await db.escSkill.update({
             where: { slug },
             data: {
               name,
-              category: category || "general",
+              version: version || "1.0.0",
               promptContent,
               updatedAt: new Date(),
             },
@@ -69,8 +79,8 @@ export async function POST(request: NextRequest) {
             data: {
               name,
               slug,
-              description: skillData.description || "",
-              category: category || "general",
+              version: version || "1.0.0",
+              category: "general", // Par défaut
               promptContent,
               source: "esc-skills",
               isActive: false, // Inactif par défaut
@@ -79,7 +89,7 @@ export async function POST(request: NextRequest) {
           results.added++
         }
       } catch (err) {
-        console.error(`[ESC Import] Error processing skill ${skillData.slug}:`, err)
+        console.error(`[ESC Import] Error processing skill ${slug}:`, err)
         results.errors++
       }
     }
