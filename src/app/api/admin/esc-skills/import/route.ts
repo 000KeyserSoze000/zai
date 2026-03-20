@@ -263,9 +263,12 @@ async function handleGitHubBulkSync(logs: string[], providerId?: string) {
     try {
       logs.push(`Syncing from provider: ${provider.name} (${provider.url})`)
       // Convert github.com URL to raw.githubusercontent.com
-      const baseUrl = provider.url.replace("github.com", "raw.githubusercontent.com").replace("/tree/", "/").replace("/blob/", "/")
+      let baseUrl = provider.url.replace("github.com", "raw.githubusercontent.com").replace("/tree/", "/").replace("/blob/", "/")
+      // Remove trailing slash to avoid double slash
+      baseUrl = baseUrl.replace(/\/$/, '')
       const manifestUrl = baseUrl + "/manifest.json"
       
+      logs.push(`Attempting sync from: ${manifestUrl}`)
       const res = await handleGitHubBulkSyncByUrl(manifestUrl, baseUrl, logs)
       finalResults.added += res.added
       finalResults.updated += res.updated
