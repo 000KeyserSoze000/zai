@@ -13,7 +13,8 @@ import {
   Eye,
   PlusCircle,
   Copy,
-  XCircle
+  XCircle,
+  Pencil
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -83,6 +84,8 @@ export default function EscCollectionPage() {
   const [selectedAgentId, setSelectedAgentId] = useState<string>("")
   const [installing, setInstalling] = useState(false)
   const [importing, setImporting] = useState(false)
+  const [editSkill, setEditSkill] = useState<EscSkill | null>(null)
+  const [updatingSkill, setUpdatingSkill] = useState(false)
   
   // Selection & Pagination
   const [selectedIds, setSelectedIds] = useState<string[]>([])
@@ -386,6 +389,30 @@ export default function EscCollectionPage() {
     }
   }
 
+  const handleUpdateSkill = async () => {
+    if (!editSkill) return
+    setUpdatingSkill(true)
+    try {
+      const res = await fetch(`/api/admin/esc-skills/${editSkill.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          name: editSkill.name, 
+          category: editSkill.category 
+        }),
+      })
+      if (res.ok) {
+        toast({ title: "Mis à jour", description: "La skill a été modifiée." })
+        setEditSkill(null)
+        fetchData()
+      }
+    } catch (error) {
+      toast({ title: t("common.error"), variant: "destructive" })
+    } finally {
+      setUpdatingSkill(false)
+    }
+  }
+
   const handleInstall = async () => {
     if (!installSkill || !selectedAgentId) return
     setInstalling(true)
@@ -663,6 +690,15 @@ export default function EscCollectionPage() {
                       variant="ghost" 
                       size="icon" 
                       className="h-7 w-7 text-neutral-500 hover:text-white"
+                      onClick={(e) => { e.stopPropagation(); setEditSkill(skill); }}
+                      title="Modifier le nom ou la catégorie"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-7 w-7 text-neutral-500 hover:text-white"
                       onClick={(e) => { e.stopPropagation(); setViewSkill(skill); }}
                     >
                       <Eye className="w-3.5 h-3.5" />
@@ -798,6 +834,48 @@ export default function EscCollectionPage() {
                 }}
               >
                 Installer cette skill
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Skill Dialog */}
+        <Dialog open={!!editSkill} onOpenChange={() => setEditSkill(null)}>
+          <DialogContent className="bg-neutral-900 border-neutral-800 text-white">
+            <DialogHeader>
+              <DialogTitle>Modifier la Skill</DialogTitle>
+              <DialogDescription className="text-neutral-400">
+                Renommez cette compétence ou déplacez-la dans une autre catégorie.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-6 space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-neutral-400">Nom de la skill</label>
+                <Input 
+                  value={editSkill?.name || ""} 
+                  onChange={(e) => setEditSkill(prev => prev ? { ...prev, name: e.target.value } : null)}
+                  className="bg-neutral-950 border-neutral-800"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-neutral-400">Catégorie</label>
+                <Input 
+                  value={editSkill?.category || ""} 
+                  onChange={(e) => setEditSkill(prev => prev ? { ...prev, category: e.target.value } : null)}
+                  className="bg-neutral-950 border-neutral-800"
+                  placeholder="Ex: Marketing, Dev, SEO..."
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="ghost" onClick={() => setEditSkill(null)}>Annuler</Button>
+              <Button 
+                disabled={updatingSkill} 
+                onClick={handleUpdateSkill}
+                className="bg-orange-600 hover:bg-orange-700"
+              >
+                {updatingSkill ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                Enregistrer les modifications
               </Button>
             </DialogFooter>
           </DialogContent>

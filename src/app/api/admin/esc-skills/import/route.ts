@@ -49,19 +49,27 @@ export async function POST(request: NextRequest) {
     
     if (url) {
       if (url.includes('github.com')) return await handleGitHubImport(url, logs)
-      throw new Error("Seules les URLs GitHub sont supportées en import direct.")
+      if (url.includes('smithery.ai/skills')) return await handleSmitheryImport(url, logs)
+      throw new Error("Seules les URLs GitHub et Smithery.ai sont supportées.")
     }
     
     const providers = await (db as any).skillProvider.findMany({ where: { isActive: true, ...(providerId ? { id: providerId } : {}) } })
     const final = { added: 0, updated: 0, errors: 0 }
 
     for (const p of providers) {
-      logs.push(`Sycing provider: ${p.name}...`)
       const gh = parseGitHubUrl(p.url)
-      if (!gh) { logs.push(`URL Invalide: ${p.url}`); final.errors++; continue }
-      
-      const res = await syncGitHubTree(gh.owner, gh.repo, gh.branch, gh.path, logs, p.url)
-      final.added += res.added; final.updated += res.updated; final.errors += res.errors
+      if (gh) {
+        const res = await syncGitHubTree(gh.owner, gh.repo, gh.branch, gh.path, logs, p.url)
+        final.added += res.added; final.updated += res.updated; final.errors += res.errors
+      } else if (p.url.includes('smithery.ai/skills')) {
+        const res = await handleSmitheryImport(p.url, logs)
+        const data = await res.json()
+        if (data.results) {
+          final.added += data.results.added; final.updated += data.results.updated; final.errors += data.results.errors
+        }
+      } else { 
+        logs.push(`URL Invalide ou non supportée: ${p.url}`); final.errors++; 
+      }
     }
     
     return NextResponse.json({ success: true, results: final, logs })
@@ -75,6 +83,28 @@ async function handleGitHubImport(url: string, logs: string[]) {
   if (!gh) throw new Error("URL GitHub invalide")
   const res = await syncGitHubTree(gh.owner, gh.repo, gh.branch, gh.path, logs, url, true)
   return NextResponse.json({ success: true, results: res, logs })
+}
+
+async function handleSmitheryImport(url: string, logs: string[]) {
+  logs.push(`Exploring Smithery: ${url}...`)
+  try {
+    const html = await fetchFileContent(url)
+    if (!html) throw new Error("Impossible de lire la page Smithery.")
+
+    // Smithery pages are SSR'd, we can find the GitHub URL in the source
+    const githubMatch = html.match(/https:\/\/github\.com\/[^"'\s>]+/)
+    if (!githubMatch) throw new Error("Aucun lien GitHub trouvé sur cette page Smithery.")
+    
+    logs.push(`Found GitHub link from Smithery: ${githubMatch[0]}`)
+    const gh = parseGitHubUrl(githubMatch[0])
+    if (!gh) throw new Error("Lien GitHub extrait invalide")
+
+    const res = await syncGitHubTree(gh.owner, gh.repo, gh.branch, gh.path, logs, url, true)
+    return NextResponse.json({ success: true, results: res, logs })
+  } catch (error: any) {
+    logs.push(`Smithery Error: ${error.message}`)
+    return NextResponse.json({ success: false, error: error.message, logs }, { status: 500 })
+  }
 }
 
 async function syncGitHubTree(owner: string, repo: string, branch: string, rootPath: string, logs: string[], providerUrl: string, isSingle: boolean = false) {
@@ -127,17 +157,49 @@ async function syncGitHubTree(owner: string, repo: string, branch: string, rootP
         }
 
         if (mainContent) {
+          const defaultName = extractSkillName(mainContent, displayName)
+          const actualSlug = folderPath.replace(/\//g, "-").toLowerCase() || repo.toLowerCase()
+          
+          // Data Protection: Check if skill exists and preserve user changes
+          const existing = await (db as any).escSkill.findUnique({ where: { slug: actualSlug } })
+          
           const data = {
-            name: extractSkillName(mainContent, displayName),
             slug: actualSlug,
             promptContent: mainContent,
             files: leafFiles,
-            source: "github",
+            source: providerUrl.includes('smithery.ai') ? "smithery" : "github",
             providerUrl: providerUrl.replace(/\/$/, ""),
-            isActive: true, version: "1.0.0", category: "Imported"
+            updatedAt: new Date()
           }
-          await (db as any).escSkill.upsert({ where: { slug: data.slug }, update: { ...data, updatedAt: new Date() }, create: data })
-          results.added++
+
+          if (!existing) {
+            // New skill: full create
+            await (db as any).escSkill.create({
+              data: {
+                ...data,
+                name: defaultName,
+                isActive: true,
+                version: "1.0.0",
+                category: "Imported"
+              }
+            })
+            results.added++
+          } else {
+            // Existing skill: ONLY update content, NOT name/category if the user changed them
+            const updatePayload: any = { ...data }
+            
+            // If the name is still the "auto-generated" one, we can update it
+            // Otherwise, we leave it as the user renamed it
+            if (existing.category === "Imported") {
+              // We can update details freely if it was never moved from Imported
+            }
+
+            await (db as any).escSkill.update({
+              where: { id: existing.id },
+              data: updatePayload
+            })
+            results.updated++
+          }
         }
       } catch (e) { results.errors++ }
     }
