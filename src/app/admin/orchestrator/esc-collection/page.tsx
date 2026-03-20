@@ -373,7 +373,7 @@ export default function EscCollectionPage() {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-white">ESC Skills Collection</h2>
+            <h2 className="text-2xl font-bold text-white">Collection de skills</h2>
             <p className="text-neutral-400 text-sm">Gérez et activez les compétences IA haute performance</p>
           </div>
           

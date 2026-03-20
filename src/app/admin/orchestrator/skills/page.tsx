@@ -320,12 +320,12 @@ export default function AdminSkillsPage() {
               </DialogDescription>
             </DialogHeader>
             
-            <div className="grid grid-cols-12 gap-8 py-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-4">
               {/* Left Column: Basic Info & Prompt */}
-              <div className="col-span-9 space-y-6">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="lg:col-span-8 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                    <div className="space-y-2">
-                    <Label className="text-neutral-300">{t("orchestrator.skillsPage.formName")}</Label>
+                    <Label className="text-neutral-300">{t("orchestrator.skillsPage.formName")} *</Label>
                     <Input
                       value={form.name}
                       onChange={(e) => {
@@ -337,7 +337,7 @@ export default function AdminSkillsPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-neutral-300">{t("orchestrator.skillsPage.formSlug")}</Label>
+                    <Label className="text-neutral-300">{t("orchestrator.skillsPage.formSlug")} *</Label>
                     <Input
                       value={form.slug}
                       onChange={(e) => setForm({ ...form, slug: e.target.value })}
@@ -346,23 +346,23 @@ export default function AdminSkillsPage() {
                   </div>
                 </div>
 
-                  <div className="flex flex-col md:flex-row gap-0 border border-neutral-700 rounded-lg overflow-hidden bg-neutral-900/50 min-h-[600px]">
+                  <div className="flex flex-col md:flex-row gap-0 border border-neutral-700 rounded-lg overflow-hidden bg-neutral-900/50 min-h-[500px]">
                     {/* File Explorer for Bundles */}
                     {form.files && Object.keys(form.files).length > 0 && (
-                      <div className="w-full md:w-52 border-r border-neutral-700 bg-neutral-900/30 p-3 overflow-y-auto max-h-[600px] flex-shrink-0">
+                      <div className="w-full md:w-52 border-r border-neutral-700 bg-neutral-900/30 p-2 overflow-y-auto max-h-[500px] flex-shrink-0">
                         <div className="text-[10px] uppercase font-bold text-neutral-500 mb-4 px-2 tracking-widest flex items-center gap-2">
-                          <Zap className="w-3 h-3" /> Bundle Files
+                          <Zap className="w-3 h-3" /> Bundle
                         </div>
                         <div className="space-y-1">
                           <button
                             type="button"
                             onClick={() => setSelectedFile("SKILL.md")}
-                            className={`w-full text-left px-3 py-2 text-[11px] font-medium rounded-md transition-all truncate group flex items-center gap-2 ${
+                            className={`w-full text-left px-2 py-1.5 text-[10px] font-medium rounded transition-all truncate group flex items-center gap-2 ${
                               selectedFile === "SKILL.md" ? "bg-orange-500/10 text-orange-400 border border-orange-500/20" : "text-neutral-400 hover:bg-neutral-800 border border-transparent"
                             }`}
                           >
                             <Code className="w-3 h-3 opacity-70" />
-                            SKILL.md (Main)
+                            SKILL.md
                           </button>
                           
                           {Object.keys(form.files).sort().map(fileName => (
@@ -370,7 +370,7 @@ export default function AdminSkillsPage() {
                               key={fileName}
                               type="button"
                               onClick={() => setSelectedFile(fileName)}
-                              className={`w-full text-left px-3 py-2 text-[11px] rounded-md transition-all truncate flex items-center gap-2 border ${
+                              className={`w-full text-left px-2 py-1.5 text-[10px] rounded transition-all truncate flex items-center gap-2 border ${
                                 selectedFile === fileName ? "bg-purple-500/10 text-purple-400 border-purple-500/20" : "text-neutral-500 hover:bg-neutral-800 border-transparent"
                               }`}
                             >
@@ -384,14 +384,13 @@ export default function AdminSkillsPage() {
 
                     <div className="flex-1 flex flex-col min-w-0">
                       <div className="flex justify-between items-center px-4 py-2 bg-neutral-900/40 border-b border-neutral-700">
-                        <Label className="text-neutral-300 flex items-center gap-2 text-[11px] font-medium uppercase tracking-tight">
+                        <Label className="text-neutral-300 flex items-center gap-2 text-[10px] font-medium uppercase tracking-tight">
                           {selectedFile === "SKILL.md" ? (
-                            <><Zap className="w-3 h-3 text-orange-500" /> {t("orchestrator.skillsPage.formPromptTemplate")}</>
+                            <><Zap className="w-3 h-3 text-orange-500" /> PROMPT TEMPLATE</>
                           ) : (
                             <><Code className="w-3 h-3 text-purple-500" /> {selectedFile}</>
                           )}
                         </Label>
-                        <span className="text-[10px] text-neutral-500 font-mono italic">{t("orchestrator.skillsPage.formPromptHint")}</span>
                       </div>
                       <Textarea
                         value={selectedFile === "SKILL.md" ? form.promptTemplate : (form.files?.[selectedFile] || "")}
@@ -406,56 +405,56 @@ export default function AdminSkillsPage() {
                             });
                           }
                         }}
-                        className="bg-transparent border-none text-white min-h-[600px] font-mono text-[13px] lg:text-[14px] leading-relaxed p-6 resize-none focus-visible:ring-0"
-                        placeholder={t("orchestrator.skillsPage.formPromptPlaceholder")}
+                        className="bg-transparent border-none text-white min-h-[500px] font-mono text-[13px] leading-relaxed p-4 resize-none focus-visible:ring-0"
                       />
                     </div>
                   </div>
                 </div>
 
               {/* Right Column: Config & Schema */}
-              <div className="col-span-3 space-y-6">
-                <div className="space-y-2">
-                  <Label className="text-neutral-300">{t("orchestrator.skillsPage.formAgent")}</Label>
-                  <Select value={form.agentId} onValueChange={(v) => setForm({ ...form, agentId: v })}>
-                    <SelectTrigger className="bg-neutral-800 border-neutral-700 text-white">
-                      <SelectValue placeholder={t("orchestrator.skillsPage.formAgentPlaceholder")} />
-                    </SelectTrigger>
-                    <SelectContent className="bg-neutral-800 border-neutral-700">
-                      {agents.map((agent) => (
-                        <SelectItem key={agent.id} value={agent.id} className="text-white">
-                          {agent.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="lg:col-span-4 space-y-6">
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-neutral-300">{t("orchestrator.skillsPage.formAgent")} *</Label>
+                    <Select value={form.agentId} onValueChange={(v) => setForm({ ...form, agentId: v })}>
+                      <SelectTrigger className="bg-neutral-800 border-neutral-700 text-white">
+                        <SelectValue placeholder={t("orchestrator.skillsPage.formAgentPlaceholder")} />
+                      </SelectTrigger>
+                      <SelectContent className="bg-neutral-800 border-neutral-700">
+                        {agents.map((agent) => (
+                          <SelectItem key={agent.id} value={agent.id} className="text-white">
+                            {agent.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div className="space-y-2">
-                  <Label className="text-neutral-300">{t("orchestrator.skillsPage.formType")}</Label>
-                  <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
-                    <SelectTrigger className="bg-neutral-800 border-neutral-700 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-neutral-800 border-neutral-700">
-                      <SelectItem value="GENERATION" className="text-white">{t("orchestrator.skillsPage.typeGeneration")}</SelectItem>
-                      <SelectItem value="ANALYSIS" className="text-white">{t("orchestrator.skillsPage.typeAnalysis")}</SelectItem>
-                      <SelectItem value="EXTRACTION" className="text-white">{t("orchestrator.skillsPage.typeExtraction")}</SelectItem>
-                      <SelectItem value="TRANSFORMATION" className="text-white">{t("orchestrator.skillsPage.typeTransformation")}</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="space-y-2">
+                    <Label className="text-neutral-300">{t("orchestrator.skillsPage.formType")}</Label>
+                    <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
+                      <SelectTrigger className="bg-neutral-800 border-neutral-700 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-neutral-800 border-neutral-700">
+                        <SelectItem value="GENERATION" className="text-white">{t("orchestrator.skillsPage.typeGeneration")}</SelectItem>
+                        <SelectItem value="ANALYSIS" className="text-white">{t("orchestrator.skillsPage.typeAnalysis")}</SelectItem>
+                        <SelectItem value="EXTRACTION" className="text-white">{t("orchestrator.skillsPage.typeExtraction")}</SelectItem>
+                        <SelectItem value="TRANSFORMATION" className="text-white">{t("orchestrator.skillsPage.typeTransformation")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label className="text-neutral-300 flex items-center gap-2">
-                      <FileJson className="w-3 h-3" /> {t("orchestrator.skillsPage.formInputSchema")}
+                      <FileJson className="w-3 h-3 text-purple-400" /> {t("orchestrator.skillsPage.formInputSchema")}
                     </Label>
                     <Textarea
                       value={form.inputSchema}
                       onChange={(e) => setForm({ ...form, inputSchema: e.target.value })}
-                      className="bg-neutral-800 border-neutral-700 text-white font-mono text-[10px] leading-tight"
-                      rows={6}
+                      className="bg-neutral-800 border-neutral-700 text-white font-mono text-[11px] leading-tight min-h-[150px]"
                     />
                   </div>
 
@@ -466,8 +465,7 @@ export default function AdminSkillsPage() {
                     <Textarea
                       value={form.outputSchema}
                       onChange={(e) => setForm({ ...form, outputSchema: e.target.value })}
-                      className="bg-neutral-800 border-neutral-700 text-white font-mono text-[10px] leading-tight"
-                      rows={6}
+                      className="bg-neutral-800 border-neutral-700 text-white font-mono text-[11px] leading-tight min-h-[150px]"
                     />
                   </div>
                 </div>
