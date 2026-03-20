@@ -564,9 +564,12 @@ model EscSkill {
   description   String?
   category      String   @default("general")
   source        String   @default("esc-skills")
+  providerUrl   String?
   version       String   @default("1.0.0")
   contentHash   String?
   promptContent String   @db.Text
+  files         Json?
+  tags          String?
   isActive      Boolean  @default(false)
   isInstalled   Boolean  @default(true)
   icon          String   @default("Zap")

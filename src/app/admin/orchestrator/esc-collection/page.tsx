@@ -52,11 +52,14 @@ interface EscSkill {
   description: string | null
   category: string
   source: string
+  providerUrl: string | null
   version: string
   isActive: boolean
   icon: string
   color: string
   promptContent: string
+  files: any | null
+  tags: string | null
   updatedAt: string
 }
 
@@ -67,12 +70,18 @@ export default function EscCollectionPage() {
   const [syncing, setSyncing] = useState(false)
   const [search, setSearch] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
+  const [sourceFilter, setSourceFilter] = useState("all")
+  const [statusFilter, setStatusFilter] = useState("all")
   
   // Dialog states
   const [viewSkill, setViewSkill] = useState<EscSkill | null>(null)
+  const [selectedFile, setSelectedFile] = useState<string>("SKILL.md")
   const [installSkill, setInstallSkill] = useState<EscSkill | null>(null)
+  const [importUrl, setImportUrl] = useState("")
+  const [showImportDialog, setShowImportDialog] = useState(false)
   const [selectedAgentId, setSelectedAgentId] = useState<string>("")
   const [installing, setInstalling] = useState(false)
+  const [importing, setImporting] = useState(false)
 
   const { toast } = useToast()
   const { t } = useTranslation()
@@ -105,34 +114,48 @@ export default function EscCollectionPage() {
   const handleSync = async () => {
     setSyncing(true)
     try {
-      const res = await fetch("/api/admin/esc-skills/import", { method: "POST" })
+      const res = await fetch("/api/admin/esc-skills/import", { 
+        method: "POST",
+        body: JSON.stringify({}) // Bulk sync
+      })
       if (res.ok) {
         const data = await res.json()
-        if (data.results.added === 0 && data.results.updated === 0) {
-          toast({
-            title: "Sync OK (0)",
-            description: "Aucun changement détecté.",
-          })
-          if (data.logs) console.log("ESC Sync Logs:", data.logs)
-        } else {
-          toast({
-            title: t("common.success"),
-            description: `${data.results.added} ajoutés, ${data.results.updated} mis à jour.`,
-          })
-        }
+        toast({
+          title: t("common.success"),
+          description: `Synchronisation terminée.`,
+        })
         fetchData()
-      } else {
-        const errorData = await res.json().catch(() => ({}))
-        throw new Error(errorData.error || "Sync failed")
       }
     } catch (error) {
-      toast({
-        title: t("common.error"),
-        description: "Échec de la synchronisation GitHub",
-        variant: "destructive",
-      })
+      toast({ title: t("common.error"), variant: "destructive" })
     } finally {
       setSyncing(false)
+    }
+  }
+
+  const handleImportByUrl = async () => {
+    if (!importUrl) return
+    setImporting(true)
+    try {
+      const res = await fetch("/api/admin/esc-skills/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: importUrl }),
+      })
+      
+      if (res.ok) {
+        toast({ title: "Import réussi", description: "La skill a été ajoutée à la bibliothèque." })
+        setImportUrl("")
+        setShowImportDialog(false)
+        fetchData()
+      } else {
+        const err = await res.json()
+        throw new Error(err.error || "Import failed")
+      }
+    } catch (error: any) {
+      toast({ title: "Erreur d'import", description: error.message, variant: "destructive" })
+    } finally {
+      setImporting(false)
     }
   }
 
@@ -198,12 +221,17 @@ export default function EscCollectionPage() {
 
   const filteredSkills = skills.filter(s => {
     const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase()) || 
-                         s.slug.toLowerCase().includes(search.toLowerCase())
+                         s.slug.toLowerCase().includes(search.toLowerCase()) ||
+                         (s.description || "").toLowerCase().includes(search.toLowerCase())
     const matchesCategory = categoryFilter === "all" || s.category === categoryFilter
-    return matchesSearch && matchesCategory
+    const matchesSource = sourceFilter === "all" || s.source === sourceFilter
+    const matchesStatus = statusFilter === "all" || 
+                         (statusFilter === "active" ? s.isActive : !s.isActive)
+    return matchesSearch && matchesCategory && matchesSource && matchesStatus
   })
 
   const categories = Array.from(new Set(skills.map(s => s.category)))
+  const sources = Array.from(new Set(skills.map(s => s.source)))
 
   return (
     <div className="p-6">
@@ -225,29 +253,63 @@ export default function EscCollectionPage() {
           </Button>
         </div>
 
-        {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-3 relative">
+        {/* Filters & Actions */}
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
             <Input 
-              placeholder="Rechercher une skill..." 
+              placeholder="Rechercher par nom, slug ou description..." 
               className="pl-10 bg-neutral-900/50 border-neutral-800"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="bg-neutral-900/50 border-neutral-800">
-              <Filter className="w-4 h-4 mr-2" />
-              <SelectValue placeholder="Catégorie" />
-            </SelectTrigger>
-            <SelectContent className="bg-neutral-900 border-neutral-800 text-white">
-              <SelectItem value="all">Toutes</SelectItem>
-              {categories.map(c => (
-                <SelectItem key={c} value={c}>{c}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[140px] bg-neutral-900/50 border-neutral-800">
+                <SelectValue placeholder="Catégorie" />
+              </SelectTrigger>
+              <SelectContent className="bg-neutral-900 border-neutral-800 text-white">
+                <SelectItem value="all">Toutes Catégories</SelectItem>
+                {categories.map(c => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={sourceFilter} onValueChange={setSourceFilter}>
+              <SelectTrigger className="w-[140px] bg-neutral-900/50 border-neutral-800">
+                <SelectValue placeholder="Source" />
+              </SelectTrigger>
+              <SelectContent className="bg-neutral-900 border-neutral-800 text-white">
+                <SelectItem value="all">Toutes Sources</SelectItem>
+                {sources.map(s => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[140px] bg-neutral-900/50 border-neutral-800">
+                <SelectValue placeholder="Statut" />
+              </SelectTrigger>
+              <SelectContent className="bg-neutral-900 border-neutral-800 text-white">
+                <SelectItem value="all">Tous Statuts</SelectItem>
+                <SelectItem value="active">Actifs</SelectItem>
+                <SelectItem value="inactive">Inactifs</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button 
+              variant="outline" 
+              className="border-neutral-800 text-white hover:bg-neutral-800"
+              onClick={() => setShowImportDialog(true)}
+            >
+              <PlusCircle className="w-4 h-4 mr-2" />
+              Importer par URL
+            </Button>
+          </div>
         </div>
 
         {/* Grid */}
@@ -266,10 +328,15 @@ export default function EscCollectionPage() {
               <Card key={skill.id} className="bg-neutral-900/40 border-neutral-800 hover:border-neutral-700 transition-all overflow-hidden">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
-                    <div className="p-2.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-500">
-                      <Zap className="w-5 h-5" />
+                    <div className="flex items-center gap-2">
+                      <div className="p-2.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-500">
+                        <Zap className="w-5 h-5" />
+                      </div>
+                      <Badge variant="outline" className="text-[10px] uppercase border-neutral-800 bg-neutral-900 text-neutral-500">
+                        {skill.source}
+                      </Badge>
                     </div>
-                    <Badge variant={skill.isActive ? "default" : "secondary"} className={skill.isActive ? "bg-green-500/20 text-green-400 border-green-500/30" : "bg-neutral-800 text-neutral-500"}>
+                    <Badge variant={skill.isActive ? "default" : "secondary"} className={skill.isActive ? "bg-green-500/20 text-green-400 border-green-500/30 text-[10px]" : "bg-neutral-800 text-neutral-500 text-[10px]"}>
                       {skill.isActive ? "Actif" : "Inactif"}
                     </Badge>
                   </div>
@@ -329,7 +396,10 @@ export default function EscCollectionPage() {
         )}
 
         {/* View Content Dialog */}
-        <Dialog open={!!viewSkill} onOpenChange={() => setViewSkill(null)}>
+        <Dialog open={!!viewSkill} onOpenChange={(open) => {
+          if (!open) setViewSkill(null)
+          setSelectedFile("SKILL.md")
+        }}>
           <DialogContent className="max-w-3xl bg-neutral-900 border-neutral-800 text-white">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
@@ -340,11 +410,43 @@ export default function EscCollectionPage() {
                 Aperçu du template de prompt (SKILL.md)
               </DialogDescription>
             </DialogHeader>
-            <ScrollArea className="max-h-[500px] mt-4 rounded-md border border-neutral-800 bg-black/40 p-4">
-              <pre className="text-xs font-mono whitespace-pre-wrap text-neutral-300">
-                {viewSkill?.promptContent}
-              </pre>
-            </ScrollArea>
+            <div className="flex flex-col md:flex-row gap-4 mt-4 h-[500px]">
+              {/* File List */}
+              {viewSkill?.files && Object.keys(viewSkill.files).length > 0 && (
+                <div className="w-full md:w-64 border border-neutral-800 rounded-md bg-black/20 p-2 overflow-y-auto">
+                  <div className="text-[10px] uppercase font-bold text-neutral-500 mb-2 px-2">Fichiers</div>
+                  {Object.keys(viewSkill.files).map(fileName => (
+                    <button
+                      key={fileName}
+                      onClick={() => setSelectedFile(fileName)}
+                      className={`w-full text-left px-3 py-1.5 text-xs rounded transition-colors mb-1 ${
+                        selectedFile === fileName ? "bg-orange-600 text-white" : "text-neutral-400 hover:bg-neutral-800"
+                      }`}
+                    >
+                      {fileName}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setSelectedFile("PROMPT_RAW")}
+                    className={`w-full text-left px-3 py-1.5 text-xs rounded transition-colors ${
+                      selectedFile === "PROMPT_RAW" ? "bg-orange-600 text-white" : "text-neutral-400 hover:bg-neutral-800"
+                    }`}
+                  >
+                    Prompt Brut (DB)
+                  </button>
+                </div>
+              )}
+
+              {/* Content Panel */}
+              <ScrollArea className="flex-1 rounded-md border border-neutral-800 bg-black/40 p-4">
+                <pre className="text-xs font-mono whitespace-pre-wrap text-neutral-300">
+                  {selectedFile === "PROMPT_RAW" 
+                    ? viewSkill?.promptContent 
+                    : (viewSkill?.files as any)?.[selectedFile] || viewSkill?.promptContent
+                  }
+                </pre>
+              </ScrollArea>
+            </div>
             <DialogFooter className="mt-6">
               <Button 
                 variant="outline" 
@@ -401,6 +503,39 @@ export default function EscCollectionPage() {
               >
                 {installing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
                 Confirmer l'installation
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        {/* Import URL Dialog */}
+        <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
+          <DialogContent className="bg-neutral-900 border-neutral-800 text-white">
+            <DialogHeader>
+              <DialogTitle>Importer via URL</DialogTitle>
+              <DialogDescription className="text-neutral-400">
+                Collez une URL Smithery Skill ou un lien GitHub Raw (.md) pour l'ajouter à votre bibliothèque.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+              <Input 
+                placeholder="https://smithery.ai/skills/..." 
+                className="bg-neutral-950 border-neutral-800"
+                value={importUrl}
+                onChange={(e) => setImportUrl(e.target.value)}
+              />
+              <p className="text-[10px] text-neutral-500 italic">
+                Supporte : Smithery.ai (Direct), GitHub Raw (Fichier Markdown), GitHub Tree.
+              </p>
+            </div>
+            <DialogFooter>
+              <Button variant="ghost" onClick={() => setShowImportDialog(false)}>Annuler</Button>
+              <Button 
+                disabled={!importUrl || importing} 
+                onClick={handleImportByUrl}
+                className="bg-orange-600 hover:bg-orange-700"
+              >
+                {importing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                Importer maintenant
               </Button>
             </DialogFooter>
           </DialogContent>

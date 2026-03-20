@@ -16,14 +16,35 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const category = searchParams.get("category")
     const isActive = searchParams.get("isActive")
+    const search = searchParams.get("search")
+    const source = searchParams.get("source")
 
     const where: any = {}
-    if (category) where.category = category
-    if (isActive !== null) where.isActive = isActive === "true"
+    
+    if (category && category !== "all") {
+      where.category = category
+    }
+    
+    if (source && source !== "all") {
+      where.source = source
+    }
+    
+    if (isActive !== null && isActive !== "") {
+      where.isActive = isActive === "true"
+    }
+
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { slug: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { tags: { contains: search, mode: 'insensitive' } },
+      ]
+    }
 
     const skills = await db.escSkill.findMany({
       where,
-      orderBy: { name: "asc" },
+      orderBy: { updatedAt: "desc" },
     })
 
     return NextResponse.json(skills)
@@ -51,7 +72,12 @@ export async function POST(request: NextRequest) {
         slug: body.slug,
         description: body.description,
         category: body.category || "general",
+        source: body.source || "manual",
+        providerUrl: body.providerUrl,
+        version: body.version || "1.0.0",
         promptContent: body.promptContent,
+        files: body.files || {},
+        tags: body.tags,
         icon: body.icon || "Zap",
         color: body.color || "orange",
         isActive: body.isActive ?? false,
