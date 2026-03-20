@@ -235,6 +235,35 @@ model SiteSettings {
   mistralApiKey      String?
   replicateApiKey    String?
   stabilityApiKey    String?
+  // New API Fields
+  plagiarismApiKey   String?
+  clipdropApiKey     String?
+  freepikApiKey      String?
+  novitaApiKey       String?
+  xeroApiKey         String?
+  xaiApiKey          String?
+  azureOpenaiApiKey  String?
+  deepseekApiKey     String?
+  falAiApiKey        String?
+  creatifyApiKey     String?
+  topviewApiKey      String?
+  vizardApiKey       String?
+  klapApiKey         String?
+  piapiApiKey        String?
+  unsplashApiKey     String?
+  pexelsApiKey       String?
+  pixabayApiKey      String?
+  serperApiKey       String?
+  perplexityApiKey   String?
+  ablyApiKey         String?
+  searchApiKey       String?
+  ttsApiKey          String?
+  synthesiaApiKey    String?
+  togetherApiKey     String?
+  heygenApiKey       String?
+  aimlapiApiKey      String?
+  pebblelyApiKey     String?
+  gammaAiApiKey      String?
   smtpEnabled        Boolean  @default(false)
   smtpHost           String?
   smtpPort           Int?

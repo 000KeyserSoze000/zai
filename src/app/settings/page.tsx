@@ -44,6 +44,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 
@@ -73,6 +74,35 @@ interface SiteSettings {
   mistralApiKey: string | null
   replicateApiKey: string | null
   stabilityApiKey: string | null
+  // New Fields
+  plagiarismApiKey: string | null
+  clipdropApiKey: string | null
+  freepikApiKey: string | null
+  novitaApiKey: string | null
+  xeroApiKey: string | null
+  xaiApiKey: string | null
+  azureOpenaiApiKey: string | null
+  deepseekApiKey: string | null
+  falAiApiKey: string | null
+  creatifyApiKey: string | null
+  topviewApiKey: string | null
+  vizardApiKey: string | null
+  klapApiKey: string | null
+  piapiApiKey: string | null
+  unsplashApiKey: string | null
+  pexelsApiKey: string | null
+  pixabayApiKey: string | null
+  serperApiKey: string | null
+  perplexityApiKey: string | null
+  ablyApiKey: string | null
+  searchApiKey: string | null
+  ttsApiKey: string | null
+  synthesiaApiKey: string | null
+  togetherApiKey: string | null
+  heygenApiKey: string | null
+  aimlapiApiKey: string | null
+  pebblelyApiKey: string | null
+  gammaAiApiKey: string | null
   // Email settings
   emailEnabled: boolean
   emailProvider: string
@@ -154,14 +184,51 @@ const OAUTH_PROVIDERS = [
 ]
 
 const AI_PROVIDERS = [
-  { id: 'zai', name: 'Z.ai', description: 'Plateforme IA française', icon: '🇫🇷' },
-  { id: 'openai', name: 'OpenAI', description: 'GPT-4, DALL-E, Whisper', icon: '🤖' },
-  { id: 'openRouter', name: 'OpenRouter', description: 'Accès à tous les modèles (Claude, Llama, etc.)', icon: '🌐' },
-  { id: 'anthropic', name: 'Anthropic', description: 'Claude 3.5 Sonnet, Opus', icon: '🧠' },
-  { id: 'googleAi', name: 'Google AI', description: 'Gemini, PaLM', icon: '🌐' },
-  { id: 'mistral', name: 'Mistral AI', description: 'Mistral Large, Mixtral', icon: '🌪️' },
-  { id: 'replicate', name: 'Replicate', description: 'Modèles open source', icon: '🔄' },
-  { id: 'stability', name: 'Stability AI', description: 'Stable Diffusion, SDXL', icon: '🎨' },
+  // AI Text (LLM)
+  { id: 'openai', name: 'OpenAI', category: 'Intelligence Artificielle (LLM)' },
+  { id: 'azureOpenai', name: 'Azure OpenAI', category: 'Intelligence Artificielle (LLM)' },
+  { id: 'anthropic', name: 'Anthropic (Claude)', category: 'Intelligence Artificielle (LLM)' },
+  { id: 'googleAi', name: 'Gemini (Google AI)', category: 'Intelligence Artificielle (LLM)' },
+  { id: 'deepseek', name: 'Deepseek', category: 'Intelligence Artificielle (LLM)' },
+  { id: 'perplexity', name: 'Perplexity', category: 'Intelligence Artificielle (LLM)' },
+  { id: 'openRouter', name: 'Open Router', category: 'Intelligence Artificielle (LLM)' },
+  { id: 'xai', name: 'X AI (Grok)', category: 'Intelligence Artificielle (LLM)' },
+  { id: 'together', name: 'Together AI', category: 'Intelligence Artificielle (LLM)' },
+  { id: 'aimlapi', name: 'AIMLAPI', category: 'Intelligence Artificielle (LLM)' },
+  { id: 'mistral', name: 'Mistral AI', category: 'Intelligence Artificielle (LLM)' },
+  { id: 'zai', name: 'Z.ai', category: 'Intelligence Artificielle (LLM)' },
+  
+  // Image Generation
+  { id: 'stability', name: 'StableDiffusion (Stability AI)', category: 'Génération & Édition Image' },
+  { id: 'clipdrop', name: 'Clipdrop', category: 'Génération & Édition Image' },
+  { id: 'freepik', name: 'Freepik', category: 'Génération & Édition Image' },
+  { id: 'novita', name: 'Novita AI', category: 'Génération & Édition Image' },
+  { id: 'falAi', name: 'Fal AI', category: 'Génération & Édition Image' },
+  { id: 'pebblely', name: 'Pebblely', category: 'Génération & Édition Image' },
+  { id: 'replicate', name: 'Replicate', category: 'Génération & Édition Image' },
+  { id: 'piapi', name: 'PiAPI (Midjourney)', category: 'Génération & Édition Image' },
+
+  // Video Generation
+  { id: 'creatify', name: 'Creatify', category: 'Vidéo AI' },
+  { id: 'topview', name: 'Topview', category: 'Vidéo AI' },
+  { id: 'vizard', name: 'Vizard', category: 'Vidéo AI' },
+  { id: 'klap', name: 'Klap', category: 'Vidéo AI' },
+  { id: 'synthesia', name: 'Synthesia', category: 'Vidéo AI' },
+  { id: 'heygen', name: 'Heygen', category: 'Vidéo AI' },
+
+  // Search & Tools
+  { id: 'serper', name: 'Serper (Google Search)', category: 'Recherche & Outils' },
+  { id: 'searchApi', name: 'Search Api', category: 'Recherche & Outils' },
+  { id: 'plagiarism', name: 'Plagiarism API', category: 'Recherche & Outils' },
+  { id: 'xero', name: 'Xero API', category: 'Recherche & Outils' },
+  { id: 'ably', name: 'Ably Settings', category: 'Recherche & Outils' },
+  { id: 'gammaAi', name: 'Gamma AI', category: 'Recherche & Outils' },
+  { id: 'tts', name: 'TTS (ElevenLabs)', category: 'Recherche & Outils' },
+
+  // Stock Assets
+  { id: 'unsplash', name: 'Unsplash', category: 'Stock & Assets' },
+  { id: 'pexels', name: 'Pexels', category: 'Stock & Assets' },
+  { id: 'pixabay', name: 'Pixabay', category: 'Stock & Assets' }
 ]
 
 const EMAIL_PROVIDERS = [
@@ -234,6 +301,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('synced')
   const [showApiKeys, setShowApiKeys] = useState<Record<string, boolean>>({})
+  const [apiKeys, setApiKeys] = useState<Record<string, string>>({})
   const [oauthProviders, setOauthProviders] = useState<Record<string, OAuthProvider>>({})
   const [legalPages, setLegalPages] = useState<LegalPage[]>([])
   const [activeLegalPage, setActiveLegalPage] = useState<string>("cgv")
@@ -675,11 +743,11 @@ export default function SettingsPage() {
 
   // Sync status indicator
   const SyncIndicator = () => {
-    const statusConfig = {
-      synced: { icon: Cloud, color: 'text-green-500', bg: 'bg-green-500/20', label: 'Synchronisé' },
+    const statusConfig: Record<string, { icon: any, color: string, bg: string, label: string, animate?: boolean }> = {
+      synced: { icon: Cloud, color: 'text-green-500', bg: 'bg-green-500/20', label: 'Synchronisé', animate: false },
       syncing: { icon: RefreshCw, color: 'text-blue-500', bg: 'bg-blue-500/20', label: 'Synchronisation...', animate: true },
-      error: { icon: CloudOff, color: 'text-red-500', bg: 'bg-red-500/20', label: 'Erreur de sync' },
-      pending: { icon: RefreshCw, color: 'text-yellow-500', bg: 'bg-yellow-500/20', label: 'En attente...' },
+      error: { icon: CloudOff, color: 'text-red-500', bg: 'bg-red-500/20', label: 'Erreur de sync', animate: false },
+      pending: { icon: RefreshCw, color: 'text-yellow-500', bg: 'bg-yellow-500/20', label: 'En attente...', animate: false },
     }
     
     const { icon: Icon, color, bg, label, animate } = statusConfig[syncStatus]
@@ -703,6 +771,17 @@ export default function SettingsPage() {
   if (!session || session.user?.role !== "ADMIN") {
     return null
   }
+
+  // Group AI providers by category and sort them
+  const categorizedProviders = AI_PROVIDERS.reduce((acc, provider) => {
+    if (!acc[provider.category]) {
+      acc[provider.category] = []
+    }
+    acc[provider.category].push(provider)
+    return acc
+  }, {} as Record<string, typeof AI_PROVIDERS>)
+
+  const sortedCategories = Object.keys(categorizedProviders).sort((a, b) => a.localeCompare(b))
 
   return (
     <div className="min-h-screen bg-black p-6">
@@ -1282,61 +1361,112 @@ export default function SettingsPage() {
                   Configurez vos clés API pour les services d'intelligence artificielle
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                {AI_PROVIDERS.map((provider) => {
-                  const keyMap: Record<string, keyof SiteSettings> = {
-                    zai: 'zaiApiKey',
-                    openai: 'openaiApiKey',
-                    openRouter: 'openRouterApiKey',
-                    anthropic: 'anthropicApiKey',
-                    googleAi: 'googleAiApiKey',
-                    mistral: 'mistralApiKey',
-                    replicate: 'replicateApiKey',
-                    stability: 'stabilityApiKey',
-                  }
-                  const settingKey = keyMap[provider.id]
-                  const hasKey = settings?.[settingKey] && typeof settings[settingKey] === 'string' && (settings[settingKey] as string).length > 0
-                  
-                  return (
-                    <div key={provider.id} className="p-4 bg-neutral-800 border border-neutral-700 rounded-lg">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl">{provider.icon}</span>
-                          <div>
-                            <p className="font-medium text-white">{provider.name}</p>
-                            <p className="text-sm text-neutral-500">{provider.description}</p>
-                          </div>
+              <CardContent>
+                <div className="space-y-12">
+                  {sortedCategories.map((category) => {
+                    const providers = categorizedProviders[category].sort((a, b) => a.name.localeCompare(b.name))
+                    return (
+                      <div key={category} className="space-y-6">
+                        <h3 className="text-lg font-semibold text-orange-500 border-b border-neutral-800 pb-2 flex items-center gap-2">
+                          {category}
+                          <Badge variant="outline" className="text-[10px] bg-neutral-900 border-neutral-700">
+                            {providers.length} services
+                          </Badge>
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {providers.map((provider) => {
+                            const keyMap: Record<string, keyof SiteSettings> = {
+                              zai: 'zaiApiKey',
+                              openai: 'openaiApiKey',
+                              azureOpenai: 'azureOpenaiApiKey',
+                              openRouter: 'openRouterApiKey',
+                              anthropic: 'anthropicApiKey',
+                              googleAi: 'googleAiApiKey',
+                              mistral: 'mistralApiKey',
+                              replicate: 'replicateApiKey',
+                              stability: 'stabilityApiKey',
+                              plagiarism: 'plagiarismApiKey',
+                              clipdrop: 'clipdropApiKey',
+                              freepik: 'freepikApiKey',
+                              novita: 'novitaApiKey',
+                              xero: 'xeroApiKey',
+                              xai: 'xaiApiKey',
+                              deepseek: 'deepseekApiKey',
+                              falAi: 'falAiApiKey',
+                              creatify: 'creatifyApiKey',
+                              topview: 'topviewApiKey',
+                              vizard: 'vizardApiKey',
+                              klap: 'klapApiKey',
+                              piapi: 'piapiApiKey',
+                              unsplash: 'unsplashApiKey',
+                              pexels: 'pexelsApiKey',
+                              pixabay: 'pixabayApiKey',
+                              serper: 'serperApiKey',
+                              perplexity: 'perplexityApiKey',
+                              ably: 'ablyApiKey',
+                              searchApi: 'searchApiKey',
+                              tts: 'ttsApiKey',
+                              synthesia: 'synthesiaApiKey',
+                              together: 'togetherApiKey',
+                              heygen: 'heygenApiKey',
+                              aimlapi: 'aimlapiApiKey',
+                              pebblely: 'pebblelyApiKey',
+                              gammaAi: 'gammaAiApiKey'
+                            }
+                            const settingKey = keyMap[provider.id]
+                            const hasKey = settings?.[settingKey] && typeof settings[settingKey] === 'string' && (settings[settingKey] as string).length > 0
+                            
+                            return (
+                              <div key={provider.id} className="p-4 bg-neutral-800/50 border border-neutral-700 rounded-lg hover:border-neutral-600 transition-colors">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex flex-col">
+                                    <Label htmlFor={provider.id} className="text-sm font-medium">{provider.name}</Label>
+                                  </div>
+                                  {hasKey ? (
+                                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[10px]">
+                                      Configuré
+                                    </Badge>
+                                  ) : (
+                                    <Badge className="bg-neutral-500/20 text-neutral-400 border-neutral-500/30 text-[10px]">
+                                      Optionnel
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="flex gap-2">
+                                  <div className="relative flex-1">
+                                    <Input
+                                      id={provider.id}
+                                      type={showApiKeys[provider.id] ? "text" : "password"}
+                                      placeholder={hasKey ? "••••••••••••••••" : "Clé API"}
+                                      value={apiKeys[provider.id] || ""}
+                                      onChange={(e) => setApiKeys({ ...apiKeys, [provider.id]: e.target.value })}
+                                      className="h-9 bg-neutral-900 border-neutral-700 focus:border-orange-500 transition-all text-xs pr-8 font-mono"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => setShowApiKeys(prev => ({ ...prev, [provider.id]: !prev[provider.id] }))}
+                                      className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white"
+                                    >
+                                      {showApiKeys[provider.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                                    </button>
+                                  </div>
+                                  <Button 
+                                    size="sm" 
+                                    className="h-9 bg-orange-600 hover:bg-orange-700"
+                                    onClick={() => updateSetting(settingKey, apiKeys[provider.id] || "")}
+                                    disabled={!apiKeys[provider.id]}
+                                  >
+                                    OK
+                                  </Button>
+                                </div>
+                              </div>
+                            )
+                          })}
                         </div>
-                        {hasKey ? (
-                          <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                            <Check className="w-3 h-3 mr-1" />
-                            Configuré
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-neutral-500/20 text-neutral-400 border-neutral-500/30">
-                            Non configuré
-                          </Badge>
-                        )}
                       </div>
-                      <div className="relative">
-                        <Input
-                          type={showApiKeys[provider.id] ? "text" : "password"}
-                          value={(settings?.[settingKey] as string) || ""}
-                          onChange={(e) => updateSetting(settingKey, e.target.value)}
-                          placeholder={`Entrez votre clé API ${provider.name}`}
-                          className="bg-neutral-700 border-neutral-600 text-white font-mono pr-10"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowApiKeys(prev => ({ ...prev, [provider.id]: !prev[provider.id] }))}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white"
-                        >
-                          {showApiKeys[provider.id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </CardContent>
             </Card>
 
