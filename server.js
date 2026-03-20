@@ -9,7 +9,13 @@ const app = next({ dev })
 const handle = app.getRequestHandler()
 
 console.log(`[Server] Starting in ${dev ? 'development' : 'production'} mode...`)
-console.log(`[Server] DATABASE_URL is set: ${process.env.DATABASE_URL ? 'YES' : 'NO'}`)
+
+// Log the database host and name (redacted)
+const fullUrl = process.env.DATABASE_URL || '';
+const hostPart = fullUrl.split('@')[1]?.split('/')[0] || 'NOT_SET';
+const dbPart = fullUrl.split('/').pop()?.split('?')[0] || 'NOT_SET';
+console.log(`[Server] DATABASE_URL Host: ${hostPart}`);
+console.log(`[Server] DATABASE_URL Name: ${dbPart}`);
 
 app.prepare().then(() => {
   createServer((req, res) => {
