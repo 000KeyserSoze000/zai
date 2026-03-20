@@ -23,6 +23,8 @@ import {
   LayoutGrid,
   Library,
   Bot,
+  BadgeCheck,
+  ChevronDown,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -42,6 +44,7 @@ import { LogoutButton } from "@/components/logout-button"
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [expandedMenus, setExpandedMenus] = useState<string[]>(["studio"])
   const pathname = usePathname()
   const { t } = useTranslation()
   const {
@@ -57,6 +60,15 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     plan,
     isTrial
   } = useAuth()
+  
+  interface NavItem {
+    id: string
+    href: string
+    icon: any
+    labelKey: string
+    descKey: string
+    subItems?: { id: string; href: string; labelKey: string }[]
+  }
 
   // Admin navigation items - using translation keys
   const ADMIN_NAV_ITEMS = [
@@ -64,10 +76,22 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     { id: "users", href: "/admin/users", icon: Users, labelKey: "nav.users", descKey: "nav.usersDesc" },
     { id: "subscriptions", href: "/admin/subscriptions", icon: CreditCard, labelKey: "nav.subscriptions", descKey: "nav.subscriptionsDesc" },
     { id: "catalogue", href: "/command-center", icon: LayoutGrid, labelKey: "nav.commandCenter", descKey: "nav.commandCenterDesc" },
+    {
+      id: "studio",
+      href: "#",
+      icon: Sparkles,
+      labelKey: "nav.studio",
+      descKey: "nav.studioDesc",
+      subItems: [
+        { id: "studio-social", href: "/content-studio/social", labelKey: "nav.studioSocial" },
+        { id: "studio-blog", href: "/content-studio/blog", labelKey: "nav.studioBlog" },
+        { id: "studio-ecommerce", href: "/content-studio/ecommerce", labelKey: "nav.studioEcommerce" },
+      ]
+    },
     { id: "orchestrator", href: "/admin/orchestrator", icon: Cpu, labelKey: "nav.orchestrator", descKey: "nav.orchestratorDesc" },
     { id: "library", href: "/library", icon: FolderOpen, labelKey: "nav.library", descKey: "nav.libraryDesc" },
     { id: "analytics", href: "/analytics", icon: BarChart3, labelKey: "nav.analytics", descKey: "nav.analyticsDesc" },
-    { id: "business-profile", href: "/settings/profile", icon: Sparkles, labelKey: "nav.businessProfile", descKey: "nav.businessProfileDesc" },
+    { id: "business-profile", href: "/settings/profile", icon: BadgeCheck, labelKey: "nav.businessProfile", descKey: "nav.businessProfileDesc" },
     { id: "settings", href: "/settings", icon: Settings, labelKey: "nav.settings", descKey: "nav.settingsDesc" },
   ]
 
@@ -75,16 +99,28 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   const CLIENT_NAV_ITEMS = [
     { id: "dashboard", href: "/", icon: LayoutDashboard, labelKey: "nav.dashboard", descKey: "nav.mySpace" },
     { id: "catalogue", href: "/command-center", icon: LayoutGrid, labelKey: "nav.commandCenter", descKey: "nav.commandCenterDesc" },
+    {
+      id: "studio",
+      href: "#",
+      icon: Sparkles,
+      labelKey: "nav.studio",
+      descKey: "nav.studioDesc",
+      subItems: [
+        { id: "studio-social", href: "/content-studio/social", labelKey: "nav.studioSocial" },
+        { id: "studio-blog", href: "/content-studio/blog", labelKey: "nav.studioBlog" },
+        { id: "studio-ecommerce", href: "/content-studio/ecommerce", labelKey: "nav.studioEcommerce" },
+      ]
+    },
     { id: "agents", href: "/orchestrator", icon: Bot, labelKey: "nav.agents", descKey: "nav.orchestratorDesc" },
     { id: "library", href: "/library", icon: FolderOpen, labelKey: "nav.library", descKey: "nav.myContent" },
     { id: "analytics", href: "/analytics", icon: BarChart3, labelKey: "nav.analytics", descKey: "nav.myStats" },
     { id: "subscription", href: "/subscription", icon: CreditCard, labelKey: "nav.subscription", descKey: "nav.subscriptionDesc" },
-    { id: "business-profile", href: "/settings/profile", icon: Sparkles, labelKey: "nav.businessProfile", descKey: "nav.businessProfileDesc" },
+    { id: "business-profile", href: "/settings/profile", icon: BadgeCheck, labelKey: "nav.businessProfile", descKey: "nav.businessProfileDesc" },
     { id: "settings", href: "/settings", icon: Sliders, labelKey: "nav.settings", descKey: "nav.myAccount" },
   ]
 
   // Choose navigation based on role
-  const NAV_ITEMS = isAdmin ? ADMIN_NAV_ITEMS : CLIENT_NAV_ITEMS
+  const NAV_ITEMS: NavItem[] = isAdmin ? ADMIN_NAV_ITEMS : CLIENT_NAV_ITEMS
 
   const getActiveSection = () => {
     // 1. Most specific rules first
@@ -95,6 +131,11 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     if (pathname.startsWith("/admin/users")) return "users"
     if (pathname.startsWith("/admin/subscriptions")) return "subscriptions"
     if (pathname.startsWith("/command-center")) return "catalogue"
+    if (pathname.startsWith("/content-studio/social")) return "studio-social"
+    if (pathname.startsWith("/content-studio/blog")) return "studio-blog"
+    if (pathname.startsWith("/content-studio/ecommerce")) return "studio-ecommerce"
+    if (pathname.startsWith("/content-studio")) return "studio"
+    if (pathname.startsWith("/orchestrator")) return "agents"
     if (pathname.startsWith("/library")) return "library"
     if (pathname.startsWith("/analytics")) return "analytics"
     
@@ -169,24 +210,80 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
           </div>
 
           <nav className="space-y-2 flex-1">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                className={`w-full flex items-center gap-3 p-3 rounded transition-colors ${activeSection === item.id
-                    ? "bg-orange-500 text-white"
-                    : "text-neutral-400 hover:text-white hover:bg-neutral-800"
-                  }`}
-              >
-                <item.icon className="w-5 h-5 flex-shrink-0" />
-                {!sidebarCollapsed && (
-                  <div className="text-left">
-                    <span className="text-sm font-medium block">{t(item.labelKey)}</span>
-                    <span className={`text-xs ${activeSection === item.id ? "text-orange-100" : "text-neutral-500"}`}>{t(item.descKey)}</span>
-                  </div>
-                )}
-              </Link>
-            ))}
+            {NAV_ITEMS.map((item) => {
+              const isExpanded = expandedMenus.includes(item.id)
+              const hasSubItems = item.subItems && item.subItems.length > 0
+              const isActive = activeSection === item.id || (hasSubItems && item.subItems?.some(si => si.id === activeSection))
+
+              return (
+                <div key={item.id} className="space-y-1">
+                  {hasSubItems ? (
+                    <button
+                      onClick={() => {
+                        if (sidebarCollapsed) {
+                          setSidebarCollapsed(false)
+                          setExpandedMenus([item.id])
+                        } else {
+                          setExpandedMenus(prev =>
+                            prev.includes(item.id)
+                              ? prev.filter(id => id !== item.id)
+                              : [...prev, item.id]
+                          )
+                        }
+                      }}
+                      className={`w-full flex items-center gap-3 p-3 rounded transition-colors ${isActive
+                        ? "bg-orange-500/10 text-white"
+                        : "text-neutral-400 hover:text-white hover:bg-neutral-800"
+                        }`}
+                    >
+                      <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-orange-500" : ""}`} />
+                      {!sidebarCollapsed && (
+                        <>
+                          <div className="text-left flex-1">
+                            <span className="text-sm font-medium block">{t(item.labelKey)}</span>
+                            <span className="text-xs text-neutral-500">{t(item.descKey)}</span>
+                          </div>
+                          <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className={`w-full flex items-center gap-3 p-3 rounded transition-colors ${activeSection === item.id
+                        ? "bg-orange-500 text-white"
+                        : "text-neutral-400 hover:text-white hover:bg-neutral-800"
+                        }`}
+                    >
+                      <item.icon className="w-5 h-5 flex-shrink-0" />
+                      {!sidebarCollapsed && (
+                        <div className="text-left">
+                          <span className="text-sm font-medium block">{t(item.labelKey)}</span>
+                          <span className={`text-xs ${activeSection === item.id ? "text-orange-100" : "text-neutral-500"}`}>{t(item.descKey)}</span>
+                        </div>
+                      )}
+                    </Link>
+                  )}
+
+                  {hasSubItems && isExpanded && !sidebarCollapsed && (
+                    <div className="ml-9 space-y-1">
+                      {item.subItems?.map((subItem) => (
+                        <Link
+                          key={subItem.id}
+                          href={subItem.href}
+                          className={`w-full flex items-center gap-3 p-2 rounded transition-colors text-sm ${activeSection === subItem.id
+                            ? "text-orange-500 font-medium"
+                            : "text-neutral-500 hover:text-white hover:bg-neutral-800"
+                            }`}
+                        >
+                          {t(subItem.labelKey)}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </nav>
 
           {/* Subscription Info for Clients */}
