@@ -209,7 +209,7 @@ async function handleSmitheryImport(url: string, logs: string[]) {
   return handleGitHubImport(bestUrl, logs)
 }
 
-async function handleGitHubBulkSyncByUrl(manifestUrl: string, baseUrl: string, logs: string[]) {
+async function handleGitHubBulkSyncByUrl(manifestUrl: string, baseUrl: string, logs: string[], providerUrl: string) {
   const manifestRes = await fetch(manifestUrl, { cache: 'no-store' })
   if (!manifestRes.ok) throw new Error(`Impossible de récupérer le manifeste à ${manifestUrl}`)
   
@@ -228,7 +228,7 @@ async function handleGitHubBulkSyncByUrl(manifestUrl: string, baseUrl: string, l
       const data = {
         name, slug, version: version || "1.0.0", category: category || "general", 
         promptContent: content, source: "github", 
-        providerUrl: `${baseUrl}/${path}`,
+        providerUrl,
         isActive: false, files: { "SKILL.md": content }
       }
 
@@ -255,21 +255,22 @@ async function handleGitHubBulkSync(logs: string[], providerId?: string) {
   if (providers.length === 0) {
     if (providerId) throw new Error("Fournisseur introuvable ou inactif.")
     logs.push("No providers found in DB, using default.")
-    const res = await handleGitHubBulkSyncByUrl(GITHUB_MANIFEST_URL, GITHUB_BASE_URL, logs)
+    const res = await handleGitHubBulkSyncByUrl(GITHUB_MANIFEST_URL, GITHUB_BASE_URL, logs, GITHUB_BASE_URL)
     return NextResponse.json({ success: true, results: res, logs })
   }
 
   for (const provider of providers) {
+    const cleanProviderUrl = provider.url.replace(/\/$/, "")
     try {
       logs.push(`Syncing from provider: ${provider.name} (${provider.url})`)
       // Convert github.com URL to raw.githubusercontent.com
-      let baseUrl = provider.url.replace("github.com", "raw.githubusercontent.com").replace("/tree/", "/").replace("/blob/", "/")
+      let baseUrl = cleanProviderUrl.replace("github.com", "raw.githubusercontent.com").replace("/tree/", "/").replace("/blob/", "/")
       // Remove trailing slash to avoid double slash
       baseUrl = baseUrl.replace(/\/$/, '')
       const manifestUrl = baseUrl + "/manifest.json"
       
       logs.push(`Attempting sync from: ${manifestUrl}`)
-      const res = await handleGitHubBulkSyncByUrl(manifestUrl, baseUrl, logs)
+      const res = await handleGitHubBulkSyncByUrl(manifestUrl, baseUrl, logs, cleanProviderUrl)
       finalResults.added += res.added
       finalResults.updated += res.updated
       finalResults.errors += res.errors
@@ -286,7 +287,7 @@ async function handleGitHubBulkSync(logs: string[], providerId?: string) {
           else if (rootMatch) [, owner, repo] = rootMatch
           
           if (owner && repo) {
-            const res = await handleGitHubFolderSync(owner, repo, branch, path, logs, provider.url)
+            const res = await handleGitHubFolderSync(owner, repo, branch, path, logs, cleanProviderUrl)
             finalResults.added += res.added
             finalResults.updated += res.updated
             finalResults.errors += res.errors
@@ -330,7 +331,8 @@ async function handleGitHubFolderSync(owner: string, repo: string, branch: strin
             const data = {
               name, slug, version: "1.0.0", category: "imported", 
               promptContent: content, source: "github", 
-              providerUrl, isActive: true, icon: "Zap", color: "orange"
+              providerUrl, isActive: true, icon: "Zap", color: "orange",
+              files: { "SKILL.md": content }
             }
 
             await (db as any).escSkill.upsert({
