@@ -154,13 +154,21 @@ async function handleGitHubImport(url: string, logs: string[]) {
 
 async function handleSmitheryImport(url: string, logs: string[]) {
   logs.push(`Detecting GitHub repository from Smithery page...`)
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+  })
   const html = await res.text()
   
+  if (html.includes("Vercel Security Checkpoint") || html.includes("cf-browser-verification")) {
+    throw new Error("L'importation Smithery est bloquée par une protection anti-robot. Veuillez copier le lien 'Repository' (GitHub) en bas à droite de la page Smithery et le coller ici directement.")
+  }
+
   // Look for github.com links (handle escaped slashes too)
   const repoMatch = html.match(/https:\\?\/\\?\/github\.com\\?\/[^"']+/g)
   if (!repoMatch) {
-    throw new Error("Impossible de trouver le dépôt GitHub associé sur la page Smithery.")
+    throw new Error("Impossible de trouver le dépôt GitHub sur cette page. Essayez de coller le lien GitHub directement.")
   }
 
   // Clean the matches (remove \ slashes)
