@@ -82,6 +82,15 @@ export default function EscCollectionPage() {
   const [selectedAgentId, setSelectedAgentId] = useState<string>("")
   const [installing, setInstalling] = useState(false)
   const [importing, setImporting] = useState(false)
+  
+  // Selection & Pagination
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(25) // High density
+  
+  // Category Manager
+  const [showCategoryDialog, setShowCategoryDialog] = useState(false)
+  const [editingCategory, setEditingCategory] = useState<{oldName: string, newName: string} | null>(null)
 
   const { toast } = useToast()
   const { t } = useTranslation()
@@ -119,7 +128,6 @@ export default function EscCollectionPage() {
         body: JSON.stringify({}) // Bulk sync
       })
       if (res.ok) {
-        const data = await res.json()
         toast({
           title: t("common.success"),
           description: `Synchronisation terminée.`,
@@ -130,6 +138,66 @@ export default function EscCollectionPage() {
       toast({ title: t("common.error"), variant: "destructive" })
     } finally {
       setSyncing(false)
+    }
+  }
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Supprimer ces ${selectedIds.length} skills ?`)) return
+    try {
+      const res = await fetch("/api/admin/esc-skills/bulk", {
+        method: "POST",
+        body: JSON.stringify({ ids: selectedIds, action: "DELETE" })
+      })
+      if (res.ok) {
+        toast({ title: "Supprimé", description: `${selectedIds.length} skills retirées.` })
+        setSelectedIds([])
+        fetchData()
+      }
+    } catch (error) {
+      toast({ title: t("common.error"), variant: "destructive" })
+    }
+  }
+
+  const handleBulkMove = async (newCategory: string) => {
+    if (newCategory === "new_category") {
+      const name = prompt("Nom de la nouvelle catégorie :")
+      if (!name) return
+      newCategory = name
+    }
+    
+    try {
+      const res = await fetch("/api/admin/esc-skills/bulk", {
+        method: "POST",
+        body: JSON.stringify({ ids: selectedIds, action: "MOVE", targetCategory: newCategory })
+      })
+      if (res.ok) {
+        toast({ title: "Déplacé", description: `${selectedIds.length} skills déplacées vers ${newCategory}` })
+        setSelectedIds([])
+        fetchData()
+      }
+    } catch (error) {
+      toast({ title: t("common.error"), variant: "destructive" })
+    }
+  }
+
+  const handleCategoryAction = async (action: "RENAME" | "DELETE") => {
+    if (!editingCategory) return
+    const confirmMsg = action === "DELETE" ? `Supprimer TOUTES les skills de la catégorie ${editingCategory.oldName} ?` : `Renommer ${editingCategory.oldName} en ${editingCategory.newName} ?`
+    if (!confirm(confirmMsg)) return
+
+    try {
+      const res = await fetch("/api/admin/esc-skills/categories", {
+        method: "POST",
+        body: JSON.stringify({ action, oldName: editingCategory.oldName, newName: editingCategory.newName })
+      })
+      if (res.ok) {
+        toast({ title: "Fait", description: "Catégorie mise à jour." })
+        setShowCategoryDialog(false)
+        setEditingCategory(null)
+        fetchData()
+      }
+    } catch (error) {
+      toast({ title: t("common.error"), variant: "destructive" })
     }
   }
 
@@ -230,8 +298,21 @@ export default function EscCollectionPage() {
     return matchesSearch && matchesCategory && matchesSource && matchesStatus
   })
 
-  const categories = Array.from(new Set(skills.map(s => s.category)))
-  const sources = Array.from(new Set(skills.map(s => s.source)))
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredSkills.length / itemsPerPage)
+  const paginatedSkills = filteredSkills.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+  
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === paginatedSkills.length && paginatedSkills.length > 0) setSelectedIds([])
+    else setSelectedIds(paginatedSkills.map(s => s.id))
+  }
+
+  const categories = Array.from(new Set(skills.map(s => s.category))).sort()
+  const sources = Array.from(new Set(skills.map(s => s.source))).sort()
 
   return (
     <div className="p-6">
@@ -243,14 +324,24 @@ export default function EscCollectionPage() {
             <p className="text-neutral-400 text-sm">Gérez et activez les compétences IA haute performance</p>
           </div>
           
-          <Button 
-            onClick={handleSync} 
-            disabled={syncing}
-            className="bg-orange-600 hover:bg-orange-700 text-white"
-          >
-            {syncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
-            Synchroniser GitHub
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={() => setShowCategoryDialog(true)}
+              variant="outline"
+              className="border-neutral-800 text-neutral-400 hover:text-white"
+            >
+              <Filter className="w-4 h-4 mr-2" />
+              Gérer Catégories
+            </Button>
+            <Button 
+              onClick={handleSync} 
+              disabled={syncing}
+              className="bg-orange-600 hover:bg-orange-700 text-white"
+            >
+              {syncing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+              Synchroniser
+            </Button>
+          </div>
         </div>
 
         {/* Filters & Actions */}
@@ -537,6 +628,54 @@ export default function EscCollectionPage() {
                 {importing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
                 Importer maintenant
               </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Category Management Dialog */}
+        <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
+          <DialogContent className="bg-neutral-900 border-neutral-800 text-white max-w-md">
+            <DialogHeader>
+              <DialogTitle>Gérer les Catégories</DialogTitle>
+              <DialogDescription className="text-neutral-400">
+                Modifiez ou supprimez des catégories entières.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-4 max-h-[400px] overflow-y-auto pr-2">
+              {categories.map(cat => (
+                <div key={cat} className="flex items-center gap-2 p-2 rounded-lg bg-neutral-950/50 border border-neutral-800 group">
+                   <div className="flex-1">
+                      {editingCategory?.oldName === cat ? (
+                         <Input 
+                            value={editingCategory.newName} 
+                            onChange={(e) => setEditingCategory({...editingCategory, newName: e.target.value})}
+                            onKeyDown={(e) => e.key === 'Enter' && handleCategoryAction("RENAME")}
+                            className="h-8 text-xs bg-neutral-900"
+                            autoFocus
+                         />
+                      ) : (
+                        <span className="text-xs font-bold text-neutral-300">{cat}</span>
+                      )}
+                   </div>
+                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {editingCategory?.oldName === cat ? (
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-green-500" onClick={() => handleCategoryAction("RENAME")}>
+                           <Zap className="w-3.5 h-3.5" />
+                        </Button>
+                      ) : (
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-white" onClick={() => setEditingCategory({oldName: cat, newName: cat})}>
+                           <RefreshCw className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                      <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-red-500" onClick={() => { setEditingCategory({oldName: cat, newName: ""}); handleCategoryAction("DELETE"); }}>
+                         <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                   </div>
+                </div>
+              ))}
+            </div>
+            <DialogFooter>
+              <Button variant="ghost" onClick={() => { setShowCategoryDialog(false); setEditingCategory(null); }}>Fermer</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
