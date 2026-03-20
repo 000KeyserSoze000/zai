@@ -336,6 +336,9 @@ model AgentCategory {
   accessLevel   String   @default("ALL")
   displayOrder  Int      @default(0)
   isActive      Boolean  @default(true)
+  isProduct     Boolean  @default(false)
+  price         Float?
+  currency      String   @default("EUR")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   agents        Agent[]

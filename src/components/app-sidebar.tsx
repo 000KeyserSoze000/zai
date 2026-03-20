@@ -20,6 +20,9 @@ import {
   Crown,
   Sparkles,
   TrendingUp,
+  LayoutGrid,
+  Library,
+  Bot,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -60,7 +63,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     { id: "dashboard", href: "/admin", icon: LayoutDashboard, labelKey: "nav.dashboard", descKey: "nav.dashboardDesc" },
     { id: "users", href: "/admin/users", icon: Users, labelKey: "nav.users", descKey: "nav.usersDesc" },
     { id: "subscriptions", href: "/admin/subscriptions", icon: CreditCard, labelKey: "nav.subscriptions", descKey: "nav.subscriptionsDesc" },
-    { id: "command-center", href: "/command-center", icon: Zap, labelKey: "nav.commandCenter", descKey: "nav.commandCenterDesc" },
+    { id: "catalogue", href: "/command-center", icon: LayoutGrid, labelKey: "nav.commandCenter", descKey: "nav.commandCenterDesc" },
     { id: "orchestrator", href: "/admin/orchestrator", icon: Cpu, labelKey: "nav.orchestrator", descKey: "nav.orchestratorDesc" },
     { id: "library", href: "/library", icon: FolderOpen, labelKey: "nav.library", descKey: "nav.libraryDesc" },
     { id: "analytics", href: "/analytics", icon: BarChart3, labelKey: "nav.analytics", descKey: "nav.analyticsDesc" },
@@ -71,7 +74,8 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   // Client navigation items
   const CLIENT_NAV_ITEMS = [
     { id: "dashboard", href: "/", icon: LayoutDashboard, labelKey: "nav.dashboard", descKey: "nav.mySpace" },
-    { id: "command-center", href: "/command-center", icon: Zap, labelKey: "nav.contentStudio", descKey: "nav.contentStudioDesc" },
+    { id: "catalogue", href: "/command-center", icon: LayoutGrid, labelKey: "nav.commandCenter", descKey: "nav.commandCenterDesc" },
+    { id: "agents", href: "/orchestrator", icon: Bot, labelKey: "nav.agents", descKey: "nav.orchestratorDesc" },
     { id: "library", href: "/library", icon: FolderOpen, labelKey: "nav.library", descKey: "nav.myContent" },
     { id: "analytics", href: "/analytics", icon: BarChart3, labelKey: "nav.analytics", descKey: "nav.myStats" },
     { id: "subscription", href: "/subscription", icon: CreditCard, labelKey: "nav.subscription", descKey: "nav.subscriptionDesc" },
@@ -90,7 +94,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     // 2. Generic matches for other specific modules
     if (pathname.startsWith("/admin/users")) return "users"
     if (pathname.startsWith("/admin/subscriptions")) return "subscriptions"
-    if (pathname.startsWith("/command-center")) return "command-center"
+    if (pathname.startsWith("/command-center")) return "catalogue"
     if (pathname.startsWith("/library")) return "library"
     if (pathname.startsWith("/analytics")) return "analytics"
     

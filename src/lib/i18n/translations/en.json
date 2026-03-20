@@ -40,8 +40,8 @@
         "dashboard": "DASHBOARD",
         "dashboardDesc": "Overview",
         "mySpace": "My space",
-        "commandCenter": "COMMAND CENTER",
-        "commandCenterDesc": "AI Modules",
+        "commandCenter": "CATALOGUE",
+        "commandCenterDesc": "AI Products",
         "contentStudio": "CONTENT STUDIO",
         "contentStudioDesc": "Content creation",
         "orchestrator": "ORCHESTRATOR",
@@ -530,11 +530,11 @@
         "comingSoonBtn": "Coming soon"
     },
     "commandCenter": {
-        "title": "Command Center",
-        "subtitle": "Select an AI module to get started",
-        "modulesAvailable": "Available Modules",
+        "title": "Catalogue",
+        "subtitle": "Select an AI product to get started",
+        "modulesAvailable": "Products Available",
         "active": "active",
-        "modules": "Modules"
+        "modules": "Products"
     },
     "modules": {
         "contentStudio": {

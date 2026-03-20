@@ -1,0 +1,23 @@
+# Database
+PRODUCTION_DB_URL="postgresql://florentpostgree:laureenqWeR55t@212.227.84.152:5432/contentpropostgree"
+
+# NextAuth
+NEXTAUTH_URL="https://contentpro.fr"
+NEXTAUTH_SECRET="contentpro-2024-jwt-secure-key-scgnhek-random-aze123"
+JWT_SECRET="contentpro-2024-jwt-secure-key-scgnhek-random-aze123"
+
+# Optional: External API Keys
+ZAI_API_KEY=""
+OPENAI_API_KEY=""
+OPENROUTER_API_KEY="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"
+ANTHROPIC_API_KEY="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"
+GOOGLE_AI_API_KEY="AIzaSyABrfLHN7y34jXGvlGxV2uX8kqP11iYc7Q"
+
+# Email (optional)
+SMTP_ENABLED="false"
+SMTP_HOST=""
+SMTP_PORT=""
+SMTP_USER=""
+SMTP_PASSWORD=""
+SMTP_FROM_EMAIL=""
+SMTP_FROM_NAME="ContentPro"

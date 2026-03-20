@@ -40,8 +40,8 @@
         "dashboard": "DASHBOARD",
         "dashboardDesc": "Vista general",
         "mySpace": "Mi espacio",
-        "commandCenter": "COMMAND CENTER",
-        "commandCenterDesc": "Módulos IA",
+        "commandCenter": "CATALOGUE",
+        "commandCenterDesc": "Productos IA",
         "contentStudio": "CONTENT STUDIO",
         "contentStudioDesc": "Creación de contenido",
         "orchestrator": "ORCHESTRATOR",
@@ -530,11 +530,11 @@
         "comingSoonBtn": "Próximamente"
     },
     "commandCenter": {
-        "title": "Centro de Comando",
-        "subtitle": "Seleccione un módulo IA para comenzar",
-        "modulesAvailable": "Módulos Disponibles",
+        "title": "Catálogo",
+        "subtitle": "Seleccione un producto de IA para comenzar",
+        "modulesAvailable": "Productos Disponibles",
         "active": "activos",
-        "modules": "Módulos"
+        "modules": "Productos"
     },
     "modules": {
         "contentStudio": {

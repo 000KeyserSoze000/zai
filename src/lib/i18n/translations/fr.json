@@ -40,8 +40,8 @@
         "dashboard": "DASHBOARD",
         "dashboardDesc": "Vue d'ensemble",
         "mySpace": "Mon espace",
-        "commandCenter": "COMMAND CENTER",
-        "commandCenterDesc": "Modules IA",
+        "commandCenter": "CATALOGUE",
+        "commandCenterDesc": "Produits IA",
         "contentStudio": "CONTENT STUDIO",
         "contentStudioDesc": "Création de contenu",
         "orchestrator": "ORCHESTRATOR",
@@ -524,17 +524,17 @@
         }
     },
     "home": {
-        "title": "Sélectionnez un Module",
-        "subtitle": "Choisissez le module IA adapté à vos besoins",
+        "title": "Catalogue de Solutions IA",
+        "subtitle": "Découvrez nos produits et services boostés par l'IA",
         "comingSoon": "Bientôt",
         "comingSoonBtn": "Bientôt disponible"
     },
     "commandCenter": {
-        "title": "Command Center",
-        "subtitle": "Sélectionnez un module IA pour commencer",
-        "modulesAvailable": "Modules Disponibles",
+        "title": "Catalogue",
+        "subtitle": "Sélectionnez un produit IA pour commencer",
+        "modulesAvailable": "Produits Disponibles",
         "active": "actifs",
-        "modules": "Modules"
+        "modules": "Produits"
     },
     "modules": {
         "contentStudio": {

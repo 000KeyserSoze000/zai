@@ -9,7 +9,8 @@ import {
   FileText,
   Share2,
   Lock,
-  ArrowRight
+  ArrowRight,
+  LayoutGrid,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/i18n"
@@ -130,7 +131,7 @@ export default function CommandCenterPage() {
 
                 {module.status === "active" ? (
                   <Link href={module.href}>
-                    <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
+                    <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20">
                       {t("common.launchModule")}
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>

@@ -13,6 +13,7 @@ import {
     Zap,
     Loader2,
     Lock,
+    LayoutGrid,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -119,7 +120,7 @@ export default function CommandCenterPage() {
                         const category = categories.find(c => c.id === fallback.id)
                         return {
                             ...fallback,
-                            enabled: category?.enabled ?? true,
+                            enabled: category?.isActive ?? true,
                         }
                     })
                     
@@ -159,7 +160,7 @@ export default function CommandCenterPage() {
                 <div className="mb-6">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="w-9 h-9 bg-orange-500/20 rounded-lg flex items-center justify-center">
-                            <Zap className="w-4 h-4 text-orange-500" />
+                            <LayoutGrid className="w-4 h-4 text-orange-500" />
                         </div>
                         <div>
                             <h1 className="text-xl font-bold text-white">{t("commandCenter.title")}</h1>

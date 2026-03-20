@@ -134,6 +134,9 @@ export interface AgentCategory {
   accessLevel?: string
   displayOrder?: number
   isActive: boolean
+  isProduct?: boolean
+  price?: number
+  currency?: string
   agents?: AgentConfig[]
 }
 
