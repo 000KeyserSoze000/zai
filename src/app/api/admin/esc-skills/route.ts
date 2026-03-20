@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
     const isActive = searchParams.get("isActive")
     const search = searchParams.get("search")
     const source = searchParams.get("source")
+    const providerUrl = searchParams.get("providerUrl")
 
     const where: any = {}
     
@@ -27,6 +28,10 @@ export async function GET(request: NextRequest) {
     
     if (source && source !== "all") {
       where.source = source
+    }
+
+    if (providerUrl && providerUrl !== "all") {
+      where.providerUrl = providerUrl
     }
     
     if (isActive !== null && isActive !== "") {
@@ -42,12 +47,26 @@ export async function GET(request: NextRequest) {
       ]
     }
 
-    const skills = await db.escSkill.findMany({
-      where,
-      orderBy: { updatedAt: "desc" },
+    const [skills, installedSkills] = await Promise.all([
+      (db as any).escSkill.findMany({
+        where,
+        orderBy: { updatedAt: "desc" },
+      }),
+      db.skill.findMany({
+        select: { slug: true, agent: { select: { name: true } } }
+      })
+    ])
+
+    const results = skills.map(s => {
+      const installed = installedSkills.find(is => is.slug === s.slug)
+      return {
+        ...s,
+        isInstalled: !!installed,
+        installedAgentName: installed?.agent?.name
+      }
     })
 
-    return NextResponse.json(skills)
+    return NextResponse.json(results)
   } catch (error) {
     console.error("[ESC Skills GET] Error:", error)
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
@@ -66,7 +85,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const skill = await db.escSkill.create({
+    const skill = await (db as any).escSkill.create({
       data: {
         name: body.name,
         slug: body.slug,

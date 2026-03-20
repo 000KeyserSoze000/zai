@@ -98,7 +98,9 @@ export default function EscCollectionPage() {
   const [showProviderDialog, setShowProviderDialog] = useState(false)
   const [editingProvider, setEditingProvider] = useState<any>(null)
   const [newProvider, setNewProvider] = useState({ name: "", url: "" })
+  const [providerFilter, setProviderFilter] = useState("all")
   const [savingProvider, setSavingProvider] = useState(false)
+  const [bulkDeleting, setBulkDeleting] = useState(false)
 
   const { toast } = useToast()
   const { t } = useTranslation()
@@ -106,8 +108,12 @@ export default function EscCollectionPage() {
   const fetchData = async () => {
     setLoading(true)
     try {
+      const params = new URLSearchParams()
+      if (categoryFilter !== "all") params.append("category", categoryFilter)
+      if (providerFilter !== "all") params.append("providerUrl", providerFilter)
+      
       const [skillsRes, agentsRes] = await Promise.all([
-        fetch("/api/admin/esc-skills"),
+        fetch(`/api/admin/esc-skills?${params.toString()}`),
         fetch("/api/admin/orchestrator/agents")
       ])
       
@@ -189,7 +195,24 @@ export default function EscCollectionPage() {
     }
   }
 
-  const handleDeleteProvider = async (id: string) => {
+  const handleDeleteProvider = async (id: string, url?: string, action: "REMOVE" | "DELETE_ALL" = "REMOVE") => {
+    if (action === "DELETE_ALL") {
+      if (!confirm(`ATTENTION: Cela va supprimer TOUTES les skills provenant de ${url}. Continuer ?`)) return
+      setBulkDeleting(true)
+      try {
+        const res = await fetch("/api/admin/esc-skills/bulk", {
+          method: "POST",
+          body: JSON.stringify({ action: "DELETE_BY_PROVIDER", providerUrl: url })
+        })
+        if (res.ok) {
+          toast({ title: "Nettoyage réussi", description: "Toutes les skills du fournisseur ont été supprimées." })
+          fetchData()
+        }
+      } catch (err) { toast({ title: "Erreur", variant: "destructive" }) }
+      finally { setBulkDeleting(false) }
+      return
+    }
+
     if (!confirm("Retirer ce fournisseur ?")) return
     try {
       const res = await fetch(`/api/admin/esc-skills/providers?id=${id}`, { method: "DELETE" })
@@ -239,24 +262,43 @@ export default function EscCollectionPage() {
     }
   }
 
-  const handleCategoryAction = async (action: "RENAME" | "DELETE") => {
+  const handleCategoryAction = async (action: "RENAME" | "DELETE" | "DELETE_ALL") => {
     if (!editingCategory) return
-    const confirmMsg = action === "DELETE" ? `Supprimer TOUTES les skills de la catégorie ${editingCategory.oldName} ?` : `Renommer ${editingCategory.oldName} en ${editingCategory.newName} ?`
+    let confirmMsg = ""
+    if (action === "DELETE") confirmMsg = `Supprimer TOUTES les skills de la catégorie ${editingCategory.oldName} ?`
+    else if (action === "DELETE_ALL") confirmMsg = `Voulez-vous vraiment supprimer DÉFINITIVEMENT toutes les skills de la catégorie ${editingCategory.oldName} ? Cette action est irréversible.`
+    else confirmMsg = `Renommer ${editingCategory.oldName} en ${editingCategory.newName} ?`
+    
     if (!confirm(confirmMsg)) return
 
     try {
-      const res = await fetch("/api/admin/esc-skills/categories", {
-        method: "POST",
-        body: JSON.stringify({ action, oldName: editingCategory.oldName, newName: editingCategory.newName })
-      })
-      if (res.ok) {
-        toast({ title: "Fait", description: "Catégorie mise à jour." })
-        setShowCategoryDialog(false)
-        setEditingCategory(null)
-        fetchData()
+      if (action === "DELETE_ALL") {
+        setBulkDeleting(true)
+        const res = await fetch("/api/admin/esc-skills/bulk", {
+          method: "POST",
+          body: JSON.stringify({ action: "DELETE_BY_CATEGORY", category: editingCategory.oldName })
+        })
+        if (res.ok) {
+          toast({ title: "Supprimé", description: "Toute la catégorie a été vidée." })
+          setShowCategoryDialog(false)
+          fetchData()
+        }
+      } else {
+        const res = await fetch("/api/admin/esc-skills/categories", {
+          method: "POST",
+          body: JSON.stringify({ action, oldName: editingCategory.oldName, newName: editingCategory.newName })
+        })
+        if (res.ok) {
+          toast({ title: "Fait", description: "Catégorie mise à jour." })
+          setShowCategoryDialog(false)
+          setEditingCategory(null)
+          fetchData()
+        }
       }
     } catch (error) {
       toast({ title: t("common.error"), variant: "destructive" })
+    } finally {
+      setBulkDeleting(false)
     }
   }
 
@@ -344,6 +386,9 @@ export default function EscCollectionPage() {
 
   useEffect(() => {
     fetchData()
+  }, [categoryFilter, providerFilter])
+
+  useEffect(() => {
     fetchProviders()
   }, [])
 
@@ -449,6 +494,18 @@ export default function EscCollectionPage() {
               </SelectContent>
             </Select>
 
+            <Select value={providerFilter} onValueChange={setProviderFilter}>
+              <SelectTrigger className="w-[160px] bg-neutral-900/50 border-neutral-800 text-orange-400">
+                <SelectValue placeholder="Filtrer par Fournisseur" />
+              </SelectTrigger>
+              <SelectContent className="bg-neutral-900 border-neutral-800 text-white">
+                <SelectItem value="all">Tous Fournisseurs</SelectItem>
+                {providers.map(p => (
+                  <SelectItem key={p.id} value={p.url}>{p.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[140px] bg-neutral-900/50 border-neutral-800">
                 <SelectValue placeholder="Statut" />
@@ -550,9 +607,16 @@ export default function EscCollectionPage() {
                       <div className={`p-1.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20`}>
                         <Zap className="w-3.5 h-3.5" />
                       </div>
-                      <Badge variant={skill.isActive ? "default" : "secondary"} className={skill.isActive ? "bg-green-500/20 text-green-400 border-green-500/10 text-[8px] h-4" : "bg-neutral-800 text-neutral-500 text-[8px] h-4"}>
-                        {skill.isActive ? "Actif" : "Brouillon"}
-                      </Badge>
+                      <div className="flex flex-col items-end gap-1">
+                        <Badge variant={skill.isActive ? "default" : "secondary"} className={skill.isActive ? "bg-green-500/20 text-green-400 border-green-500/10 text-[8px] h-4" : "bg-neutral-800 text-neutral-500 text-[8px] h-4"}>
+                          {skill.isActive ? "Actif" : "Brouillon"}
+                        </Badge>
+                        {(skill as any).isInstalled && (
+                          <Badge className="bg-orange-500/20 text-orange-500 border-orange-500/10 text-[8px] h-4">
+                            Installé: {(skill as any).installedAgentName || "Oui"}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     <CardTitle className="text-sm font-bold text-white truncate group-hover:text-orange-400 transition-colors pt-1">
                       {skill.name}
@@ -726,6 +790,12 @@ export default function EscCollectionPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="py-6 space-y-4">
+              {(installSkill as any)?.isInstalled && (
+                <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg text-xs text-orange-400 font-medium">
+                  ⚠️ Cette skill est déjà installée sur l'agent : {(installSkill as any).installedAgentName}.
+                  Vous pouvez la réinstaller sur un autre agent si besoin.
+                </div>
+              )}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-neutral-400">Agent responsable</label>
                 <Select value={selectedAgentId} onValueChange={setSelectedAgentId}>
@@ -854,8 +924,11 @@ export default function EscCollectionPage() {
                         <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-white" onClick={() => { setEditingProvider(p); setNewProvider({name: p.name, url: p.url}); }}>
                           <RefreshCw className="w-3.5 h-3.5" />
                         </Button>
-                        <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-red-500" onClick={() => handleDeleteProvider(p.id)}>
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-red-500" onClick={() => handleDeleteProvider(p.id, p.url, "DELETE_ALL")}>
                           <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-red-400" onClick={() => handleDeleteProvider(p.id)}>
+                          <ExternalLink className="w-3.5 h-3.5" />
                         </Button>
                       </div>
                     </div>
@@ -919,6 +992,9 @@ export default function EscCollectionPage() {
                            <RefreshCw className="w-3.5 h-3.5" />
                         </Button>
                       )}
+                      <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-red-500" title="Vider la catégorie" onClick={() => { setEditingCategory({oldName: cat, newName: ""}); handleCategoryAction("DELETE_ALL"); }}>
+                         <Zap className="w-3.5 h-3.5" />
+                      </Button>
                       <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-red-500" onClick={() => { setEditingCategory({oldName: cat, newName: ""}); handleCategoryAction("DELETE"); }}>
                          <Trash2 className="w-3.5 h-3.5" />
                       </Button>
