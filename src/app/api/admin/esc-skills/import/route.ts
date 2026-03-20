@@ -329,49 +329,73 @@ async function handleGitHubBulkSync(logs: string[], providerId?: string) {
 async function handleGitHubFolderSync(owner: string, repo: string, branch: string, rootPath: string, logs: string[], providerUrl: string) {
   const results = { added: 0, updated: 0, errors: 0 }
   try {
-    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${rootPath}?ref=${branch}`
-    const res = await fetch(apiUrl, { headers: { "User-Agent": "ZAI-App" }, cache: 'no-store' })
-    if (!res.ok) throw new Error(`GitHub API error: ${res.status}`)
+    // 1. Fetch entire tree recursively in ONE call
+    const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`
+    const treeRes = await fetch(treeUrl, { headers: { "User-Agent": "ZAI-App" }, cache: 'no-store' })
+    if (!treeRes.ok) throw new Error(`GitHub Tree API error: ${treeRes.status}`)
     
-    const items = await res.json()
-    if (!Array.isArray(items)) return results
+    const treeData = await treeRes.json()
+    if (!treeData.tree || !Array.isArray(treeData.tree)) return results
 
-    for (const item of items) {
-      if (item.type === "dir") {
-        try {
-          // Fetch ALL files in this subdirectory recursively
-          const folderFiles = await fetchGitHubDirectory(owner, repo, branch, item.path, logs, 0)
-          
-          // Find the main content (SKILL.md or similar)
-          const mainFileKey = Object.keys(folderFiles).find(k => k.toLowerCase().endsWith("skill.md")) || Object.keys(folderFiles)[0]
-          const content = folderFiles[mainFileKey]
-          
-          if (content) {
-            const slug = item.name
-            const name = extractSkillName(content, slug)
-            
-            const data = {
-              name, slug, version: "1.0.0", category: "imported", 
-              promptContent: content, source: "github", 
-              providerUrl, isActive: true, icon: "Zap", color: "orange",
-              files: folderFiles
+    // 2. Identify skills (folders under rootPath that contain a .md file)
+    const skillsMap: Record<string, { files: any[], name: string }> = {}
+    
+    for (const item of treeData.tree) {
+      if (item.type === "blob" && item.path.startsWith(rootPath + "/")) {
+        const relativePath = item.path.substring(rootPath.length + 1)
+        const parts = relativePath.split('/')
+        if (parts.length < 2) continue // Skip files at root of skills folder itself
+
+        const skillId = parts[0] // Subdirectory name
+        if (!skillsMap[skillId]) skillsMap[skillId] = { files: [], name: skillId }
+        
+        skillsMap[skillId].files.push(item)
+      }
+    }
+
+    // 3. Process each found skill
+    for (const [slug, data] of Object.entries(skillsMap)) {
+      try {
+        const folderFiles: Record<string, string> = {}
+        let content = ""
+        
+        // Fetch all file contents for this skill
+        for (const file of data.files) {
+          const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`
+          const fileContent = await fetchFileContent(rawUrl)
+          if (fileContent) {
+            const fileName = file.path.split('/').pop() || "file"
+            folderFiles[fileName] = fileContent
+            // Identify main SKILL.md or similar
+            if (fileName.toLowerCase().endsWith("skill.md") || (fileName.toLowerCase().endsWith(".md") && !content)) {
+              content = fileContent
             }
-
-            await (db as any).escSkill.upsert({
-              where: { slug },
-              update: data,
-              create: data
-            })
-            results.added++
           }
-        } catch (e: any) { 
-          logs.push(`Error importing skill folder ${item.name}: ${e.message}`)
-          results.errors++ 
         }
+
+        if (content) {
+          const name = extractSkillName(content, slug)
+          const skillData = {
+            name, slug, version: "1.0.0", category: "imported", 
+            promptContent: content, source: "github", 
+            providerUrl, isActive: true, icon: "Zap", color: "orange",
+            files: folderFiles
+          }
+
+          await (db as any).escSkill.upsert({
+            where: { slug },
+            update: skillData,
+            create: skillData
+          })
+          results.added++
+        }
+      } catch (e: any) {
+        logs.push(`Error processing ${slug}: ${e.message}`)
+        results.errors++
       }
     }
   } catch (err: any) {
-    logs.push(`Folder sync error: ${err.message}`)
+    logs.push(`Tree sync error: ${err.message}`)
   }
   return results
 }
