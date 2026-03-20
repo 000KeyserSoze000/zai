@@ -217,11 +217,31 @@ async function handleGitHubBulkSyncByUrl(manifestUrl: string, baseUrl: string, l
   const skillEntries = Object.entries(manifest.skills || {})
   const results = { added: 0, updated: 0, errors: 0 }
 
+  // Parse baseUrl for GitHub API calls
+  const urlParts = baseUrl.split('/')
+  const owner = urlParts[3]
+  const repo = urlParts[4]
+  const branch = urlParts[5]
+
   for (const [slug, skillInfo] of skillEntries) {
     try {
       const { path, version, category } = skillInfo as any
       const skillMdUrl = `${baseUrl}/${path}`
-      const content = await fetchFileContent(skillMdUrl)
+      
+      let folderFiles: Record<string, string> = {}
+      let content = ""
+
+      if (path.includes('/')) {
+        // It resides in a subfolder, let's fetch the whole folder
+        const folderPath = path.substring(0, path.lastIndexOf('/'))
+        folderFiles = await fetchGitHubDirectory(owner, repo, branch, folderPath, logs, 0)
+        content = folderFiles[path.split('/').pop() || "SKILL.md"]
+      } else {
+        // Standalone file at root
+        content = await fetchFileContent(skillMdUrl)
+        if (content) folderFiles = { [path]: content }
+      }
+
       if (!content) continue
       
       const name = extractSkillName(content, slug)
@@ -229,7 +249,8 @@ async function handleGitHubBulkSyncByUrl(manifestUrl: string, baseUrl: string, l
         name, slug, version: version || "1.0.0", category: category || "general", 
         promptContent: content, source: "github", 
         providerUrl,
-        isActive: false, files: { "SKILL.md": content }
+        isActive: false, 
+        files: folderFiles
       }
 
       const existing = await (db as any).escSkill.findUnique({ where: { slug } })
@@ -318,13 +339,14 @@ async function handleGitHubFolderSync(owner: string, repo: string, branch: strin
     for (const item of items) {
       if (item.type === "dir") {
         try {
-          // Check if this subdirectory has a SKILL.md
-          const skillApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${item.path}/SKILL.md?ref=${branch}`
-          const skillRes = await fetch(skillApiUrl, { headers: { "User-Agent": "ZAI-App" }, cache: 'no-store' })
+          // Fetch ALL files in this subdirectory recursively
+          const folderFiles = await fetchGitHubDirectory(owner, repo, branch, item.path, logs, 0)
           
-          if (skillRes.ok) {
-            const skillFile = await skillRes.json()
-            const content = Buffer.from(skillFile.content, 'base64').toString('utf-8')
+          // Find the main content (SKILL.md or similar)
+          const mainFileKey = Object.keys(folderFiles).find(k => k.toLowerCase().endsWith("skill.md")) || Object.keys(folderFiles)[0]
+          const content = folderFiles[mainFileKey]
+          
+          if (content) {
             const slug = item.name
             const name = extractSkillName(content, slug)
             
@@ -332,7 +354,7 @@ async function handleGitHubFolderSync(owner: string, repo: string, branch: strin
               name, slug, version: "1.0.0", category: "imported", 
               promptContent: content, source: "github", 
               providerUrl, isActive: true, icon: "Zap", color: "orange",
-              files: { "SKILL.md": content }
+              files: folderFiles
             }
 
             await (db as any).escSkill.upsert({
@@ -342,7 +364,10 @@ async function handleGitHubFolderSync(owner: string, repo: string, branch: strin
             })
             results.added++
           }
-        } catch (e) { results.errors++ }
+        } catch (e: any) { 
+          logs.push(`Error importing skill folder ${item.name}: ${e.message}`)
+          results.errors++ 
+        }
       }
     }
   } catch (err: any) {
