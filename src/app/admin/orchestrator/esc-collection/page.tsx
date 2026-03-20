@@ -12,7 +12,8 @@ import {
   Box,
   Eye,
   PlusCircle,
-  Copy
+  Copy,
+  XCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -203,16 +204,23 @@ export default function EscCollectionPage() {
 
   const handleDeleteProvider = async (id: string, url?: string, action: "REMOVE" | "DELETE_ALL" = "REMOVE") => {
     if (action === "DELETE_ALL") {
-      if (!confirm(`ATTENTION: Cela va supprimer TOUTES les skills provenant de ${url}. Continuer ?`)) return
+      if (!confirm(`ATTENTION: Cela va supprimer TOUTES les skills provenant de ${url} ET retirer le fournisseur. Continuer ?`)) return
       setBulkDeleting(true)
       try {
+        // 1. Delete all skills from this provider
         const res = await fetch("/api/admin/esc-skills/bulk", {
           method: "POST",
           body: JSON.stringify({ action: "DELETE_BY_PROVIDER", providerUrl: url })
         })
+        
         if (res.ok) {
-          toast({ title: "Nettoyage réussi", description: "Toutes les skills du fournisseur ont été supprimées." })
-          fetchData()
+          // 2. Delete the provider itself
+          const provRes = await fetch(`/api/admin/esc-skills/providers?id=${id}`, { method: "DELETE" })
+          if (provRes.ok) {
+            toast({ title: "Suppression complète", description: "Fournisseur et skills retirés." })
+            fetchProviders()
+            fetchData()
+          }
         }
       } catch (err) { toast({ title: "Erreur", variant: "destructive" }) }
       finally { setBulkDeleting(false) }
@@ -946,14 +954,32 @@ export default function EscCollectionPage() {
                         >
                           <RefreshCw className={`w-3.5 h-3.5 ${syncingProviderId === p.id ? "animate-spin" : ""}`} />
                         </Button>
-                        <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-white" title="Modifier" onClick={() => { setEditingProvider(p); setNewProvider({name: p.name, url: p.url}); }}>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-7 w-7 text-neutral-500 hover:text-white" 
+                          title="Modifier" 
+                          onClick={() => { setEditingProvider(p); setNewProvider({name: p.name, url: p.url}); }}
+                        >
                           <ExternalLink className="w-3.5 h-3.5" />
                         </Button>
-                        <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-red-500" onClick={() => handleDeleteProvider(p.id, p.url, "DELETE_ALL")}>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-7 w-7 text-neutral-500 hover:text-red-500" 
+                          onClick={() => handleDeleteProvider(p.id, p.url, "DELETE_ALL")}
+                          title="Supprimer tout (Fournisseur + Skills)"
+                        >
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
-                        <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-red-400" onClick={() => handleDeleteProvider(p.id)}>
-                          <ExternalLink className="w-3.5 h-3.5" />
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-7 w-7 text-neutral-500 hover:text-orange-400" 
+                          onClick={() => handleDeleteProvider(p.id)}
+                          title="Retirer le fournisseur uniquement"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
                         </Button>
                       </div>
                     </div>

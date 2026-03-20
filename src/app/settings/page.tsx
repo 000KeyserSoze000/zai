@@ -67,6 +67,7 @@ interface SiteSettings {
   googleOAuth: string | null
   zaiApiKey: string | null
   openaiApiKey: string | null
+  openRouterApiKey: string | null
   anthropicApiKey: string | null
   googleAiApiKey: string | null
   mistralApiKey: string | null
@@ -155,6 +156,7 @@ const OAUTH_PROVIDERS = [
 const AI_PROVIDERS = [
   { id: 'zai', name: 'Z.ai', description: 'Plateforme IA française', icon: '🇫🇷' },
   { id: 'openai', name: 'OpenAI', description: 'GPT-4, DALL-E, Whisper', icon: '🤖' },
+  { id: 'openRouter', name: 'OpenRouter', description: 'Accès à tous les modèles (Claude, Llama, etc.)', icon: '🌐' },
   { id: 'anthropic', name: 'Anthropic', description: 'Claude 3.5 Sonnet, Opus', icon: '🧠' },
   { id: 'googleAi', name: 'Google AI', description: 'Gemini, PaLM', icon: '🌐' },
   { id: 'mistral', name: 'Mistral AI', description: 'Mistral Large, Mixtral', icon: '🌪️' },
@@ -1285,6 +1287,7 @@ export default function SettingsPage() {
                   const keyMap: Record<string, keyof SiteSettings> = {
                     zai: 'zaiApiKey',
                     openai: 'openaiApiKey',
+                    openRouter: 'openRouterApiKey',
                     anthropic: 'anthropicApiKey',
                     googleAi: 'googleAiApiKey',
                     mistral: 'mistralApiKey',
@@ -1292,7 +1295,7 @@ export default function SettingsPage() {
                     stability: 'stabilityApiKey',
                   }
                   const settingKey = keyMap[provider.id]
-                  const hasKey = settings?.[settingKey] && settings[settingKey]!.length > 0
+                  const hasKey = settings?.[settingKey] && typeof settings[settingKey] === 'string' && (settings[settingKey] as string).length > 0
                   
                   return (
                     <div key={provider.id} className="p-4 bg-neutral-800 border border-neutral-700 rounded-lg">

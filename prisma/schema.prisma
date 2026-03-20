@@ -229,6 +229,7 @@ model SiteSettings {
   googleOAuth        String?
   zaiApiKey          String?
   openaiApiKey       String?
+  openRouterApiKey   String?
   anthropicApiKey    String?
   googleAiApiKey     String?
   mistralApiKey      String?
