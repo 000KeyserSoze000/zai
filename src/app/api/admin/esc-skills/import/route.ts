@@ -82,7 +82,7 @@ async function fetchGitHubDirectory(owner: string, repo: string, branch: string,
     for (const item of items) {
       if (item.type === "file") {
         const ext = item.name.split(".").pop()?.toLowerCase()
-        const allowed = ["md", "txt", "json", "js", "ts", "yml", "yaml", "xml", "csv"]
+        const allowed = ["md", "txt", "json", "js", "ts", "yml", "yaml", "xml", "csv", "py", "sh", "sql", "css", "html"]
         if (allowed.includes(ext || "")) {
           const content = await fetchGitHubFile(owner, repo, branch, item.path)
           if (content) {
