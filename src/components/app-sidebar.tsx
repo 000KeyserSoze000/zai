@@ -83,15 +83,21 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   const NAV_ITEMS = isAdmin ? ADMIN_NAV_ITEMS : CLIENT_NAV_ITEMS
 
   const getActiveSection = () => {
-    // Exact matches or specific prefixes first
+    // 1. Most specific rules first
+    if (pathname.startsWith("/settings/profile")) return "business-profile"
+    if (pathname.startsWith("/admin/orchestrator")) return "orchestrator"
+    
+    // 2. Generic matches for other specific modules
     if (pathname.startsWith("/admin/users")) return "users"
     if (pathname.startsWith("/admin/subscriptions")) return "subscriptions"
-    if (pathname.startsWith("/admin/orchestrator")) return "orchestrator"
     if (pathname.startsWith("/command-center")) return "command-center"
     if (pathname.startsWith("/library")) return "library"
     if (pathname.startsWith("/analytics")) return "analytics"
-    if (pathname.startsWith("/settings/profile")) return "business-profile"
+    
+    // 3. Settings fallback (must be after /settings/profile)
     if (pathname.startsWith("/settings")) return "settings"
+    
+    // 4. Dashboards
     if (pathname === "/" || pathname === "/admin") return "dashboard"
     
     return "dashboard"
@@ -320,24 +326,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
-            ) : (
-              <>
-                {/* Language Switcher for non-authenticated users */}
-                <LanguageSwitcher />
-                <Link href="/login">
-                  <Button variant="ghost" size="sm" className="text-neutral-400 hover:text-white">
-                    <LogIn className="w-4 h-4 mr-2" />
-                    {t("auth.login")}
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    {t("auth.freeTrial")}
-                  </Button>
-                </Link>
-              </>
-            )}
+            ) : null}
           </div>
         </div>
 
