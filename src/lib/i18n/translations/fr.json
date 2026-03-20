@@ -36,6 +36,15 @@
         "retry": "Réessayer",
         "month": "mois"
     },
+    "categories": {
+        "content-studio": "Content Studio",
+        "finance-ai": "Finance AI",
+        "marketing-ai": "Marketing AI",
+        "business-tools": "Business Tools",
+        "social-factory": "Social Factory",
+        "ecommerce-studio": "E-commerce Hub",
+        "academy-ai": "Academy AI"
+    },
     "nav": {
         "dashboard": "DASHBOARD",
         "dashboardDesc": "Vue d'ensemble",
@@ -698,6 +707,55 @@
             "variantB": "Variante B",
             "test": "Test",
             "daysPlanning": "jours de planning"
+        },
+        "content": {
+            "video-script": { "name": "Script Vidéo GPT", "desc": "Générez des scripts captivants pour YouTube et TikTok." },
+            "thumbnail-master": { "name": "Thumbnail Master", "desc": "Créez des miniatures haute résolution en un clic." },
+            "seo-metadata": { "name": "SEO Metadata", "desc": "Optimisez vos titres et descriptions pour le search." },
+            "voiceover-pro": { "name": "Voiceover Pro", "desc": "Synthèse vocale ultra-réaliste en 30 langues." },
+            "storyboard": { "name": "Storyboard AI", "desc": "Visualisez votre contenu avant la production." }
+        },
+        "finance": {
+            "expense-tracker": { "name": "Expense Tracker", "desc": "Analyse intelligente de vos flux de trésorerie." },
+            "revenue-forecast": { "name": "Revenue Forecast", "desc": "Prédisez vos revenus futurs avec précision." },
+            "tax-assistant": { "name": "Tax Assistant", "desc": "Optimisez votre fiscalité automatiquement." },
+            "investment-analyzer": { "name": "Investment AI", "desc": "Analyse de risque et opportunités de marché." },
+            "crypto-pulse": { "name": "Crypto Pulse", "desc": "Suivez les tendances du marché crypto." }
+        },
+        "marketing": {
+            "ad-copy": { "name": "Ad Copy Gen", "desc": "Rédigez des publicités qui convertissent sur Facebook et Google." },
+            "seo-optimizer": { "name": "SEO Optimizer", "desc": "Audit et optimisation en temps réel de vos pages." },
+            "email-campaigner": { "name": "Email Master", "desc": "Séquences d'emails personnalisées pour vos prospects." },
+            "brand-identity": { "name": "Brand Identity", "desc": "Définissez votre charte graphique et ton de voix." },
+            "persona-creator": { "name": "Persona Creator", "desc": "Identifiez votre client idéal avec précision." }
+        },
+        "business": {
+            "contract-gen": { "name": "Contract Gen", "desc": "Générez des contrats juridiquement valides." },
+            "proposal-gpt": { "name": "Proposal GPT", "desc": "Créez des propositions commerciales gagnantes." },
+            "strategy-ai": { "name": "Strategy AI", "desc": "Planifiez votre croissance à 12 mois." },
+            "legal-helper": { "name": "Legal Helper", "desc": "Assistance juridique 24/7 sur vos documents." },
+            "market-analyzer": { "name": "Market Analyzer", "desc": "Analyse concurrentielle approfondie." }
+        },
+        "social": {
+            "post-scheduler": { "name": "Post Scheduler", "desc": "Planification intelligente sur tous vos comptes." },
+            "viral-hook": { "name": "Viral Hook Gen", "desc": "Trouvez l'accroche parfaite pour vos vidéos." },
+            "engagement-bot": { "name": "Engagement Bot", "desc": "Répondez intelligemment à vos commentaires." },
+            "bio-optimizer": { "name": "Bio Optimizer", "desc": "Optimisez vos biographies sociales pour le SEO." },
+            "meme-gen": { "name": "Meme Gen AI", "desc": "Créez des mèmes viraux en quelques secondes." }
+        },
+        "ecommerce": {
+            "product-desc": { "name": "Product GPT", "desc": "Fiches produits percutantes pour Amazon et Shopify." },
+            "customer-service": { "name": "Customer Bot", "desc": "Support client automatisé haute performance." },
+            "pricing-strategy": { "name": "Pricing AI", "desc": "Optimisez vos prix selon la concurrence." },
+            "inventory-forecast": { "name": "Inventory AI", "desc": "Évitez les ruptures de stock avec prédiction." },
+            "ux-audit": { "name": "Shop UX Audit", "desc": "Identifiez les points de friction de votre boutique." }
+        },
+        "academy": {
+            "course-outliner": { "name": "Course Outliner", "desc": "Structurez vos formations en un clin d'œil." },
+            "quiz-gen": { "name": "Quiz Gen AI", "desc": "Générez des quiz interactifs pour vos élèves." },
+            "edu-script": { "name": "Edu Script", "desc": "Scripts pour vidéos de formation et tutoriels." },
+            "tutor-bot": { "name": "Tutor Bot", "desc": "Assistant pédagogique 24/7 pour vos apprenants." },
+            "research-helper": { "name": "Research AI", "desc": "Synthétisez des documents longs en secondes." }
         }
     },
     "contentStudio": {
@@ -943,5 +1001,31 @@
         "noSubscription": "Aucun abonnement actif",
         "startTrial": "Commencer l'essai gratuit",
         "contactSales": "Contacter le support"
+    },
+    "tools": {
+        "title": "Outils IA",
+        "subtitle": "Découvrez nos outils pour créateurs de contenu",
+        "description": "Boostez votre productivité et votre créativité avec nos outils IA spécialisés.",
+        "categories": {
+            "video": "Vidéo",
+            "audio": "Audio",
+            "image": "Image",
+            "text": "Texte",
+            "education": "Éducation"
+        },
+        "allTools": "Tous les outils",
+        "videoTools": {
+            "script-gen": { "name": "Script Gen AI", "desc": "Générez des scripts vidéo captivants en quelques secondes." },
+            "video-editor": { "name": "Video Editor AI", "desc": "Éditez vos vidéos avec l'aide de l'IA pour un rendu professionnel." },
+            "thumbnail-gen": { "name": "Thumbnail Gen AI", "desc": "Créez des miniatures YouTube percutantes et optimisées." },
+            "seo-optimizer": { "name": "SEO Optimizer AI", "desc": "Optimisez le SEO de vos vidéos pour maximiser leur visibilité." }
+        },
+        "educationTools": {
+            "course-outliner": { "name": "Course Outliner", "desc": "Structurez vos formations en un clin d'œil." },
+            "quiz-gen": { "name": "Quiz Gen AI", "desc": "Générez des quiz interactifs pour vos élèves." },
+            "edu-script": { "name": "Edu Script", "desc": "Scripts pour vidéos de formation et tutoriels." },
+            "tutor-bot": { "name": "Tutor Bot", "desc": "Assistant pédagogique 24/7 pour vos apprenants." },
+            "research-helper": { "name": "Research AI", "desc": "Synthétisez des documents longs en secondes." }
+        }
     }
 }

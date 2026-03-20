@@ -36,6 +36,15 @@
         "retry": "Retry",
         "month": "month"
     },
+    "categories": {
+        "content-studio": "Content Studio",
+        "finance-ai": "Finance AI",
+        "marketing-ai": "Marketing AI",
+        "business-tools": "Business Tools",
+        "social-factory": "Social Factory",
+        "ecommerce-studio": "E-commerce Hub",
+        "academy-ai": "Academy AI"
+    },
     "nav": {
         "dashboard": "DASHBOARD",
         "dashboardDesc": "Overview",
@@ -527,8 +536,8 @@
         }
     },
     "home": {
-        "title": "Select a Module",
-        "subtitle": "Choose the AI module best suited to your needs",
+        "title": "AI Solutions Catalogue",
+        "subtitle": "Discover our AI-powered products and services",
         "comingSoon": "Soon",
         "comingSoonBtn": "Coming soon"
     },
@@ -642,9 +651,9 @@
             "name": "Business Tools",
             "description": "Professional document generation",
             "features": {
-                "contracts": "Contracts",
-                "proposals": "Proposals",
-                "reports": "Reports"
+                "thumbnails": "AI Thumbnails",
+                "seo": "Optimized SEO",
+                "social": "Social Posts"
             },
             "title": "Document Generator",
             "subtitle": "Business plan, budget, contract, report — describe your need",
@@ -698,6 +707,55 @@
             "variantB": "Variant B",
             "test": "Test",
             "daysPlanning": "days of planning"
+        },
+        "content": {
+            "video-script": { "name": "Video Script GPT", "desc": "Generate compelling scripts for YouTube and TikTok." },
+            "thumbnail-master": { "name": "Thumbnail Master", "desc": "Create high-res thumbnails in one click." },
+            "seo-metadata": { "name": "SEO Metadata", "desc": "Optimize your titles and descriptions for search." },
+            "voiceover-pro": { "name": "Voiceover Pro", "desc": "Ultra-realistic voice synth in 30 languages." },
+            "storyboard": { "name": "Storyboard AI", "desc": "Visualize your content before production." }
+        },
+        "finance": {
+            "expense-tracker": { "name": "Expense Tracker", "desc": "Smart analysis of your cash flow." },
+            "revenue-forecast": { "name": "Revenue Forecast", "desc": "Predict your future revenue with precision." },
+            "tax-assistant": { "name": "Tax Assistant", "desc": "Optimize your taxes automatically." },
+            "investment-analyzer": { "name": "Investment AI", "desc": "Risk analysis and market opportunities." },
+            "crypto-pulse": { "name": "Crypto Pulse", "desc": "Track crypto market trends." }
+        },
+        "marketing": {
+            "ad-copy": { "name": "Ad Copy Gen", "desc": "Write conversion-focused ads for Facebook and Google." },
+            "seo-optimizer": { "name": "SEO Optimizer", "desc": "Real-time audit and optimization of your pages." },
+            "email-campaigner": { "name": "Email Master", "desc": "Personalized email sequences for your leads." },
+            "brand-identity": { "name": "Brand Identity", "desc": "Define your branding and tone of voice." },
+            "persona-creator": { "name": "Persona Creator", "desc": "Identify your ideal customer accurately." }
+        },
+        "business": {
+            "contract-gen": { "name": "Contract Gen", "desc": "Generate legally valid contracts." },
+            "proposal-gpt": { "name": "Proposal GPT", "desc": "Create winning business proposals." },
+            "strategy-ai": { "name": "Strategy AI", "desc": "Plan your 12-month growth strategy." },
+            "legal-helper": { "name": "Legal Helper", "desc": "24/7 legal assistance on your documents." },
+            "market-analyzer": { "name": "Market Analyzer", "desc": "Deep competitive analysis." }
+        },
+        "social": {
+            "post-scheduler": { "name": "Post Scheduler", "desc": "Smart planning across all your accounts." },
+            "viral-hook": { "name": "Viral Hook Gen", "desc": "Find the perfect hook for your videos." },
+            "engagement-bot": { "name": "Engagement Bot", "desc": "Respond intelligently to your comments." },
+            "bio-optimizer": { "name": "Bio Optimizer", "desc": "Optimize your social bios for SEO." },
+            "meme-gen": { "name": "Meme Gen AI", "desc": "Create viral memes in seconds." }
+        },
+        "ecommerce": {
+            "product-desc": { "name": "Product GPT", "desc": "Compelling product copies for Amazon and Shopify." },
+            "customer-service": { "name": "Customer Bot", "desc": "High-performance automated customer support." },
+            "pricing-strategy": { "name": "Pricing AI", "desc": "Optimize your prices based on competition." },
+            "inventory-forecast": { "name": "Inventory AI", "desc": "Avoid stockouts with smart prediction." },
+            "ux-audit": { "name": "Shop UX Audit", "desc": "Identify friction points in your store." }
+        },
+        "academy": {
+            "course-outliner": { "name": "Course Outliner", "desc": "Structure your courses in a snap." },
+            "quiz-gen": { "name": "Quiz Gen AI", "desc": "Generate interactive quizzes for your students." },
+            "edu-script": { "name": "Edu Script", "desc": "Scripts for training videos and tutorials." },
+            "tutor-bot": { "name": "Tutor Bot", "desc": "24/7 pedagogical assistant for your learners." },
+            "research-helper": { "name": "Research AI", "desc": "Summarize long documents in seconds." }
         }
     },
     "contentStudio": {
@@ -902,7 +960,6 @@
     "settings": {
         "title": "Settings",
         "subtitle": "Platform configuration",
-
         "tabs": {
             "general": "General",
             "integrations": "Integrations",
@@ -944,6 +1001,5 @@
         "noSubscription": "No active subscription",
         "startTrial": "Start free trial",
         "contactSales": "Contact sales"
-
     }
 }

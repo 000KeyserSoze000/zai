@@ -19,58 +19,135 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useTranslation } from "@/lib/i18n"
 import type { AgentCategory } from "@/lib/types"
+import { ShoppingCart, GraduationCap, ChevronLeft, Search } from "lucide-react"
+
+interface SubModule {
+    id: string
+    nameKey: string
+    descKey: string
+    icon: React.ComponentType<{ className?: string }>
+}
 
 // Fallback modules if API fails
 const FALLBACK_MODULES = [
     {
         id: "content-studio",
-        nameKey: "modules.contentStudio.name",
+        nameKey: "categories.content-studio",
         descKey: "modules.contentStudio.description",
         icon: Clapperboard,
         color: "orange",
         href: "/command-center/content-studio",
         featureKeys: ["modules.contentStudio.features.thumbnails", "modules.contentStudio.features.seo", "modules.contentStudio.features.social"],
-        version: "v1.0",
+        version: "v1.1",
+        subModules: [
+            { id: "video-script", nameKey: "modules.content.video-script.name", descKey: "modules.content.video-script.desc", icon: FileText },
+            { id: "thumbnail", nameKey: "modules.content.thumbnail-master.name", descKey: "modules.content.thumbnail-master.desc", icon: Sparkles },
+            { id: "seo", nameKey: "modules.content.seo-metadata.name", descKey: "modules.content.seo-metadata.desc", icon: Search },
+            { id: "voiceover", nameKey: "modules.content.voiceover-pro.name", descKey: "modules.content.voiceover-pro.desc", icon: Zap },
+            { id: "storyboard", nameKey: "modules.content.storyboard.name", descKey: "modules.content.storyboard.desc", icon: LayoutGrid },
+        ]
     },
     {
         id: "finance-ai",
-        nameKey: "modules.financeAi.name",
+        nameKey: "categories.finance-ai",
         descKey: "modules.financeAi.description",
         icon: TrendingUp,
         color: "cyan",
         href: "/command-center/finance-ai",
         featureKeys: ["modules.financeAi.features.forecasts", "modules.financeAi.features.reports", "modules.financeAi.features.kpis"],
         version: "v1.0",
+        subModules: [
+            { id: "expenses", nameKey: "modules.finance.expense-tracker.name", descKey: "modules.finance.expense-tracker.desc", icon: FileText },
+            { id: "revenue", nameKey: "modules.finance.revenue-forecast.name", descKey: "modules.finance.revenue-forecast.desc", icon: TrendingUp },
+            { id: "tax", nameKey: "modules.finance.tax-assistant.name", descKey: "modules.finance.tax-assistant.desc", icon: Target },
+            { id: "investment", nameKey: "modules.finance.investment-analyzer.name", descKey: "modules.finance.investment-analyzer.desc", icon: Sparkles },
+            { id: "crypto", nameKey: "modules.finance.crypto-pulse.name", descKey: "modules.finance.crypto-pulse.desc", icon: Zap },
+        ]
     },
     {
         id: "marketing-ai",
-        nameKey: "modules.marketingAi.name",
+        nameKey: "categories.marketing-ai",
         descKey: "modules.marketingAi.description",
         icon: Target,
         color: "purple",
         href: "/command-center/marketing-ai",
         featureKeys: ["modules.marketingAi.features.campaigns", "modules.marketingAi.features.targeting", "modules.marketingAi.features.analytics"],
         version: "v1.0",
+        subModules: [
+            { id: "ad-copy", nameKey: "modules.marketing.ad-copy.name", descKey: "modules.marketing.ad-copy.desc", icon: FileText },
+            { id: "seo-opt", nameKey: "modules.marketing.seo-optimizer.name", descKey: "modules.marketing.seo-optimizer.desc", icon: Search },
+            { id: "email", nameKey: "modules.marketing.email-campaigner.name", descKey: "modules.marketing.email-campaigner.desc", icon: Zap },
+            { id: "brand", nameKey: "modules.marketing.brand-identity.name", descKey: "modules.marketing.brand-identity.desc", icon: Sparkles },
+            { id: "persona", nameKey: "modules.marketing.persona-creator.name", descKey: "modules.marketing.persona-creator.desc", icon: Target },
+        ]
     },
     {
         id: "business-tools",
-        nameKey: "modules.businessTools.name",
+        nameKey: "categories.business-tools",
         descKey: "modules.businessTools.description",
         icon: FileText,
         color: "green",
         href: "/command-center/business-tools",
         featureKeys: ["modules.businessTools.features.contracts", "modules.businessTools.features.proposals", "modules.businessTools.features.reports"],
         version: "v1.0",
+        subModules: [
+            { id: "contract", nameKey: "modules.business.contract-gen.name", descKey: "modules.business.contract-gen.desc", icon: FileText },
+            { id: "proposal", nameKey: "modules.business.proposal-gpt.name", descKey: "modules.business.proposal-gpt.desc", icon: Sparkles },
+            { id: "strategy", nameKey: "modules.business.strategy-ai.name", descKey: "modules.business.strategy-ai.desc", icon: TrendingUp },
+            { id: "legal", nameKey: "modules.business.legal-helper.name", descKey: "modules.business.legal-helper.desc", icon: Target },
+            { id: "market", nameKey: "modules.business.market-analyzer.name", descKey: "modules.business.market-analyzer.desc", icon: Search },
+        ]
     },
     {
         id: "social-factory",
-        nameKey: "modules.socialFactory.name",
+        nameKey: "categories.social-factory",
         descKey: "modules.socialFactory.description",
         icon: Share2,
         color: "pink",
         href: "/command-center/social-factory",
         featureKeys: ["modules.socialFactory.features.multiplatform", "modules.socialFactory.features.scheduling", "modules.socialFactory.features.analytics"],
         version: "v1.0",
+        subModules: [
+            { id: "scheduler", nameKey: "modules.social.post-scheduler.name", descKey: "modules.social.post-scheduler.desc", icon: LayoutGrid },
+            { id: "hooks", nameKey: "modules.social.viral-hook.name", descKey: "modules.social.viral-hook.desc", icon: Zap },
+            { id: "engagement", nameKey: "modules.social.engagement-bot.name", descKey: "modules.social.engagement-bot.desc", icon: Target },
+            { id: "bio", nameKey: "modules.social.bio-optimizer.name", descKey: "modules.social.bio-optimizer.desc", icon: FileText },
+            { id: "memes", nameKey: "modules.social.meme-gen.name", descKey: "modules.social.meme-gen.desc", icon: Sparkles },
+        ]
+    },
+    {
+        id: "ecommerce-studio",
+        nameKey: "categories.ecommerce-studio",
+        descKey: "modules.ecommerce.product-desc.desc",
+        icon: ShoppingCart,
+        color: "yellow",
+        href: "#",
+        featureKeys: ["Shopify", "Amazon", "UX Audit"],
+        version: "v1.0",
+        subModules: [
+            { id: "product", nameKey: "modules.ecommerce.product-desc.name", descKey: "modules.ecommerce.product-desc.desc", icon: FileText },
+            { id: "customer", nameKey: "modules.ecommerce.customer-service.name", descKey: "modules.ecommerce.customer-service.desc", icon: Zap },
+            { id: "pricing", nameKey: "modules.ecommerce.pricing-strategy.name", descKey: "modules.ecommerce.pricing-strategy.desc", icon: TrendingUp },
+            { id: "inventory", nameKey: "modules.ecommerce.inventory-forecast.name", descKey: "modules.ecommerce.inventory-forecast.desc", icon: Target },
+            { id: "ux", nameKey: "modules.ecommerce.ux-audit.name", descKey: "modules.ecommerce.ux-audit.desc", icon: Search },
+        ]
+    },
+    {
+        id: "academy-ai",
+        nameKey: "categories.academy-ai",
+        descKey: "modules.academy.course-outliner.desc",
+        icon: GraduationCap,
+        color: "indigo",
+        href: "#",
+        featureKeys: ["LMS", "Quizz AI", "Edu GPT"],
+        version: "v1.0",
+        subModules: [
+            { id: "course", nameKey: "modules.academy.course-outliner.name", descKey: "modules.academy.course-outliner.desc", icon: LayoutGrid },
+            { id: "quiz", nameKey: "modules.academy.quiz-gen.name", descKey: "modules.academy.quiz-gen.desc", icon: Sparkles },
+            { id: "edu-script", nameKey: "modules.academy.edu-script.name", descKey: "modules.academy.edu-script.desc", icon: FileText },
+            { id: "tutor", nameKey: "modules.academy.tutor-bot.name", descKey: "modules.academy.tutor-bot.desc", icon: Zap },
+            { id: "research", nameKey: "modules.academy.research-helper.name", descKey: "modules.academy.research-helper.desc", icon: Search },
+        ]
     },
 ]
 
@@ -80,6 +157,8 @@ const colorMap: Record<string, { bg: string; text: string; border: string; glow:
     purple: { bg: "bg-purple-500/20", text: "text-purple-500", border: "border-purple-500/50 hover:border-purple-500", glow: "shadow-purple-500/10", gradient: "from-purple-500 to-violet-500" },
     green: { bg: "bg-green-500/20", text: "text-green-500", border: "border-green-500/50 hover:border-green-500", glow: "shadow-green-500/10", gradient: "from-green-500 to-emerald-500" },
     pink: { bg: "bg-pink-500/20", text: "text-pink-500", border: "border-pink-500/50 hover:border-pink-500", glow: "shadow-pink-500/10", gradient: "from-pink-500 to-rose-500" },
+    yellow: { bg: "bg-yellow-500/20", text: "text-yellow-500", border: "border-yellow-500/50 hover:border-yellow-500", glow: "shadow-yellow-500/10", gradient: "from-yellow-500 to-orange-500" },
+    indigo: { bg: "bg-indigo-500/20", text: "text-indigo-500", border: "border-indigo-500/50 hover:border-indigo-500", glow: "shadow-indigo-500/10", gradient: "from-indigo-500 to-blue-600" },
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -88,6 +167,8 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Target,
     FileText,
     Share2,
+    ShoppingCart,
+    GraduationCap,
 }
 
 interface ModuleConfig {
@@ -100,12 +181,14 @@ interface ModuleConfig {
     featureKeys: string[]
     version: string
     enabled: boolean
+    subModules: SubModule[]
 }
 
 export default function CommandCenterPage() {
     const { t } = useTranslation()
     const [modules, setModules] = useState<ModuleConfig[]>([])
     const [loading, setLoading] = useState(true)
+    const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
 
     useEffect(() => {
         const fetchConfig = async () => {
@@ -169,21 +252,58 @@ export default function CommandCenterPage() {
                     </div>
                 </div>
 
-                {/* Enabled Modules */}
-                <div className="flex items-center gap-2 mb-4">
-                    <Sparkles className="w-4 h-4 text-orange-500" />
-                    <h2 className="text-sm font-semibold text-white">{t("commandCenter.modulesAvailable")}</h2>
-                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[10px]">
-                        {enabledModules.length} {t("commandCenter.active")}
-                    </Badge>
-                </div>
+                {/* Enabled Categories / Modules */}
+                {selectedCategoryId ? (
+                    <div>
+                        <div className="flex items-center gap-4 mb-6">
+                            <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="text-neutral-400 hover:text-white"
+                                onClick={() => setSelectedCategoryId(null)}
+                            >
+                                <ChevronLeft className="w-4 h-4 mr-2" />
+                                {t("common.back")}
+                            </Button>
+                            <div className="h-4 w-px bg-neutral-800" />
+                            <h2 className="text-lg font-bold text-white">
+                                {t(modules.find(m => m.id === selectedCategoryId)?.nameKey || "")}
+                            </h2>
+                        </div>
 
-                {enabledModules.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
+                            {modules.find(m => m.id === selectedCategoryId)?.subModules.map((sub) => {
+                                const parent = modules.find(m => m.id === selectedCategoryId)!
+                                const colors = colorMap[parent.color]
+                                return (
+                                    <div key={sub.id} className="group relative bg-neutral-900 border border-neutral-800 rounded-xl p-4 transition-all hover:border-neutral-700 hover:shadow-lg h-full flex flex-col">
+                                        <div className={`w-10 h-10 ${colors.bg} rounded-lg flex items-center justify-center mb-4`}>
+                                            <sub.icon className={`w-5 h-5 ${colors.text}`} />
+                                        </div>
+                                        <h3 className="text-sm font-semibold text-white mb-1 group-hover:text-orange-400 transition-colors">
+                                            {t(sub.nameKey)}
+                                        </h3>
+                                        <p className="text-xs text-neutral-500 mb-4 line-clamp-2 leading-relaxed flex-1">
+                                            {t(sub.descKey)}
+                                        </p>
+                                        <Button size="sm" className={`w-full h-8 text-[10px] bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700`}>
+                                            {t("common.launch")}
+                                        </Button>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                ) : enabledModules.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4 mb-8">
                         {enabledModules.map((module) => {
                             const colors = colorMap[module.color]
                             return (
-                                <Link key={module.id} href={module.href} className="block group">
+                                <div 
+                                    key={module.id} 
+                                    className="block group cursor-pointer"
+                                    onClick={() => setSelectedCategoryId(module.id)}
+                                >
                                     <div className={`relative bg-neutral-900 border ${colors.border} rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg ${colors.glow} hover:-translate-y-1 h-full`}>
                                         <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${colors.gradient}`} />
 
@@ -205,7 +325,7 @@ export default function CommandCenterPage() {
                                             </p>
 
                                             <div className="flex flex-wrap gap-1 mb-3">
-                                                {module.featureKeys.map((featureKey) => (
+                                                {module.featureKeys.slice(0, 2).map((featureKey) => (
                                                     <span
                                                         key={featureKey}
                                                         className="px-1.5 py-0.5 bg-neutral-800/80 rounded text-[10px] text-neutral-400 border border-neutral-700/50"
@@ -215,13 +335,13 @@ export default function CommandCenterPage() {
                                                 ))}
                                             </div>
 
-                                            <Button size="sm" className={`w-full h-8 text-xs bg-gradient-to-r ${colors.gradient} hover:opacity-90 text-white transition-all`}>
-                                                {t("common.launch")}
+                                            <Button size="sm" className={`w-full h-8 text-[10px] bg-gradient-to-r ${colors.gradient} hover:opacity-90 text-white transition-all`}>
+                                                Explorer
                                                 <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
                                             </Button>
                                         </div>
                                     </div>
-                                </Link>
+                                </div>
                             )
                         })}
                     </div>
