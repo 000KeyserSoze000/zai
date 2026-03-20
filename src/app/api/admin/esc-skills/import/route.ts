@@ -274,10 +274,77 @@ async function handleGitHubBulkSync(logs: string[], providerId?: string) {
       finalResults.updated += res.updated
       finalResults.errors += res.errors
     } catch (err: any) {
+      if (err.message.includes("Impossible de récupérer le manifeste")) {
+        logs.push(`Manifest not found, attempting folder scan for ${provider.name}...`)
+        try {
+          const url = provider.url.replace(/[\\\)\]"'].*$/, "").split("?")[0].replace(/\/$/, "")
+          const treeMatch = url.match(/github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/(.+)/)
+          const rootMatch = url.match(/github\.com\/([^/]+)\/([^/]+)$/)
+          
+          let owner, repo, branch = "main", path = ""
+          if (treeMatch) [, owner, repo, branch, path] = treeMatch
+          else if (rootMatch) [, owner, repo] = rootMatch
+          
+          if (owner && repo) {
+            const res = await handleGitHubFolderSync(owner, repo, branch, path, logs, provider.url)
+            finalResults.added += res.added
+            finalResults.updated += res.updated
+            finalResults.errors += res.errors
+            continue
+          }
+        } catch (folderErr: any) {
+          logs.push(`Folder scan failed for ${provider.name}: ${folderErr.message}`)
+        }
+      }
       logs.push(`Error syncing ${provider.name}: ${err.message}`)
       finalResults.errors++
     }
   }
 
   return NextResponse.json({ success: true, results: finalResults, logs })
+}
+
+async function handleGitHubFolderSync(owner: string, repo: string, branch: string, rootPath: string, logs: string[], providerUrl: string) {
+  const results = { added: 0, updated: 0, errors: 0 }
+  try {
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${rootPath}?ref=${branch}`
+    const res = await fetch(apiUrl, { headers: { "User-Agent": "ZAI-App" }, cache: 'no-store' })
+    if (!res.ok) throw new Error(`GitHub API error: ${res.status}`)
+    
+    const items = await res.json()
+    if (!Array.isArray(items)) return results
+
+    for (const item of items) {
+      if (item.type === "dir") {
+        try {
+          // Check if this subdirectory has a SKILL.md
+          const skillApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${item.path}/SKILL.md?ref=${branch}`
+          const skillRes = await fetch(skillApiUrl, { headers: { "User-Agent": "ZAI-App" }, cache: 'no-store' })
+          
+          if (skillRes.ok) {
+            const skillFile = await skillRes.json()
+            const content = Buffer.from(skillFile.content, 'base64').toString('utf-8')
+            const slug = item.name
+            const name = extractSkillName(content, slug)
+            
+            const data = {
+              name, slug, version: "1.0.0", category: "imported", 
+              promptContent: content, source: "github", 
+              providerUrl, isActive: true, icon: "Zap", color: "orange"
+            }
+
+            await (db as any).escSkill.upsert({
+              where: { slug },
+              update: data,
+              create: data
+            })
+            results.added++
+          }
+        } catch (e) { results.errors++ }
+      }
+    }
+  } catch (err: any) {
+    logs.push(`Folder sync error: ${err.message}`)
+  }
+  return results
 }
