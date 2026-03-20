@@ -95,32 +95,32 @@ async function syncGitHubTree(owner: string, repo: string, branch: string, rootP
 
     logs.push(`Found ${skillMarkers.length} unique skills markers in tree.`)
 
-    // 2. Group all files by their parent directory
-    const folderGroups: Record<string, any[]> = {}
-    for (const item of treeData.tree) {
-      if (item.type !== "blob") continue
-      const parentDir = item.path.substring(0, item.path.lastIndexOf('/')) || ""
-      if (!folderGroups[parentDir]) folderGroups[parentDir] = []
-      folderGroups[parentDir].push(item)
-    }
-
-    // 3. Process only directories that contain a skill marker
+    // 2. Identify and Process each skill
     for (const marker of skillMarkers) {
       try {
-        const folderPath = marker.path.substring(0, marker.path.lastIndexOf('/')) || ""
-        const items = folderGroups[folderPath] || [marker]
+        const fullPath = marker.path
+        const folderPath = fullPath.substring(0, fullPath.lastIndexOf('/')) || ""
         
+        // Find ALL files under this folder (including subfolders)
+        const allSkillSubFiles = treeData.tree.filter((item: any) => 
+          item.type === "blob" && 
+          item.path.startsWith(folderPath + (folderPath ? "/" : ""))
+        )
+
         let mainContent = ""
         const leafFiles: Record<string, string> = {}
-        // Use full path for slug to avoid collisions (e.g. social-media/instagram vs ad-gen/instagram)
         const actualSlug = folderPath.replace(/\//g, "-").toLowerCase() || repo.toLowerCase()
         const displayName = folderPath.split('/').pop() || actualSlug
 
-        for (const item of items) {
+        for (const item of allSkillSubFiles) {
           const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${item.path}`
           const content = await fetchFileContent(rawUrl)
           if (content) {
-            const fileName = item.path.split('/').pop() || "file"
+            // Keep the relative path inside the skill folder (e.g. "scripts/helper.js")
+            const fileName = folderPath 
+                ? item.path.substring(folderPath.length + 1) 
+                : item.path
+            
             leafFiles[fileName] = content
             if (item.path === marker.path) mainContent = content
           }
