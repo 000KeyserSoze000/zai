@@ -403,6 +403,42 @@ export default function EscCollectionPage() {
           </div>
         </div>
 
+        {/* Selection Toolbar */}
+        {selectedIds.length > 0 && (
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-neutral-900 border border-orange-500/50 rounded-full px-6 py-3 shadow-2xl z-50 flex items-center gap-6 animate-in fade-in slide-in-from-bottom-4">
+            <div className="text-sm font-bold text-white px-2">
+              {selectedIds.length} sélectionné(s)
+            </div>
+            <div className="h-4 w-[1px] bg-neutral-800" />
+            
+            <Select onValueChange={handleBulkMove}>
+              <SelectTrigger className="w-[160px] h-8 bg-neutral-950 border-neutral-800 text-xs">
+                <SelectValue placeholder="Déplacer vers..." />
+              </SelectTrigger>
+              <SelectContent className="bg-neutral-900 border-neutral-800 text-white">
+                <div className="p-2 border-b border-neutral-800 mb-1">
+                   {categories.map(c => <SelectItem key={c} value={c} className="text-white">{c}</SelectItem>)}
+                </div>
+                <SelectItem value="new_category" className="text-orange-400 font-bold">+ Nouvelle catégorie</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button 
+              size="sm" 
+              variant="destructive" 
+              onClick={handleBulkDelete}
+              className="h-8 rounded-full"
+            >
+              <Trash2 className="w-3.5 h-3.5 mr-2" />
+              Supprimer
+            </Button>
+            
+            <Button size="sm" variant="ghost" className="h-8 text-neutral-400" onClick={() => setSelectedIds([])}>
+              Annuler
+            </Button>
+          </div>
+        )}
+
         {/* Grid */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
@@ -414,75 +450,128 @@ export default function EscCollectionPage() {
             <p className="text-neutral-500">Aucune skill trouvée.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredSkills.map((skill) => (
-              <Card key={skill.id} className="bg-neutral-900/40 border-neutral-800 hover:border-neutral-700 transition-all overflow-hidden">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-500">
-                        <Zap className="w-5 h-5" />
+          <div className="space-y-6">
+            <div className="flex items-center justify-between px-2">
+                <div className="flex items-center gap-2">
+                   <Switch checked={selectedIds.length === paginatedSkills.length && paginatedSkills.length > 0} onCheckedChange={toggleSelectAll} />
+                   <span className="text-[10px] text-neutral-500 uppercase font-bold">Tout sélectionner (cette page)</span>
+                </div>
+                <div className="text-[10px] text-neutral-600 font-mono">
+                   {filteredSkills.length} SKILLS — PAGE {currentPage}/{totalPages}
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {paginatedSkills.map((skill) => (
+                <Card 
+                  key={skill.id} 
+                  onClick={() => toggleSelect(skill.id)}
+                  className={`bg-neutral-900/40 border-neutral-800 hover:border-orange-500/30 transition-all cursor-pointer relative group ${
+                    selectedIds.includes(skill.id) ? "border-orange-500 bg-orange-500/5 shadow-[0_0_15px_rgba(249,115,22,0.1)]" : ""
+                  }`}
+                >
+                  {/* Selection Indicator */}
+                  <div className={`absolute top-2 left-2 w-4 h-4 rounded border flex items-center justify-center transition-all z-10 ${
+                    selectedIds.includes(skill.id) ? "bg-orange-500 border-orange-500" : "bg-black/50 border-neutral-700 opacity-0 group-hover:opacity-100"
+                  }`}>
+                    {selectedIds.includes(skill.id) && <Zap className="w-2.5 h-2.5 text-white fill-current" />}
+                  </div>
+
+                  <CardHeader className="p-3 pb-2 space-y-1">
+                    <div className="flex items-start justify-between">
+                      <div className={`p-1.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20`}>
+                        <Zap className="w-3.5 h-3.5" />
                       </div>
-                      <Badge variant="outline" className="text-[10px] uppercase border-neutral-800 bg-neutral-900 text-neutral-500">
-                        {skill.source}
+                      <Badge variant={skill.isActive ? "default" : "secondary"} className={skill.isActive ? "bg-green-500/20 text-green-400 border-green-500/10 text-[8px] h-4" : "bg-neutral-800 text-neutral-500 text-[8px] h-4"}>
+                        {skill.isActive ? "Actif" : "Brouillon"}
                       </Badge>
                     </div>
-                    <Badge variant={skill.isActive ? "default" : "secondary"} className={skill.isActive ? "bg-green-500/20 text-green-400 border-green-500/30 text-[10px]" : "bg-neutral-800 text-neutral-500 text-[10px]"}>
-                      {skill.isActive ? "Actif" : "Inactif"}
-                    </Badge>
-                  </div>
-                  <CardTitle className="mt-4 text-lg font-bold text-white">
-                    {skill.name}
-                    <span className="ml-2 text-[10px] text-neutral-600 font-mono">{skill.version}</span>
-                  </CardTitle>
-                  <CardDescription className="text-neutral-400 line-clamp-2 text-xs">
-                    {skill.description || `Skill importée (${skill.slug})`}
-                  </CardDescription>
-                </CardHeader>
-                <CardFooter className="pt-3 border-t border-neutral-800/50 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Switch 
-                      checked={skill.isActive} 
-                      onCheckedChange={() => toggleActive(skill.id, skill.isActive)}
-                    />
-                    <span className="text-[10px] text-neutral-500 uppercase font-bold tracking-tighter">
-                      {skill.isActive ? "Activé" : "Désactivé"}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1">
+                    <CardTitle className="text-sm font-bold text-white truncate group-hover:text-orange-400 transition-colors pt-1">
+                      {skill.name}
+                    </CardTitle>
+                    <div className="flex items-center gap-1.5 overflow-hidden">
+                       <Badge variant="outline" className="text-[8px] px-1 py-0 border-neutral-800 bg-neutral-950 text-neutral-500 uppercase flex-shrink-0">
+                          {skill.category}
+                       </Badge>
+                       <span className="text-[9px] text-neutral-600 truncate">{skill.slug}</span>
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent className="p-3 pt-0">
+                     <p className="text-neutral-500 text-[10px] line-clamp-2 h-7 group-hover:text-neutral-400 transition-colors">
+                        {skill.description || `Skill importée (${skill.slug})`}
+                     </p>
+                  </CardContent>
+
+                  <CardFooter className="p-2 pt-0 flex items-center justify-end gap-1 border-t border-neutral-800/10 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="h-8 w-8 text-neutral-600 hover:text-white"
-                      onClick={() => setViewSkill(skill)}
-                      title="Voir le prompt"
+                      className="h-7 w-7 text-neutral-500 hover:text-white"
+                      onClick={(e) => { e.stopPropagation(); setViewSkill(skill); }}
                     >
-                      <Eye className="w-4 h-4" />
+                      <Eye className="w-3.5 h-3.5" />
                     </Button>
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="h-8 w-8 text-neutral-600 hover:text-orange-500"
+                      className="h-7 w-7 text-neutral-500 hover:text-orange-500"
+                      onClick={(e) => { e.stopPropagation(); setInstallSkill(skill); }}
+                    >
+                      <PlusCircle className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-7 w-7 text-neutral-500 hover:text-red-400"
+                      onClick={(e) => { e.stopPropagation(); handleDelete(skill.id); }}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 pt-8">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => prev - 1)}
+                  className="border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:text-white"
+                >
+                  Précédent
+                </Button>
+                <div className="flex items-center gap-1 mx-4">
+                  {Array.from({ length: totalPages }).map((_, i) => (
+                    <button
+                      key={i}
                       onClick={() => {
-                        setInstallSkill(skill)
-                        setSelectedAgentId("")
+                         setCurrentPage(i + 1);
+                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      title="Installer / Utiliser"
+                      className={`w-8 h-8 rounded-md text-xs font-bold transition-all ${
+                        currentPage === i + 1 ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20" : "text-neutral-500 hover:bg-neutral-800"
+                      }`}
                     >
-                      <PlusCircle className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 text-neutral-600 hover:text-red-400"
-                      onClick={() => handleDelete(skill.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardFooter>
-              </Card>
-            ))}
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(prev => prev + 1)}
+                  className="border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:text-white"
+                >
+                  Suivant
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
