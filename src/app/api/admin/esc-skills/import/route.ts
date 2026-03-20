@@ -2,6 +2,33 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/api-utils"
 
+function parseGitHubUrl(url: string) {
+  // Remove trailing slash and any quotes/extra chars
+  const clean = url.replace(/[\\\)\]"'].*$/, "").split("?")[0].replace(/\/$/, "")
+  
+  // Format 1: https://github.com/owner/repo/tree/branch/path
+  const treeMatch = clean.match(/github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/(.+)/)
+  if (treeMatch) return { owner: treeMatch[1], repo: treeMatch[2], branch: treeMatch[3], path: treeMatch[4] }
+  
+  // Format 2: https://github.com/owner/repo/blob/branch/path
+  const blobMatch = clean.match(/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+)/)
+  if (blobMatch) return { owner: blobMatch[1], repo: blobMatch[2], branch: blobMatch[3], path: blobMatch[4] }
+  
+  // Format 3: https://raw.githubusercontent.com/owner/repo/branch/path
+  const rawMatch = clean.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/([^/]+)\/(.+)/)
+  if (rawMatch) return { owner: rawMatch[1], repo: rawMatch[2], branch: rawMatch[3], path: rawMatch[4] }
+  
+  // Format 4: https://github.com/owner/repo
+  const rootMatch = clean.match(/github\.com\/([^/]+)\/([^/]+)$/)
+  if (rootMatch) return { owner: rootMatch[1], repo: rootMatch[2], branch: "main", path: "" }
+
+  // Format 5: https://raw.githubusercontent.com/owner/repo/branch
+  const rawRootMatch = clean.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/([^/]+)$/)
+  if (rawRootMatch) return { owner: rawRootMatch[1], repo: rawRootMatch[2], branch: rawRootMatch[3], path: "" }
+
+  return null
+}
+
 const GITHUB_MANIFEST_URL = "https://raw.githubusercontent.com/guilhermemarketing/esc-skills/main/manifest.json"
 const GITHUB_BASE_URL = "https://raw.githubusercontent.com/guilhermemarketing/esc-skills/main"
 
@@ -217,11 +244,9 @@ async function handleGitHubBulkSyncByUrl(manifestUrl: string, baseUrl: string, l
   const skillEntries = Object.entries(manifest.skills || {})
   const results = { added: 0, updated: 0, errors: 0 }
 
-  // Parse baseUrl for GitHub API calls
-  const urlParts = baseUrl.split('/')
-  const owner = urlParts[3]
-  const repo = urlParts[4]
-  const branch = urlParts[5]
+  const gh = parseGitHubUrl(baseUrl)
+  if (!gh) throw new Error("URL de base GitHub invalide")
+  const { owner, repo, branch } = gh
 
   for (const [slug, skillInfo] of skillEntries) {
     try {
@@ -299,25 +324,21 @@ async function handleGitHubBulkSync(logs: string[], providerId?: string) {
       if (err.message.includes("Impossible de récupérer le manifeste")) {
         logs.push(`Manifest not found, attempting folder scan for ${provider.name}...`)
         try {
-          const url = provider.url.replace(/[\\\)\]"'].*$/, "").split("?")[0].replace(/\/$/, "")
-          const treeMatch = url.match(/github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/(.+)/)
-          const rootMatch = url.match(/github\.com\/([^/]+)\/([^/]+)$/)
-          
-          let owner, repo, branch = "main", path = ""
-          if (treeMatch) [, owner, repo, branch, path] = treeMatch
-          else if (rootMatch) [, owner, repo] = rootMatch
-          
-          if (owner && repo) {
-            const res = await handleGitHubFolderSync(owner, repo, branch, path, logs, cleanProviderUrl)
+          const gh = parseGitHubUrl(provider.url)
+          if (!gh) {
+             logs.push(`URL invalide pour ${provider.name}: ${provider.url}`)
+             continue
+          }
+          const { owner, repo, branch, path } = gh
+          const res = await handleGitHubFolderSync(owner, repo, branch, path, logs, cleanProviderUrl)
             finalResults.added += res.added
             finalResults.updated += res.updated
             finalResults.errors += res.errors
             continue
+          } catch (folderErr: any) {
+            logs.push(`Folder scan failed for ${provider.name}: ${folderErr.message}`)
           }
-        } catch (folderErr: any) {
-          logs.push(`Folder scan failed for ${provider.name}: ${folderErr.message}`)
         }
-      }
       logs.push(`Error syncing ${provider.name}: ${err.message}`)
       finalResults.errors++
     }
