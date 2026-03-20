@@ -101,6 +101,7 @@ export default function EscCollectionPage() {
   const [providerFilter, setProviderFilter] = useState("all")
   const [savingProvider, setSavingProvider] = useState(false)
   const [bulkDeleting, setBulkDeleting] = useState(false)
+  const [syncingProviderId, setSyncingProviderId] = useState<string | null>(null)
 
   const { toast } = useToast()
   const { t } = useTranslation()
@@ -147,19 +148,20 @@ export default function EscCollectionPage() {
       }
     } catch (err) { console.error(err) }
   }
+  const handleSync = async (providerId?: string) => {
+    if (providerId) setSyncingProviderId(providerId)
+    else setSyncing(true)
 
-  const handleSync = async () => {
-    setSyncing(true)
     try {
       const res = await fetch("/api/admin/esc-skills/import", { 
         method: "POST",
-        body: JSON.stringify({}) // Bulk sync
+        body: JSON.stringify({ providerId }) 
       })
       if (res.ok) {
         const data = await res.json()
         toast({
-          title: "Mise à jour terminée",
-          description: data?.results ? `${data.results.added} nouvelles, ${data.results.updated} mises à jour.` : "Synchronisation effectuée.",
+          title: "Synchronisation terminée",
+          description: data?.results ? `${data.results.added} nouvelles, ${data.results.updated} mises à jour.` : "Effectué.",
         })
         fetchData()
       }
@@ -167,6 +169,7 @@ export default function EscCollectionPage() {
       toast({ title: t("common.error"), variant: "destructive" })
     } finally {
       setSyncing(false)
+      setSyncingProviderId(null)
     }
   }
 
@@ -241,7 +244,16 @@ export default function EscCollectionPage() {
   }
 
   const handleBulkMove = async (newCategory: string) => {
+    if (!selectedIds.length && newCategory !== "new_category") {
+       toast({ title: "Sélection requise", description: "Veuillez sélectionner des skills à déplacer.", variant: "destructive" })
+       return
+    }
+
     if (newCategory === "new_category") {
+      if (!selectedIds.length) {
+        toast({ title: "Action impossible", description: "Veuillez d'abord cocher des skills pour créer une nouvelle catégorie et les y déplacer.", variant: "destructive" })
+        return
+      }
       const name = prompt("Nom de la nouvelle catégorie :")
       if (!name) return
       newCategory = name
@@ -447,7 +459,7 @@ export default function EscCollectionPage() {
               Gérer Catégories
             </Button>
             <Button 
-              onClick={handleSync} 
+              onClick={() => handleSync()} 
               disabled={syncing}
               className="bg-orange-600 hover:bg-orange-700 text-white"
             >
@@ -921,8 +933,18 @@ export default function EscCollectionPage() {
                         <div className="text-[9px] text-neutral-500 truncate">{p.url}</div>
                       </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-                        <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-white" onClick={() => { setEditingProvider(p); setNewProvider({name: p.name, url: p.url}); }}>
-                          <RefreshCw className="w-3.5 h-3.5" />
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-7 w-7 text-orange-500 hover:bg-orange-500/10" 
+                          onClick={() => handleSync(p.id)}
+                          disabled={!!syncingProviderId || syncing}
+                          title="Synchroniser ce fournisseur"
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 ${syncingProviderId === p.id ? "animate-spin" : ""}`} />
+                        </Button>
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-white" title="Modifier" onClick={() => { setEditingProvider(p); setNewProvider({name: p.name, url: p.url}); }}>
+                          <ExternalLink className="w-3.5 h-3.5" />
                         </Button>
                         <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-red-500" onClick={() => handleDeleteProvider(p.id, p.url, "DELETE_ALL")}>
                           <Trash2 className="w-3.5 h-3.5" />

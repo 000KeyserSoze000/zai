@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json().catch(() => ({}))
-    const { url } = body
+    const { url, providerId } = body
 
     if (url) {
       logs.push(`Manual import requested for URL: ${url}`)
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return await handleGitHubBulkSync(logs)
+    return await handleGitHubBulkSync(logs, providerId)
 
   } catch (error) {
     console.error("[ESC Import] Error:", error)
@@ -245,11 +245,15 @@ async function handleGitHubBulkSyncByUrl(manifestUrl: string, baseUrl: string, l
   return results
 }
 
-async function handleGitHubBulkSync(logs: string[]) {
-  const providers = await (db as any).skillProvider.findMany({ where: { isActive: true } })
+async function handleGitHubBulkSync(logs: string[], providerId?: string) {
+  const where: any = { isActive: true }
+  if (providerId) where.id = providerId
+
+  const providers = await (db as any).skillProvider.findMany({ where })
   const finalResults = { added: 0, updated: 0, errors: 0 }
 
   if (providers.length === 0) {
+    if (providerId) throw new Error("Fournisseur introuvable ou inactif.")
     logs.push("No providers found in DB, using default.")
     const res = await handleGitHubBulkSyncByUrl(GITHUB_MANIFEST_URL, GITHUB_BASE_URL, logs)
     return NextResponse.json({ success: true, results: res, logs })
