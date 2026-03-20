@@ -168,8 +168,11 @@ export default function EscCollectionPage() {
     } catch (error) {
       toast({ title: t("common.error"), variant: "destructive" })
     } finally {
-      setSyncing(false)
-      setSyncingProviderId(null)
+      // Small delay to let the UI breathe and show completion
+      setTimeout(() => {
+        setSyncing(false)
+        setSyncingProviderId(null)
+      }, 500)
     }
   }
 

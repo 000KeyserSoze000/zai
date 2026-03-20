@@ -80,56 +80,56 @@ async function handleGitHubImport(url: string, logs: string[]) {
 async function syncGitHubTree(owner: string, repo: string, branch: string, rootPath: string, logs: string[], providerUrl: string, isSingle: boolean = false) {
   const results = { added: 0, updated: 0, errors: 0 }
   try {
-    // 1. Fetch entire tree (Single API call per provider/skill)
     const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`
     const treeRes = await fetch(treeUrl, { headers: { "Accept": "application/vnd.github.v3+json", "User-Agent": "Zai-ESC" }, cache: 'no-store' })
     if (!treeRes.ok) throw new Error(`GitHub API Error: ${treeRes.status}`)
     const treeData = await treeRes.json()
     if (!treeData.tree) return results
 
-    // 2. Identify skills (Directories containing a .md file)
-    const normalizedRoot = rootPath ? rootPath.replace(/\/$/, "") : ""
-    const skillGroups: Record<string, any[]> = {}
-    
+    // 1. Identify all SKILL.md files - these are our unique skill markers
+    const skillMarkers = treeData.tree.filter((item: any) => 
+      item.type === "blob" && 
+      item.path.startsWith(rootPath ? rootPath.replace(/\/$/, "") + "/" : "") &&
+      (item.path.toLowerCase().endsWith("skill.md") || item.path.toLowerCase().endsWith("compétence.md"))
+    )
+
+    logs.push(`Found ${skillMarkers.length} unique skills markers in tree.`)
+
+    // 2. Group all files by their parent directory
+    const folderGroups: Record<string, any[]> = {}
     for (const item of treeData.tree) {
       if (item.type !== "blob") continue
-      if (normalizedRoot && !item.path.startsWith(normalizedRoot + "/")) continue
-      
-      const relPath = normalizedRoot ? item.path.substring(normalizedRoot.length + 1) : item.path
-      const parts = relPath.split('/')
-      if (parts.length < (isSingle ? 1 : 2)) continue // In single mode, files at root are OK
-      
-      const skillId = isSingle ? "target" : parts[0]
-      if (!skillGroups[skillId]) skillGroups[skillId] = []
-      skillGroups[skillId].push(item)
+      const parentDir = item.path.substring(0, item.path.lastIndexOf('/')) || ""
+      if (!folderGroups[parentDir]) folderGroups[parentDir] = []
+      folderGroups[parentDir].push(item)
     }
 
-    logs.push(`Found ${Object.keys(skillGroups).length} skill folders. Fetching contents...`)
-
-    // 3. Process groups
-    for (const [slugPrefix, items] of Object.entries(skillGroups)) {
+    // 3. Process only directories that contain a skill marker
+    for (const marker of skillMarkers) {
       try {
-        const leafFiles: Record<string, string> = {}
+        const folderPath = marker.path.substring(0, marker.path.lastIndexOf('/')) || ""
+        const items = folderGroups[folderPath] || [marker]
+        
         let mainContent = ""
-        let actualSlug = isSingle ? rootPath.split('/').pop() || repo : slugPrefix
+        const leafFiles: Record<string, string> = {}
+        // Use full path for slug to avoid collisions (e.g. social-media/instagram vs ad-gen/instagram)
+        const actualSlug = folderPath.replace(/\//g, "-").toLowerCase() || repo.toLowerCase()
+        const displayName = folderPath.split('/').pop() || actualSlug
 
         for (const item of items) {
           const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${item.path}`
-          const content = await fetchFileContent(rawUrl) // RAW FETCH: NO RATE LIMIT
+          const content = await fetchFileContent(rawUrl)
           if (content) {
             const fileName = item.path.split('/').pop() || "file"
             leafFiles[fileName] = content
-            if (fileName.toLowerCase().endsWith("skill.md") || (fileName.toLowerCase().endsWith(".md") && !mainContent)) {
-              mainContent = content
-              if (!isSingle) actualSlug = item.path.split('/').slice(-2, -1)[0] || slugPrefix
-            }
+            if (item.path === marker.path) mainContent = content
           }
         }
 
         if (mainContent) {
           const data = {
-            name: extractSkillName(mainContent, actualSlug),
-            slug: actualSlug.toLowerCase(),
+            name: extractSkillName(mainContent, displayName),
+            slug: actualSlug,
             promptContent: mainContent,
             files: leafFiles,
             source: "github",

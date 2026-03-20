@@ -36,17 +36,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Name and URL are required" }, { status: 400 })
     }
 
+    const cleanUrl = url.replace(/\/$/, "")
     if (id) {
       // Update
       const provider = await (db as any).skillProvider.update({
         where: { id },
-        data: { name, url, type, isActive }
+        data: { name, url: cleanUrl, type, isActive }
       })
       return NextResponse.json(provider)
     } else {
       // Create
       const provider = await (db as any).skillProvider.create({
-        data: { name, url, type: type || "GITHUB_REPO", isActive: isActive ?? true }
+        data: { name, url: cleanUrl, type: type || "GITHUB_REPO", isActive: isActive ?? true }
       })
       return NextResponse.json(provider)
     }

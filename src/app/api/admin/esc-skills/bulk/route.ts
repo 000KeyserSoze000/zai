@@ -33,8 +33,14 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === "DELETE_BY_PROVIDER" && providerUrl) {
+      const cleanUrl = providerUrl.replace(/\/$/, "")
       const result = await (db as any).escSkill.deleteMany({
-        where: { providerUrl }
+        where: { 
+          OR: [
+            { providerUrl: cleanUrl },
+            { providerUrl: cleanUrl + "/" }
+          ]
+        }
       })
       return NextResponse.json({ success: true, count: result.count })
     }
