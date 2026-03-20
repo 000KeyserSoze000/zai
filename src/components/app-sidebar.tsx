@@ -83,14 +83,17 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   const NAV_ITEMS = isAdmin ? ADMIN_NAV_ITEMS : CLIENT_NAV_ITEMS
 
   const getActiveSection = () => {
-    if (pathname === "/" || pathname === "/admin") return "dashboard"
+    // Exact matches or specific prefixes first
     if (pathname.startsWith("/admin/users")) return "users"
     if (pathname.startsWith("/admin/subscriptions")) return "subscriptions"
+    if (pathname.startsWith("/admin/orchestrator")) return "orchestrator"
     if (pathname.startsWith("/command-center")) return "command-center"
-    if (pathname.startsWith("/orchestrator")) return "orchestrator"
     if (pathname.startsWith("/library")) return "library"
     if (pathname.startsWith("/analytics")) return "analytics"
+    if (pathname.startsWith("/settings/profile")) return "business-profile"
     if (pathname.startsWith("/settings")) return "settings"
+    if (pathname === "/" || pathname === "/admin") return "dashboard"
+    
     return "dashboard"
   }
 
@@ -102,10 +105,11 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     if (pathname.startsWith("/admin/subscriptions")) return t("nav.subscriptions")
     if (pathname.startsWith("/command-center/content-studio")) return t("nav.contentStudio")
     if (pathname.startsWith("/command-center")) return t("nav.commandCenter")
-    if (pathname.startsWith("/orchestrator")) return t("nav.orchestrator")
+    if (pathname.startsWith("/admin/orchestrator")) return t("nav.orchestrator")
     if (pathname.startsWith("/library")) return t("nav.library")
     if (pathname.startsWith("/analytics")) return t("nav.analytics")
     if (pathname.startsWith("/subscription")) return t("nav.mySubscription")
+    if (pathname.startsWith("/settings/profile")) return t("nav.businessProfile")
     if (pathname.startsWith("/settings")) return t("nav.settings")
     return isAdmin ? t("nav.dashboard") : t("nav.mySpace")
   }
