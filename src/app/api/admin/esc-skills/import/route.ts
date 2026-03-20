@@ -145,23 +145,28 @@ async function handleGitHubImport(url: string, logs: string[]) {
 
   logs.push(`Total files imported: ${Object.keys(files).join(", ")}`)
 
-  const skillContent = files["SKILL.md"] || files["COMPÉTENCE.md"] || Object.values(files)[0]
+  // Find the skill definition file (insensitively)
+  const skillFileName = Object.keys(files).find(f => f.toLowerCase() === "skill.md" || f.toLowerCase() === "compétence.md")
+  const skillContent = skillFileName ? files[skillFileName] : Object.values(files)[0]
   
-  // Extract name: Skip frontmatter if present
+  // Extract name: Skip lines until we find a heading or a non-empty line outside frontmatter
   const lines = skillContent.split("\n")
-  let nameLine = lines[0]
-  if (nameLine.trim() === "---") {
-    // Look for first non-empty line after the frontmatter
-    let inFrontmatter = true
-    for (let i = 1; i < lines.length; i++) {
-       if (lines[i].trim() === "---") { inFrontmatter = false; continue; }
-       if (!inFrontmatter && lines[i].trim() !== "") {
-          nameLine = lines[i]
-          break
-       }
+  let nameLine = ""
+  let inFrontmatter = false
+  
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim()
+    if (trimmed === "---") {
+      inFrontmatter = !inFrontmatter
+      continue
+    }
+    if (!inFrontmatter && trimmed !== "" && !trimmed.startsWith("---")) {
+      nameLine = lines[i]
+      break
     }
   }
-  const name = nameLine.replace("#", "").trim() || path.split("/").pop() || repo
+  
+  const name = nameLine ? nameLine.replace(/^#+\s*/, "").replace(/^[*-]\s*/, "").replace(/[*:].*$/, "").trim() : (path.split("/").pop() || repo)
   const slug = path.split("/").pop() || repo.toLowerCase()
 
   const data = {
