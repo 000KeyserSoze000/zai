@@ -51,3 +51,6 @@ server.log
 /skills/
 # Dev scripts output
 .zscripts/
+/tmp/
+/backups/
+BACKUP_TOTAL_*
