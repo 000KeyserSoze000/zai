@@ -8,6 +8,38 @@ const GITHUB_BASE_URL = "https://raw.githubusercontent.com/guilhermemarketing/es
 export const dynamic = 'force-dynamic'
 
 /**
+ * Helper to extract skill name from content, skipping comments and frontmatter
+ */
+function extractSkillName(content: string, fallback: string): string {
+  const lines = content.split("\n")
+  let inFrontmatter = false
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim()
+    if (!line) continue
+    
+    // Skip frontmatter
+    if (line === "---") {
+      inFrontmatter = !inFrontmatter
+      continue
+    }
+    if (inFrontmatter) continue
+
+    // Skip HTML Comments
+    if (line.startsWith("<!--")) continue
+
+    // Skip other metadata markers [KEY]: VALUE
+    if (/^\[.*\]:/.test(line)) continue
+
+    // We found the first real content line!
+    // Strip Markdown heading markers #
+    return line.replace(/^#+\s*/, "").replace(/^[*-]\s*/, "").replace(/[*:].*$/, "").trim()
+  }
+  
+  return fallback
+}
+
+/**
  * POST /api/admin/esc-skills/import
  */
 export async function POST(request: NextRequest) {
@@ -94,15 +126,11 @@ async function fetchGitHubDirectory(owner: string, repo: string, branch: string,
           logs.push(`- Allowing file: ${item.name}`)
           const content = await fetchFileContent(item.download_url || item.url)
           if (content) {
-            // Keep relative structure from the starting scan path
             const suffix = item.path.includes(path + "/") ? item.path.split(path + "/")[1] : item.name
             files[suffix] = content
           }
-        } else {
-          logs.push(`- Skipping file (ext not allowed): ${item.name}`)
         }
       } else if (item.type === "dir" && depth < 1) {
-        // Only go one level deeper (depth limit)
         const subFiles = await fetchGitHubDirectory(owner, repo, branch, item.path, logs, depth + 1)
         Object.assign(files, subFiles)
       }
@@ -115,7 +143,6 @@ async function fetchGitHubDirectory(owner: string, repo: string, branch: string,
 }
 
 async function handleGitHubImport(url: string, logs: string[]) {
-  // Clean URL (remove trailing junk like ) or \ from scraped HTML)
   const cleanUrl = url.replace(/[\\\)\]"'].*$/, "").split("?")[0].replace(/\/$/, "")
   logs.push(`Cleaned GitHub URL: ${cleanUrl}`)
   
@@ -138,35 +165,14 @@ async function handleGitHubImport(url: string, logs: string[]) {
   }
 
   const files = await fetchGitHubDirectory(owner, repo, branch, path, logs)
-  
-  if (Object.keys(files).length === 0) {
-    throw new Error("Aucun fichier valide identifié.")
-  }
+  if (Object.keys(files).length === 0) throw new Error("Aucun fichier valide identifié.")
 
   logs.push(`Total files imported: ${Object.keys(files).join(", ")}`)
 
-  // Find the skill definition file (insensitively)
   const skillFileName = Object.keys(files).find(f => f.toLowerCase() === "skill.md" || f.toLowerCase() === "compétence.md")
   const skillContent = skillFileName ? files[skillFileName] : Object.values(files)[0]
   
-  // Extract name: Skip lines until we find a heading or a non-empty line outside frontmatter
-  const lines = skillContent.split("\n")
-  let nameLine = ""
-  let inFrontmatter = false
-  
-  for (let i = 0; i < lines.length; i++) {
-    const trimmed = lines[i].trim()
-    if (trimmed === "---") {
-      inFrontmatter = !inFrontmatter
-      continue
-    }
-    if (!inFrontmatter && trimmed !== "" && !trimmed.startsWith("---")) {
-      nameLine = lines[i]
-      break
-    }
-  }
-  
-  const name = nameLine ? nameLine.replace(/^#+\s*/, "").replace(/^[*-]\s*/, "").replace(/[*:].*$/, "").trim() : (path.split("/").pop() || repo)
+  const name = extractSkillName(skillContent, path.split("/").pop() || repo)
   const slug = path.split("/").pop() || repo.toLowerCase()
 
   const data = {
@@ -203,9 +209,9 @@ async function handleSmitheryImport(url: string, logs: string[]) {
   return handleGitHubImport(bestUrl, logs)
 }
 
-async function handleGitHubBulkSync(logs: string[]) {
-  const manifestRes = await fetch(GITHUB_MANIFEST_URL, { cache: 'no-store' })
-  if (!manifestRes.ok) throw new Error("Impossible de récupérer le manifeste")
+async function handleGitHubBulkSyncByUrl(manifestUrl: string, baseUrl: string, logs: string[]) {
+  const manifestRes = await fetch(manifestUrl, { cache: 'no-store' })
+  if (!manifestRes.ok) throw new Error(`Impossible de récupérer le manifeste à ${manifestUrl}`)
   
   const manifest = await manifestRes.json()
   const skillEntries = Object.entries(manifest.skills || {})
@@ -214,15 +220,15 @@ async function handleGitHubBulkSync(logs: string[]) {
   for (const [slug, skillInfo] of skillEntries) {
     try {
       const { path, version, category } = skillInfo as any
-      const skillMdUrl = `${GITHUB_BASE_URL}/${path}`
+      const skillMdUrl = `${baseUrl}/${path}`
       const content = await fetchFileContent(skillMdUrl)
       if (!content) continue
       
-      const name = content.substring(0, 50).split("\n")[0].replace("#", "").trim()
+      const name = extractSkillName(content, slug)
       const data = {
         name, slug, version: version || "1.0.0", category: category || "general", 
         promptContent: content, source: "github", 
-        providerUrl: `https://github.com/guilhermemarketing/esc-skills/tree/main/${path}`,
+        providerUrl: `${baseUrl}/${path}`,
         isActive: false, files: { "SKILL.md": content }
       }
 
@@ -236,6 +242,35 @@ async function handleGitHubBulkSync(logs: string[]) {
       }
     } catch (err) { results.errors++ }
   }
+  return results
+}
 
-  return NextResponse.json({ success: true, results, logs })
+async function handleGitHubBulkSync(logs: string[]) {
+  const providers = await (db as any).skillProvider.findMany({ where: { isActive: true } })
+  const finalResults = { added: 0, updated: 0, errors: 0 }
+
+  if (providers.length === 0) {
+    logs.push("No providers found in DB, using default.")
+    const res = await handleGitHubBulkSyncByUrl(GITHUB_MANIFEST_URL, GITHUB_BASE_URL, logs)
+    return NextResponse.json({ success: true, results: res, logs })
+  }
+
+  for (const provider of providers) {
+    try {
+      logs.push(`Syncing from provider: ${provider.name} (${provider.url})`)
+      // Convert github.com URL to raw.githubusercontent.com
+      const baseUrl = provider.url.replace("github.com", "raw.githubusercontent.com").replace("/tree/", "/").replace("/blob/", "/")
+      const manifestUrl = baseUrl + "/manifest.json"
+      
+      const res = await handleGitHubBulkSyncByUrl(manifestUrl, baseUrl, logs)
+      finalResults.added += res.added
+      finalResults.updated += res.updated
+      finalResults.errors += res.errors
+    } catch (err: any) {
+      logs.push(`Error syncing ${provider.name}: ${err.message}`)
+      finalResults.errors++
+    }
+  }
+
+  return NextResponse.json({ success: true, results: finalResults, logs })
 }

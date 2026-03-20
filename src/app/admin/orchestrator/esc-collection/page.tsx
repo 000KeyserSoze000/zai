@@ -91,6 +91,14 @@ export default function EscCollectionPage() {
   // Category Manager
   const [showCategoryDialog, setShowCategoryDialog] = useState(false)
   const [editingCategory, setEditingCategory] = useState<{oldName: string, newName: string} | null>(null)
+  const [newCategoryName, setNewCategoryName] = useState("")
+
+  // Provider Manager
+  const [providers, setProviders] = useState<any[]>([])
+  const [showProviderDialog, setShowProviderDialog] = useState(false)
+  const [editingProvider, setEditingProvider] = useState<any>(null)
+  const [newProvider, setNewProvider] = useState({ name: "", url: "" })
+  const [savingProvider, setSavingProvider] = useState(false)
 
   const { toast } = useToast()
   const { t } = useTranslation()
@@ -120,6 +128,13 @@ export default function EscCollectionPage() {
     }
   }
 
+  const fetchProviders = async () => {
+    try {
+      const res = await fetch("/api/admin/esc-skills/providers")
+      if (res.ok) setProviders(await res.json())
+    } catch (err) { console.error(err) }
+  }
+
   const handleSync = async () => {
     setSyncing(true)
     try {
@@ -128,9 +143,10 @@ export default function EscCollectionPage() {
         body: JSON.stringify({}) // Bulk sync
       })
       if (res.ok) {
+        const data = await res.json()
         toast({
-          title: t("common.success"),
-          description: `Synchronisation terminée.`,
+          title: "Mise à jour terminée",
+          description: `${data.results.added} nouvelles, ${data.results.updated} mises à jour.`,
         })
         fetchData()
       }
@@ -139,6 +155,42 @@ export default function EscCollectionPage() {
     } finally {
       setSyncing(false)
     }
+  }
+
+  const handleSaveProvider = async () => {
+    if (!newProvider.name || !newProvider.url) return
+    setSavingProvider(true)
+    try {
+      const res = await fetch("/api/admin/esc-skills/providers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingProvider ? { ...newProvider, id: editingProvider.id } : newProvider),
+      })
+      if (res.ok) {
+        toast({ title: "Enregistré", description: "Fournisseur mis à jour." })
+        setNewProvider({ name: "", url: "" })
+        setEditingProvider(null)
+        fetchProviders()
+      } else {
+        const err = await res.json()
+        toast({ title: "Erreur", description: err.error, variant: "destructive" })
+      }
+    } catch (err) {
+      toast({ title: "Erreur", variant: "destructive" })
+    } finally {
+      setSavingProvider(false)
+    }
+  }
+
+  const handleDeleteProvider = async (id: string) => {
+    if (!confirm("Retirer ce fournisseur ?")) return
+    try {
+      const res = await fetch(`/api/admin/esc-skills/providers?id=${id}`, { method: "DELETE" })
+      if (res.ok) {
+        toast({ title: "Supprimé" })
+        fetchProviders()
+      }
+    } catch (err) { toast({ title: "Erreur", variant: "destructive" }) }
   }
 
   const handleBulkDelete = async () => {
@@ -285,6 +337,7 @@ export default function EscCollectionPage() {
 
   useEffect(() => {
     fetchData()
+    fetchProviders()
   }, [])
 
   const filteredSkills = skills.filter(s => {
@@ -324,7 +377,15 @@ export default function EscCollectionPage() {
             <p className="text-neutral-400 text-sm">Gérez et activez les compétences IA haute performance</p>
           </div>
           
-          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+            <Button 
+              onClick={() => setShowProviderDialog(true)}
+              variant="outline"
+              className="border-neutral-800 text-neutral-400 hover:text-white"
+            >
+              <Box className="w-4 h-4 mr-2" />
+              Gérer Fournisseurs
+            </Button>
             <Button 
               onClick={() => setShowCategoryDialog(true)}
               variant="outline"
@@ -721,16 +782,111 @@ export default function EscCollectionPage() {
           </DialogContent>
         </Dialog>
 
+        {/* Provider Management Dialog */}
+        <Dialog open={showProviderDialog} onOpenChange={setShowProviderDialog}>
+          <DialogContent className="bg-neutral-900 border-neutral-800 text-white max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Box className="w-5 h-5 text-orange-500" />
+                Gérer les Fournisseurs de Skills
+              </DialogTitle>
+              <DialogDescription className="text-neutral-400">
+                Ajoutez des dépôts GitHub ou des URLs pour synchroniser automatiquement vos bibliothèques.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+              {/* Form */}
+              <div className="space-y-4 border-r border-neutral-800 pr-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase font-bold text-neutral-500">Nom du Fournisseur</label>
+                  <Input 
+                    placeholder="Ex: Skills Officiels" 
+                    className="bg-neutral-950 border-neutral-800"
+                    value={newProvider.name}
+                    onChange={(e) => setNewProvider({...newProvider, name: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase font-bold text-neutral-500">URL GitHub (Repo ou Folder)</label>
+                  <Input 
+                    placeholder="https://github.com/..." 
+                    className="bg-neutral-950 border-neutral-800"
+                    value={newProvider.url}
+                    onChange={(e) => setNewProvider({...newProvider, url: e.target.value})}
+                  />
+                </div>
+                <Button 
+                  className="w-full bg-orange-600 hover:bg-orange-700"
+                  disabled={savingProvider || !newProvider.name || !newProvider.url}
+                  onClick={handleSaveProvider}
+                >
+                  {savingProvider ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlusCircle className="w-4 h-4 mr-2" />}
+                  {editingProvider ? "Mettre à jour" : "Ajouter le Fournisseur"}
+                </Button>
+                {editingProvider && (
+                  <Button variant="ghost" className="w-full text-neutral-500" onClick={() => { setEditingProvider(null); setNewProvider({name:"", url:""}); }}>
+                    Annuler l'édition
+                  </Button>
+                )}
+              </div>
+
+              {/* List */}
+              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                <div className="text-[10px] uppercase font-bold text-neutral-500 mb-2">Fournisseurs Actifs</div>
+                {providers.length === 0 ? (
+                  <p className="text-[10px] text-neutral-600 italic">Aucun fournisseur personnalisé. Le système utilise les skills officiels par défaut.</p>
+                ) : (
+                  providers.map(p => (
+                    <div key={p.id} className="p-3 rounded-lg bg-neutral-950/50 border border-neutral-800 flex items-center justify-between group">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-bold text-white truncate">{p.name}</div>
+                        <div className="text-[9px] text-neutral-500 truncate">{p.url}</div>
+                      </div>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-white" onClick={() => { setEditingProvider(p); setNewProvider({name: p.name, url: p.url}); }}>
+                          <RefreshCw className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-neutral-500 hover:text-red-500" onClick={() => handleDeleteProvider(p.id)}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowProviderDialog(false)} className="border-neutral-800">Fermer</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Category Management Dialog */}
         <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
           <DialogContent className="bg-neutral-900 border-neutral-800 text-white max-w-md">
             <DialogHeader>
               <DialogTitle>Gérer les Catégories</DialogTitle>
               <DialogDescription className="text-neutral-400">
-                Modifiez ou supprimez des catégories entières.
+                Modifiez, renommez ou créez de nouvelles catégories.
               </DialogDescription>
             </DialogHeader>
             <div className="py-4 space-y-4 max-h-[400px] overflow-y-auto pr-2">
+              <div className="flex items-center gap-2 mb-4 p-2 bg-orange-500/5 border border-orange-500/20 rounded-lg">
+                <Input 
+                  placeholder="Nouvelle catégorie..." 
+                  className="bg-neutral-950 border-neutral-800 h-8 text-xs"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleBulkMove(newCategoryName)}
+                />
+                <Button size="sm" className="bg-orange-600 hover:bg-orange-700 h-8" onClick={() => handleBulkMove(newCategoryName)}>
+                  <PlusCircle className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+
+              <div className="text-[10px] uppercase font-bold text-neutral-500 mb-2">Catégories Existantes</div>
               {categories.map(cat => (
                 <div key={cat} className="flex items-center gap-2 p-2 rounded-lg bg-neutral-950/50 border border-neutral-800 group">
                    <div className="flex-1">

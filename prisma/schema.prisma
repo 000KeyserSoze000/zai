@@ -581,3 +581,15 @@ model EscSkill {
 
   @@map("esc_skills")
 }
+
+model SkillProvider {
+  id        String   @id @default(cuid())
+  name      String
+  url       String   @unique
+  type      String   @default("GITHUB_REPO") // GITHUB_REPO, GITHUB_FILE, SMITHERY
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("esc_skill_providers")
+}
