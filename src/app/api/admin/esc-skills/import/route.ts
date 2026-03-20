@@ -361,18 +361,32 @@ async function handleGitHubFolderSync(owner: string, repo: string, branch: strin
     // 2. Identify skills (folders under rootPath that contain a .md file)
     const skillsMap: Record<string, { files: any[], name: string }> = {}
     
-    for (const item of treeData.tree) {
-      if (item.type === "blob" && item.path.startsWith(rootPath + "/")) {
-        const relativePath = item.path.substring(rootPath.length + 1)
-        const parts = relativePath.split('/')
-        if (parts.length < 2) continue // Skip files at root of skills folder itself
+    logs.push(`Analyzing tree with ${treeData.tree.length} items. Root path: "${rootPath}"`)
 
-        const skillId = parts[0] // Subdirectory name
-        if (!skillsMap[skillId]) skillsMap[skillId] = { files: [], name: skillId }
+    for (const item of treeData.tree) {
+      if (item.type === "blob") {
+        let relativePath = ""
+        if (!rootPath || rootPath === "") {
+          relativePath = item.path
+        } else if (item.path.startsWith(rootPath + "/")) {
+          relativePath = item.path.substring(rootPath.length + 1)
+        } else {
+          continue
+        }
+
+        const parts = relativePath.split('/')
+        if (parts.length < 2) continue 
+
+        const skillId = parts[0]
+        if (!skillsMap[skillId]) {
+          skillsMap[skillId] = { files: [], name: skillId }
+        }
         
         skillsMap[skillId].files.push(item)
       }
     }
+
+    logs.push(`Found ${Object.keys(skillsMap).length} potential skills in tree.`)
 
     // 3. Process each found skill
     for (const [slug, data] of Object.entries(skillsMap)) {
