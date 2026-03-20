@@ -309,7 +309,7 @@ export default function AdminSkillsPage() {
         <Dialog open={createDialog || editDialog} onOpenChange={(open) => {
           if (!open) { setCreateDialog(false); setEditDialog(false); setSelectedFile("SKILL.md"); }
         }}>
-          <DialogContent className="bg-neutral-900 border-neutral-700 max-w-5xl overflow-y-auto max-h-[95vh] no-scrollbar">
+          <DialogContent className="bg-neutral-900 border-neutral-700 max-w-[1400px] w-[95vw] overflow-y-auto max-h-[95vh] no-scrollbar">
             <DialogHeader>
               <DialogTitle className="text-white flex items-center gap-2">
                 <Zap className="w-5 h-5 text-orange-500" />
@@ -320,9 +320,9 @@ export default function AdminSkillsPage() {
               </DialogDescription>
             </DialogHeader>
             
-            <div className="grid grid-cols-12 gap-6 py-4">
+            <div className="grid grid-cols-12 gap-8 py-4">
               {/* Left Column: Basic Info & Prompt */}
-              <div className="col-span-8 space-y-4">
+              <div className="col-span-9 space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                    <div className="space-y-2">
                     <Label className="text-neutral-300">{t("orchestrator.skillsPage.formName")}</Label>
@@ -346,11 +346,11 @@ export default function AdminSkillsPage() {
                   </div>
                 </div>
 
-                  <div className="flex flex-col md:flex-row gap-0 border border-neutral-700 rounded-lg overflow-hidden bg-neutral-900/50">
+                  <div className="flex flex-col md:flex-row gap-0 border border-neutral-700 rounded-lg overflow-hidden bg-neutral-900/50 min-h-[600px]">
                     {/* File Explorer for Bundles */}
                     {form.files && Object.keys(form.files).length > 0 && (
-                      <div className="w-full md:w-56 border-r border-neutral-700 bg-neutral-900/30 p-2 overflow-y-auto max-h-[500px] flex-shrink-0">
-                        <div className="text-[10px] uppercase font-bold text-neutral-500 mb-3 px-2 tracking-wider flex items-center gap-2">
+                      <div className="w-full md:w-52 border-r border-neutral-700 bg-neutral-900/30 p-3 overflow-y-auto max-h-[600px] flex-shrink-0">
+                        <div className="text-[10px] uppercase font-bold text-neutral-500 mb-4 px-2 tracking-widest flex items-center gap-2">
                           <Zap className="w-3 h-3" /> Bundle Files
                         </div>
                         <div className="space-y-1">
@@ -406,7 +406,7 @@ export default function AdminSkillsPage() {
                             });
                           }
                         }}
-                        className="bg-transparent border-none text-white min-h-[500px] font-mono text-[12px] leading-relaxed p-4 resize-none focus-visible:ring-0"
+                        className="bg-transparent border-none text-white min-h-[600px] font-mono text-[13px] lg:text-[14px] leading-relaxed p-6 resize-none focus-visible:ring-0"
                         placeholder={t("orchestrator.skillsPage.formPromptPlaceholder")}
                       />
                     </div>
@@ -414,7 +414,7 @@ export default function AdminSkillsPage() {
                 </div>
 
               {/* Right Column: Config & Schema */}
-              <div className="col-span-4 space-y-6">
+              <div className="col-span-3 space-y-6">
                 <div className="space-y-2">
                   <Label className="text-neutral-300">{t("orchestrator.skillsPage.formAgent")}</Label>
                   <Select value={form.agentId} onValueChange={(v) => setForm({ ...form, agentId: v })}>
