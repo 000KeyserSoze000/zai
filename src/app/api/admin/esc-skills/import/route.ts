@@ -44,20 +44,20 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function fetchGitHubFile(owner: string, repo: string, branch: string, path: string) {
-  const url = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`
+async function fetchFileContent(url: string) {
   const res = await fetch(url, { cache: 'no-store' })
   if (!res.ok) return null
   return await res.text()
 }
 
-async function fetchGitHubDirectory(owner: string, repo: string, branch: string, path: string, depth = 0): Promise<Record<string, string>> {
+async function fetchGitHubDirectory(owner: string, repo: string, branch: string, path: string, logs: string[], depth = 0): Promise<Record<string, string>> {
   if (depth > 2) return {} 
   
   const files: Record<string, string> = {}
   const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`
   
   try {
+    logs.push(`Listing directory [depth=${depth}]: ${path || '(root)'}`)
     const res = await fetch(apiUrl, {
       headers: {
         "Accept": "application/vnd.github.v3+json",
@@ -67,37 +67,48 @@ async function fetchGitHubDirectory(owner: string, repo: string, branch: string,
     })
     
     if (!res.ok) {
-      const content = await fetchGitHubFile(owner, repo, branch, path)
+      logs.push(`API List failed (${res.status}). Falling back to single file fetch for path: ${path}`)
+      const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`
+      const content = await fetchFileContent(rawUrl)
       if (content) files[path.split("/").pop() || "SKILL.md"] = content
       return files
     }
 
     const items = await res.json()
     if (!Array.isArray(items)) {
-      const content = await fetchGitHubFile(owner, repo, branch, path)
+      logs.push(`Not a directory. Fetching single file: ${path}`)
+      const downloadUrl = items.download_url || `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`
+      const content = await fetchFileContent(downloadUrl)
       if (content) files[path.split("/").pop() || "SKILL.md"] = content
       return files
     }
 
+    logs.push(`Found ${items.length} items in ${path || 'root'}`)
+
     for (const item of items) {
       if (item.type === "file") {
-        const ext = item.name.split(".").pop()?.toLowerCase()
+        const ext = item.name.split(".").pop()?.toLowerCase() || ""
         const allowed = ["md", "txt", "json", "js", "ts", "yml", "yaml", "xml", "csv", "py", "sh", "sql", "css", "html"]
-        if (allowed.includes(ext || "")) {
-          const content = await fetchGitHubFile(owner, repo, branch, item.path)
+        
+        if (allowed.includes(ext)) {
+          logs.push(`- Allowing file: ${item.name}`)
+          const content = await fetchFileContent(item.download_url || item.url)
           if (content) {
-            // Use relative path from the initial starting path
-            const relativePath = item.path.split(path + "/").pop() || item.name
-            files[relativePath] = content
+            // Keep relative structure from the starting scan path
+            const suffix = item.path.includes(path + "/") ? item.path.split(path + "/")[1] : item.name
+            files[suffix] = content
           }
+        } else {
+          logs.push(`- Skipping file (ext not allowed): ${item.name}`)
         }
       } else if (item.type === "dir" && depth < 1) {
-        const subFiles = await fetchGitHubDirectory(owner, repo, branch, item.path, depth + 1)
+        // Only go one level deeper (depth limit)
+        const subFiles = await fetchGitHubDirectory(owner, repo, branch, item.path, logs, depth + 1)
         Object.assign(files, subFiles)
       }
     }
-  } catch (error) {
-    console.error("Error fetching directory:", error)
+  } catch (error: any) {
+    logs.push(`Error in fetchGitHubDirectory: ${error.message}`)
   }
   
   return files
@@ -106,12 +117,11 @@ async function fetchGitHubDirectory(owner: string, repo: string, branch: string,
 async function handleGitHubImport(url: string, logs: string[]) {
   // Clean URL (remove trailing junk like ) or \ from scraped HTML)
   const cleanUrl = url.replace(/[\\\)\]"'].*$/, "").split("?")[0].replace(/\/$/, "")
+  logs.push(`Cleaned GitHub URL: ${cleanUrl}`)
   
-  // Format 1: https://github.com/user/repo/tree/branch/path (Directory)
-  // Format 2: https://github.com/user/repo/blob/branch/path (File)
   const treeMatch = cleanUrl.match(/github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/(.+)/)
   const blobMatch = cleanUrl.match(/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+)/)
-  const rootMatch = cleanUrl.match(/github\.com\/([^/]+)\/([^/]+)$/) // No path, assume main/root
+  const rootMatch = cleanUrl.match(/github\.com\/([^/]+)\/([^/]+)$/)
   
   let owner, repo, branch, path: string
   
@@ -124,15 +134,16 @@ async function handleGitHubImport(url: string, logs: string[]) {
     branch = "main"
     path = ""
   } else {
-    throw new Error(`URL GitHub invalide: ${cleanUrl}. Utilisez un lien vers un dossier (tree) ou un fichier (blob).`)
+    throw new Error(`URL GitHub invalide: ${cleanUrl}`)
   }
 
-  logs.push(`Starting recursive scan for ${owner}/${repo} at ${path} (${branch})`)
-  const files = await fetchGitHubDirectory(owner, repo, branch, path)
+  const files = await fetchGitHubDirectory(owner, repo, branch, path, logs)
   
   if (Object.keys(files).length === 0) {
-    throw new Error(`Aucun fichier texte pertinent trouvé. Vérifiez que le chemin '${path}' est correct sur la branche '${branch}'.`)
+    throw new Error("Aucun fichier valide identifié.")
   }
+
+  logs.push(`Total files imported: ${Object.keys(files).join(", ")}`)
 
   const skillContent = files["SKILL.md"] || files["COMPÉTENCE.md"] || Object.values(files)[0]
   const name = skillContent.substring(0, 100).split("\n")[0].replace("#", "").trim() || path.split("/").pop() || repo
@@ -143,56 +154,36 @@ async function handleGitHubImport(url: string, logs: string[]) {
     isActive: true, category: "Importé", version: "1.0.0", icon: "Box", color: "blue"
   }
 
-  const result = await (db as any).escSkill.upsert({
+  await (db as any).escSkill.upsert({
     where: { slug },
     create: data,
     update: { ...data, updatedAt: new Date() }
   })
 
-  return NextResponse.json({ success: true, results: { added: 1, updated: 1 }, logs })
+  return NextResponse.json({ success: true, results: { added: 1, updated: 1, filesCount: Object.keys(files).length }, logs })
 }
 
 async function handleSmitheryImport(url: string, logs: string[]) {
-  logs.push(`Detecting GitHub repository from Smithery page...`)
   const res = await fetch(url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
+    headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" }
   })
   const html = await res.text()
   
-  if (html.includes("Vercel Security Checkpoint") || html.includes("cf-browser-verification")) {
-    throw new Error("L'importation Smithery est bloquée par une protection anti-robot. Veuillez copier le lien 'Repository' (GitHub) en bas à droite de la page Smithery et le coller ici directement.")
+  if (html.includes("Vercel Security Checkpoint")) {
+    throw new Error("Smithery bloque l'accès (Bot Detection). Utilisez le lien GitHub directement.")
   }
 
-  // Look for github.com links (handle escaped slashes too)
   const repoMatch = html.match(/https:\\?\/\\?\/github\.com\\?\/[^"']+/g)
-  if (!repoMatch) {
-    throw new Error("Impossible de trouver le dépôt GitHub sur cette page. Essayez de coller le lien GitHub directement.")
-  }
+  if (!repoMatch) throw new Error("Répertoire GitHub introuvable sur Smithery.")
 
-  // Clean the matches (remove \ slashes)
   const cleanedMatches = repoMatch.map(m => m.replace(/\\/g, ""))
-  
-  // Priority order: /tree/ > /blob/ > root
   const treeLinks = cleanedMatches.filter(m => m.includes("/tree/"))
-  const blobLinks = cleanedMatches.filter(m => m.includes("/blob/"))
-  
-  let bestUrl = ""
-  if (treeLinks.length > 0) {
-    bestUrl = treeLinks.reduce((a, b) => a.length > b.length ? a : b)
-  } else if (blobLinks.length > 0) {
-    bestUrl = blobLinks.reduce((a, b) => a.length > b.length ? a : b)
-  } else {
-    bestUrl = cleanedMatches.reduce((a, b) => a.length > b.length ? a : b)
-  }
+  const bestUrl = treeLinks.length > 0 ? treeLinks.reduce((a, b) => a.length > b.length ? a : b) : cleanedMatches.reduce((a, b) => a.length > b.length ? a : b)
 
-  logs.push(`Selected GitHub URL from Smithery: ${bestUrl}`)
   return handleGitHubImport(bestUrl, logs)
 }
 
 async function handleGitHubBulkSync(logs: string[]) {
-  logs.push(`Starting bulk manifest sync...`)
   const manifestRes = await fetch(GITHUB_MANIFEST_URL, { cache: 'no-store' })
   if (!manifestRes.ok) throw new Error("Impossible de récupérer le manifeste")
   
@@ -204,18 +195,15 @@ async function handleGitHubBulkSync(logs: string[]) {
     try {
       const { path, version, category } = skillInfo as any
       const skillMdUrl = `${GITHUB_BASE_URL}/${path}`
-      const skillMdRes = await fetch(skillMdUrl, { cache: 'no-store' })
-      if (!skillMdRes.ok) continue
+      const content = await fetchFileContent(skillMdUrl)
+      if (!content) continue
       
-      const promptContent = await skillMdRes.text()
-      const name = promptContent.substring(0, 50).split("\n")[0].replace("#", "").trim()
-      
+      const name = content.substring(0, 50).split("\n")[0].replace("#", "").trim()
       const data = {
-        name, slug, version: version || "1.0.0", 
-        category: category || "general", 
-        promptContent, source: "github", 
+        name, slug, version: version || "1.0.0", category: category || "general", 
+        promptContent: content, source: "github", 
         providerUrl: `https://github.com/guilhermemarketing/esc-skills/tree/main/${path}`,
-        isActive: false, files: { "SKILL.md": promptContent }
+        isActive: false, files: { "SKILL.md": content }
       }
 
       const existing = await (db as any).escSkill.findUnique({ where: { slug } })
