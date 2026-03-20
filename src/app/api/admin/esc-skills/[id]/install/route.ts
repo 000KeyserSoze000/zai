@@ -37,6 +37,7 @@ export async function POST(
           description: escSkill.description,
           promptTemplate: escSkill.promptContent,
           agentId: agentId,
+          files: escSkill.files,
           isActive: true
         }
       })
@@ -51,6 +52,7 @@ export async function POST(
           inputSchema: JSON.stringify({ "type": "object", "properties": { "text": { "type": "string" } } }),
           outputSchema: JSON.stringify({ "type": "object", "properties": { "result": { "type": "string" } } }),
           agentId: agentId,
+          files: escSkill.files,
           isActive: true,
           type: "GENERATION",
           version: 1

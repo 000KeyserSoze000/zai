@@ -39,6 +39,7 @@ interface Skill {
   isActive: boolean
   version: number
   agentId: string
+  files: any | null
   agent: Agent
   _count: { executions: number; tools: number }
 }
@@ -54,12 +55,13 @@ export default function AdminSkillsPage() {
   const [createDialog, setCreateDialog] = useState(false)
   const [deleteDialog, setDeleteDialog] = useState(false)
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null)
-  
   const [form, setForm] = useState({
     name: "", slug: "", description: "", type: "GENERATION",
     promptTemplate: "", inputSchema: "{}", outputSchema: "{}",
-    agentId: "", isActive: true
+    agentId: "", isActive: true,
+    files: null as any | null
   })
+  const [selectedFile, setSelectedFile] = useState<string>("SKILL.md")
 
   const fetchData = async () => {
     setLoading(true)
@@ -148,8 +150,10 @@ export default function AdminSkillsPage() {
       inputSchema: skill.inputSchema,
       outputSchema: skill.outputSchema,
       agentId: skill.agentId,
-      isActive: skill.isActive
+      isActive: skill.isActive,
+      files: skill.files
     })
+    setSelectedFile("SKILL.md")
     setEditDialog(true)
   }
 
@@ -157,8 +161,10 @@ export default function AdminSkillsPage() {
     setForm({
       name: "", slug: "", description: "", type: "GENERATION",
       promptTemplate: "", inputSchema: "{}", outputSchema: "{}",
-      agentId: agents[0]?.id || "", isActive: true
+      agentId: agents[0]?.id || "", isActive: true,
+      files: null
     })
+    setSelectedFile("SKILL.md")
     setCreateDialog(true)
   }
 
@@ -301,9 +307,9 @@ export default function AdminSkillsPage() {
 
         {/* Create/Edit Skill Dialog */}
         <Dialog open={createDialog || editDialog} onOpenChange={(open) => {
-          if (!open) { setCreateDialog(false); setEditDialog(false); }
+          if (!open) { setCreateDialog(false); setEditDialog(false); setSelectedFile("SKILL.md"); }
         }}>
-          <DialogContent className="bg-neutral-900 border-neutral-700 max-w-4xl overflow-y-auto max-h-[95vh] no-scrollbar">
+          <DialogContent className="bg-neutral-900 border-neutral-700 max-w-5xl overflow-y-auto max-h-[95vh] no-scrollbar">
             <DialogHeader>
               <DialogTitle className="text-white flex items-center gap-2">
                 <Zap className="w-5 h-5 text-orange-500" />
@@ -340,21 +346,61 @@ export default function AdminSkillsPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <Label className="text-neutral-300 flex items-center gap-2">
-                      <Code className="w-3 h-3" /> {t("orchestrator.skillsPage.formPromptTemplate")}
-                    </Label>
-                    <span className="text-[10px] text-neutral-500 font-mono">{t("orchestrator.skillsPage.formPromptHint")}</span>
+                  <div className="flex flex-col md:flex-row gap-4">
+                    {/* File Explorer for Bundles */}
+                    {form.files && Object.keys(form.files).length > 0 && (
+                      <div className="w-full md:w-48 border border-neutral-800 rounded-md bg-black/20 p-2 overflow-y-auto max-h-[400px]">
+                        <div className="text-[10px] uppercase font-bold text-neutral-500 mb-2 px-2">Bundle Files</div>
+                        {Object.keys(form.files).map(fileName => (
+                          <button
+                            key={fileName}
+                            type="button"
+                            onClick={() => setSelectedFile(fileName)}
+                            className={`w-full text-left px-3 py-1.5 text-[10px] rounded transition-colors mb-1 truncate ${
+                              selectedFile === fileName ? "bg-purple-600 text-white" : "text-neutral-400 hover:bg-neutral-800"
+                            }`}
+                          >
+                            {fileName}
+                          </button>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedFile("SKILL.md")}
+                          className={`w-full text-left px-3 py-1.5 text-[10px] rounded transition-colors ${
+                            selectedFile === "SKILL.md" ? "bg-purple-600 text-white" : "text-neutral-400 hover:bg-neutral-800"
+                          }`}
+                        >
+                          Main Prompt (SKILL.md)
+                        </button>
+                      </div>
+                    )}
+
+                    <div className="flex-1 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label className="text-neutral-300 flex items-center gap-2">
+                          <Code className="w-3 h-3" /> {selectedFile === "SKILL.md" ? t("orchestrator.skillsPage.formPromptTemplate") : `Contenu de ${selectedFile}`}
+                        </Label>
+                        <span className="text-[10px] text-neutral-500 font-mono">{t("orchestrator.skillsPage.formPromptHint")}</span>
+                      </div>
+                      <Textarea
+                        value={selectedFile === "SKILL.md" ? form.promptTemplate : (form.files?.[selectedFile] || "")}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (selectedFile === "SKILL.md") {
+                            setForm({ ...form, promptTemplate: val });
+                          } else {
+                            setForm({ 
+                              ...form, 
+                              files: { ...form.files, [selectedFile]: val } 
+                            });
+                          }
+                        }}
+                        className="bg-neutral-800 border-neutral-700 text-white min-h-[400px] font-mono text-[11px] leading-relaxed"
+                        placeholder={t("orchestrator.skillsPage.formPromptPlaceholder")}
+                      />
+                    </div>
                   </div>
-                  <Textarea
-                    value={form.promptTemplate}
-                    onChange={(e) => setForm({ ...form, promptTemplate: e.target.value })}
-                    className="bg-neutral-800 border-neutral-700 text-white min-h-[300px] font-mono text-xs leading-relaxed"
-                    placeholder={t("orchestrator.skillsPage.formPromptPlaceholder")}
-                  />
                 </div>
-              </div>
 
               {/* Right Column: Config & Schema */}
               <div className="col-span-4 space-y-6">

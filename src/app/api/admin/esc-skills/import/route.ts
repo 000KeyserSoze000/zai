@@ -146,7 +146,22 @@ async function handleGitHubImport(url: string, logs: string[]) {
   logs.push(`Total files imported: ${Object.keys(files).join(", ")}`)
 
   const skillContent = files["SKILL.md"] || files["COMPÉTENCE.md"] || Object.values(files)[0]
-  const name = skillContent.substring(0, 100).split("\n")[0].replace("#", "").trim() || path.split("/").pop() || repo
+  
+  // Extract name: Skip frontmatter if present
+  const lines = skillContent.split("\n")
+  let nameLine = lines[0]
+  if (nameLine.trim() === "---") {
+    // Look for first non-empty line after the frontmatter
+    let inFrontmatter = true
+    for (let i = 1; i < lines.length; i++) {
+       if (lines[i].trim() === "---") { inFrontmatter = false; continue; }
+       if (!inFrontmatter && lines[i].trim() !== "") {
+          nameLine = lines[i]
+          break
+       }
+    }
+  }
+  const name = nameLine.replace("#", "").trim() || path.split("/").pop() || repo
   const slug = path.split("/").pop() || repo.toLowerCase()
 
   const data = {
