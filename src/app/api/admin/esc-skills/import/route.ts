@@ -104,11 +104,14 @@ async function fetchGitHubDirectory(owner: string, repo: string, branch: string,
 }
 
 async function handleGitHubImport(url: string, logs: string[]) {
+  // Clean URL (remove trailing junk like ) or \ from scraped HTML)
+  const cleanUrl = url.replace(/[\\\)\]"'].*$/, "").split("?")[0].replace(/\/$/, "")
+  
   // Format 1: https://github.com/user/repo/tree/branch/path (Directory)
   // Format 2: https://github.com/user/repo/blob/branch/path (File)
-  const treeMatch = url.match(/github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/(.+)/)
-  const blobMatch = url.match(/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+)/)
-  const rootMatch = url.match(/github\.com\/([^/]+)\/([^/]+)$/) // No path, assume main/root
+  const treeMatch = cleanUrl.match(/github\.com\/([^/]+)\/([^/]+)\/tree\/([^/]+)\/(.+)/)
+  const blobMatch = cleanUrl.match(/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+)/)
+  const rootMatch = cleanUrl.match(/github\.com\/([^/]+)\/([^/]+)$/) // No path, assume main/root
   
   let owner, repo, branch, path: string
   
@@ -121,14 +124,14 @@ async function handleGitHubImport(url: string, logs: string[]) {
     branch = "main"
     path = ""
   } else {
-    throw new Error("URL GitHub invalide. Utilisez un lien vers un dossier (tree) ou un fichier (blob).")
+    throw new Error(`URL GitHub invalide: ${cleanUrl}. Utilisez un lien vers un dossier (tree) ou un fichier (blob).`)
   }
 
   logs.push(`Starting recursive scan for ${owner}/${repo} at ${path} (${branch})`)
   const files = await fetchGitHubDirectory(owner, repo, branch, path)
   
   if (Object.keys(files).length === 0) {
-    throw new Error("Aucun fichier texte pertinent trouvé dans ce dépôt/dossier.")
+    throw new Error(`Aucun fichier texte pertinent trouvé. Vérifiez que le chemin '${path}' est correct sur la branche '${branch}'.`)
   }
 
   const skillContent = files["SKILL.md"] || files["COMPÉTENCE.md"] || Object.values(files)[0]
@@ -136,7 +139,7 @@ async function handleGitHubImport(url: string, logs: string[]) {
   const slug = path.split("/").pop() || repo.toLowerCase()
 
   const data = {
-    name, slug, promptContent: skillContent, files, source: "github", providerUrl: url,
+    name, slug, promptContent: skillContent, files, source: "github", providerUrl: cleanUrl,
     isActive: true, category: "Importé", version: "1.0.0", icon: "Box", color: "blue"
   }
 
@@ -146,7 +149,7 @@ async function handleGitHubImport(url: string, logs: string[]) {
     update: { ...data, updatedAt: new Date() }
   })
 
-  return NextResponse.json({ success: true, results: { added: 1, updated: 0 }, logs })
+  return NextResponse.json({ success: true, results: { added: 1, updated: 1 }, logs })
 }
 
 async function handleSmitheryImport(url: string, logs: string[]) {
@@ -154,14 +157,30 @@ async function handleSmitheryImport(url: string, logs: string[]) {
   const res = await fetch(url)
   const html = await res.text()
   
-  const repoMatch = html.match(/https:\/\/github\.com\/[^"']+/g)
+  // Look for github.com links (handle escaped slashes too)
+  const repoMatch = html.match(/https:\\?\/\\?\/github\.com\\?\/[^"']+/g)
   if (!repoMatch) {
     throw new Error("Impossible de trouver le dépôt GitHub associé sur la page Smithery.")
   }
 
-  const repoUrl = repoMatch.reduce((a, b) => a.length > b.length ? a : b)
-  logs.push(`Redirecting to GitHub import: ${repoUrl}`)
-  return handleGitHubImport(repoUrl, logs)
+  // Clean the matches (remove \ slashes)
+  const cleanedMatches = repoMatch.map(m => m.replace(/\\/g, ""))
+  
+  // Priority order: /tree/ > /blob/ > root
+  const treeLinks = cleanedMatches.filter(m => m.includes("/tree/"))
+  const blobLinks = cleanedMatches.filter(m => m.includes("/blob/"))
+  
+  let bestUrl = ""
+  if (treeLinks.length > 0) {
+    bestUrl = treeLinks.reduce((a, b) => a.length > b.length ? a : b)
+  } else if (blobLinks.length > 0) {
+    bestUrl = blobLinks.reduce((a, b) => a.length > b.length ? a : b)
+  } else {
+    bestUrl = cleanedMatches.reduce((a, b) => a.length > b.length ? a : b)
+  }
+
+  logs.push(`Selected GitHub URL from Smithery: ${bestUrl}`)
+  return handleGitHubImport(bestUrl, logs)
 }
 
 async function handleGitHubBulkSync(logs: string[]) {
