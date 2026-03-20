@@ -111,10 +111,14 @@ export default function EscCollectionPage() {
         fetch("/api/admin/orchestrator/agents")
       ])
       
-      if (skillsRes.ok) setSkills(await skillsRes.json())
+      if (skillsRes.ok) {
+        const data = await skillsRes.json()
+        if (Array.isArray(data)) setSkills(data)
+      }
       if (agentsRes.ok) {
         const agentsData = await agentsRes.json()
-        setAgents(agentsData.agents || agentsData)
+        const agentList = agentsData.agents || agentsData
+        if (Array.isArray(agentList)) setAgents(agentList)
       }
     } catch (error) {
       console.error("Failed to fetch data:", error)
@@ -131,7 +135,10 @@ export default function EscCollectionPage() {
   const fetchProviders = async () => {
     try {
       const res = await fetch("/api/admin/esc-skills/providers")
-      if (res.ok) setProviders(await res.json())
+      if (res.ok) {
+        const data = await res.json()
+        if (Array.isArray(data)) setProviders(data)
+      }
     } catch (err) { console.error(err) }
   }
 
@@ -146,7 +153,7 @@ export default function EscCollectionPage() {
         const data = await res.json()
         toast({
           title: "Mise à jour terminée",
-          description: `${data.results.added} nouvelles, ${data.results.updated} mises à jour.`,
+          description: data?.results ? `${data.results.added} nouvelles, ${data.results.updated} mises à jour.` : "Synchronisation effectuée.",
         })
         fetchData()
       }
@@ -287,7 +294,7 @@ export default function EscCollectionPage() {
         body: JSON.stringify({ isActive: !currentStatus }),
       })
       if (res.ok) {
-        setSkills(skills.map(s => s.id === id ? { ...s, isActive: !currentStatus } : s))
+        setSkills(prev => Array.isArray(prev) ? prev.map(s => s.id === id ? { ...s, isActive: !currentStatus } : s) : [])
         toast({
           title: !currentStatus ? "Skill activée" : "Skill désactivée",
         })
@@ -364,8 +371,8 @@ export default function EscCollectionPage() {
     else setSelectedIds(paginatedSkills.map(s => s.id))
   }
 
-  const categories = Array.from(new Set(skills.map(s => s.category))).sort()
-  const sources = Array.from(new Set(skills.map(s => s.source))).sort()
+  const categories = Array.isArray(skills) ? Array.from(new Set(skills.map(s => s.category).filter(Boolean))).sort() : []
+  const sources = Array.isArray(skills) ? Array.from(new Set(skills.map(s => s.source).filter(Boolean))).sort() : []
 
   return (
     <div className="p-6">
@@ -834,7 +841,7 @@ export default function EscCollectionPage() {
               {/* List */}
               <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
                 <div className="text-[10px] uppercase font-bold text-neutral-500 mb-2">Fournisseurs Actifs</div>
-                {providers.length === 0 ? (
+                {(!Array.isArray(providers) || providers.length === 0) ? (
                   <p className="text-[10px] text-neutral-600 italic">Aucun fournisseur personnalisé. Le système utilise les skills officiels par défaut.</p>
                 ) : (
                   providers.map(p => (
