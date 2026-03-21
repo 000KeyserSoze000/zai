@@ -651,9 +651,9 @@
             "name": "Business Tools",
             "description": "Professional document generation",
             "features": {
-                "thumbnails": "AI Thumbnails",
-                "seo": "Optimized SEO",
-                "social": "Social Posts"
+                "contracts": "Contracts",
+                "proposals": "Proposals",
+                "reports": "Reports"
             },
             "title": "Document Generator",
             "subtitle": "Business plan, budget, contract, report — describe your need",
@@ -1001,5 +1001,31 @@
         "noSubscription": "No active subscription",
         "startTrial": "Start free trial",
         "contactSales": "Contact sales"
+    },
+    "tools": {
+        "title": "AI Tools",
+        "subtitle": "Discover our tools for content creators",
+        "description": "Boost your productivity and creativity with our specialized AI tools.",
+        "categories": {
+            "video": "Video",
+            "audio": "Audio",
+            "image": "Image",
+            "text": "Text",
+            "education": "Education"
+        },
+        "allTools": "All Tools",
+        "videoTools": {
+            "script-gen": { "name": "Script Gen AI", "desc": "Generate compelling video scripts in seconds." },
+            "video-editor": { "name": "Video Editor AI", "desc": "Edit your videos with the help of AI for a professional result." },
+            "thumbnail-gen": { "name": "Thumbnail Gen AI", "desc": "Create impactfull and optimized YouTube thumbnails." },
+            "seo-optimizer": { "name": "SEO Optimizer AI", "desc": "Optimize your videos' SEO to maximize their visibility." }
+        },
+        "educationTools": {
+            "course-outliner": { "name": "Course Outliner", "desc": "Structure your courses in a snap." },
+            "quiz-gen": { "name": "Quiz Gen AI", "desc": "Generate interactive quizzes for your students." },
+            "edu-script": { "name": "Edu Script", "desc": "Scripts for training videos and tutorials." },
+            "tutor-bot": { "name": "Tutor Bot", "desc": "24/7 pedagogical assistant for your learners." },
+            "research-helper": { "name": "Research AI", "desc": "Summarize long documents in seconds." }
+        }
     }
 }

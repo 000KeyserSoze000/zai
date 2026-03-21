@@ -651,9 +651,9 @@
             "name": "Business Tools",
             "description": "Generación de documentos profesionales",
             "features": {
-                "thumbnails": "Miniaturas IA",
-                "seo": "SEO Optimizado",
-                "social": "Posts Sociales"
+                "contracts": "Contratos",
+                "proposals": "Propuestas",
+                "reports": "Informes"
             },
             "title": "Generador de Documentos",
             "subtitle": "Business plan, presupuesto, contrato, informe — describa su necesidad",
@@ -1001,5 +1001,31 @@
         "noSubscription": "Sin suscripción activa",
         "startTrial": "Comenzar prueba gratuita",
         "contactSales": "Contactar soporte"
+    },
+    "tools": {
+        "title": "Herramientas IA",
+        "subtitle": "Descubre nuestras herramientas para creadores de contenido",
+        "description": "Impulsa tu productividad y creatividad con nuestras herramientas de IA especializadas.",
+        "categories": {
+            "video": "Vídeo",
+            "audio": "Audio",
+            "image": "Imagen",
+            "text": "Texto",
+            "education": "Educación"
+        },
+        "allTools": "Todas las herramientas",
+        "videoTools": {
+            "script-gen": { "name": "Script Gen AI", "desc": "Genera guiones de vídeo fascinantes en segundos." },
+            "video-editor": { "name": "Video Editor AI", "desc": "Edita tus vídeos con la ayuda de la IA para un resultado profesional." },
+            "thumbnail-gen": { "name": "Thumbnail Gen AI", "desc": "Crea miniaturas de YouTube impactantes y optimizadas." },
+            "seo-optimizer": { "name": "SEO Optimizer AI", "desc": "Optimiza el SEO de tus vídeos para maximizar su visibilidad." }
+        },
+        "educationTools": {
+            "course-outliner": { "name": "Course Outliner", "desc": "Estructura tus formaciones en un abrir y cerrar de ojos." },
+            "quiz-gen": { "name": "Quiz Gen AI", "desc": "Genera cuestionarios interactivos para tus alumnos." },
+            "edu-script": { "name": "Edu Script", "desc": "Guiones para vídeos de formación y tutoriales." },
+            "tutor-bot": { "name": "Tutor Bot", "desc": "Asistente pedagógico 24/7 para tus alumnos." },
+            "research-helper": { "name": "Research AI", "desc": "Sintetiza documentos largos en segundos." }
+        }
     }
 }
